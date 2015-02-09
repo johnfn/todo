@@ -1,0 +1,25 @@
+﻿body {
+    font-family: 'Segoe UI', sans-serif;
+}
+
+span {
+    font-style: italic;
+}
+
+.children {
+    margin-left: 30px;
+}
+
+.todo {
+    border: 1px solid #f3f3f3;
+}
+
+.todo-content {
+    color: gray;
+}
+
+a {
+    text-decoration: none;
+    color: blue;
+    cursor: pointer;
+}

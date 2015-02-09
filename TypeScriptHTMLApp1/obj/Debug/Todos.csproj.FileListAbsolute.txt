@@ -1,0 +1,6 @@
+\\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\Todos.dll.config
+\\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\Todos.dll
+\\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\bin\Todos.pdb
+\\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Debug\Todos.csprojResolveAssemblyReference.cache
+\\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Debug\Todos.dll
+\\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Debug\Todos.pdb
