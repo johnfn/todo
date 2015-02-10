@@ -1,12 +1,14 @@
 // TODO (lol)
 // X indent inner items
 // * edit todos
+// * TONS of keyboard shortcuts. just tons.
 // * header items (just for organization)
 //   * I think todos will need a 'type' key
 // * mouseover one, highlight all
 // * zoomin
 // * breadcrumb trail visible
-// * pay the power bill
+// X pay the power bill
+// * listen to debussy
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -119,13 +121,13 @@ var TodoModel = (function (_super) {
     });
     return TodoModel;
 })(Backbone.Model);
-var TodoUIState = (function (_super) {
-    __extends(TodoUIState, _super);
-    function TodoUIState(attrs) {
+var TodoUiState = (function (_super) {
+    __extends(TodoUiState, _super);
+    function TodoUiState(attrs) {
         _super.call(this, attrs);
         this.editVisible = false;
     }
-    Object.defineProperty(TodoUIState.prototype, "editVisible", {
+    Object.defineProperty(TodoUiState.prototype, "editVisible", {
         get: function () {
             return this.get('editVisible');
         },
@@ -135,18 +137,40 @@ var TodoUIState = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    return TodoUIState;
+    return TodoUiState;
 })(Backbone.Model);
 var TodoEditView = (function (_super) {
     __extends(TodoEditView, _super);
     function TodoEditView() {
         _super.apply(this, arguments);
     }
+    TodoEditView.prototype.events = function () {
+        return {
+            'click .edit-add-js': 'addTodo',
+            'click .edit-cancel-js': 'cancelTodo'
+        };
+    };
+    TodoEditView.prototype.getNameText = function () {
+        return this.$(".name").first().val();
+    };
+    TodoEditView.prototype.getDescText = function () {
+        return this.$(".desc").first().val();
+    };
+    TodoEditView.prototype.addTodo = function (e) {
+        this.model.name = this.getNameText();
+        this.trigger('add-child', this.model);
+        return false;
+    };
+    TodoEditView.prototype.cancelTodo = function (e) {
+        this.trigger('cancel');
+        return false;
+    };
     TodoEditView.prototype.initialize = function (options) {
         this.template = Util.getTemplate("todo-edit");
     };
     TodoEditView.prototype.render = function () {
         this.$el.html(this.template());
+        this.delegateEvents();
         return this;
     };
     return TodoEditView;
@@ -158,28 +182,30 @@ var TodoView = (function (_super) {
     }
     TodoView.prototype.events = function () {
         return {
-            'click .todo-add-js': 'clickAddTodo'
+            'click .todo-add-js': 'toggleTodo'
         };
     };
     TodoView.prototype.initialize = function (options) {
+        _.bindAll(this, 'initEditView', 'addChildTodo', 'toggleTodo', 'render');
         this.template = Util.getTemplate("todo");
         this.childrenViews = [];
-        this.uiState = new TodoUIState();
-        this.initChildren();
+        this.uiState = new TodoUiState();
+        _.forEach(this.model.children, this.addChildTodo);
         this.initEditView();
-    };
-    TodoView.prototype.initChildren = function () {
-        for (var i = 0; i < this.model.children.length; i++) {
-            var childModel = this.model.children[i];
-            var childView = new TodoView({ model: childModel });
-            this.childrenViews.push(childView);
-        }
     };
     TodoView.prototype.initEditView = function () {
         var editModel = new TodoModel();
         this.editView = new TodoEditView({ model: editModel });
+        this.listenTo(this.editView, 'cancel', this.toggleTodo);
+        this.listenTo(this.editView, 'add-child', this.addChildTodo);
     };
-    TodoView.prototype.clickAddTodo = function () {
+    TodoView.prototype.addChildTodo = function (childModel) {
+        this.childrenViews.push(new TodoView({
+            model: childModel
+        }));
+        this.render();
+    };
+    TodoView.prototype.toggleTodo = function () {
         this.uiState.editVisible = !this.uiState.editVisible;
         this.render();
         return false;
@@ -189,16 +215,16 @@ var TodoView = (function (_super) {
         var $childrenContainer;
         var $addTodo;
         this.$el.html(this.template(this.model.toJSON()));
-        this.delegateEvents(); // I don't even know.
-        // use .children to ensure only TOPMOST children so that we dont 
+        this.delegateEvents(); // We might lose our own events. D:
+        // use .children to ensure only TOPMOST children so that we dont
         // append the current child to the children list of the other todos.
         $childrenContainer = this.$('.children');
         $addTodo = this.$('.todo-add');
         // render children
-        this.editView.render().$el.appendTo($addTodo);
         _.each(this.childrenViews, function (child) {
             child.render().$el.appendTo($childrenContainer);
         });
+        this.editView.render().$el.appendTo($addTodo);
         // update state per uiState
         $addTodo.toggle(this.uiState.editVisible);
         return this;
