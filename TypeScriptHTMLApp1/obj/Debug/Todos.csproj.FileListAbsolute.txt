@@ -4,3 +4,9 @@
 \\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Debug\Todos.csprojResolveAssemblyReference.cache
 \\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Debug\Todos.dll
 \\psf\home\code\todos\TypeScriptHTMLApp1\TypeScriptHTMLApp1\obj\Debug\Todos.pdb
+C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\obj\Debug\Todos.csprojResolveAssemblyReference.cache
+C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\obj\Debug\Todos.dll
+C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\obj\Debug\Todos.pdb
+C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Todos.dll.config
+C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Todos.dll
+C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Todos.pdb
