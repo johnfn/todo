@@ -22,7 +22,7 @@
             <input class="name name-js" type="text" placeholder="title" />
         </div>
 
-        <textarea class="desc desc-js" rows="2" cols="10"></textarea>
+        <textarea class="invisible desc desc-js" rows="2" cols="10"></textarea>
 
         <div>
             <a class="edit-add-js" href="#">Add.</a>
@@ -31,9 +31,9 @@
     </script>
 
     <script type="text/template" id="todo">
-        <div class="todo">
+        <div class="todo <% if (selected) print ('selected') %>">
             <div class="todo-name">
-                <span class="edit-name-js"><%= name %></span>
+                <span class="edit-name-js <% if (done) print('todo-done') %>"><%= name %></span>
                 <a href="#" class="todo-add-js"> + </a>
                 <a href="#" class="todo-done-js"> ✓ </a>
             </div>

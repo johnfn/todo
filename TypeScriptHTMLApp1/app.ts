@@ -10,6 +10,16 @@
 // * Mark todos as done.
 // * option to add content if there isn't any.
 // * TONS of keyboard shortcuts. just tons.
+//   X Up/down
+//   X left to go up a level
+//   X Enter to start editing
+//   X Shift+Enter to add a child.
+//     X Autofocus on new child.
+//     * If I click to open a new child on a nonselected thing, then i hit enter...
+//     * child on bottommost thing is not selected.
+//     * Enter to finish adding a new child.
+//   * Maybe Down while editing name to edit description.
+// * Clicking should also change selection.
 // * header items (just for organization)
 //   * I think todos will need a 'type' key
 // * mouseover one, highlight all
@@ -27,7 +37,7 @@ interface ITodo {
     children: ITodo[];
 }
 
-var dummyData: ITodo = {
+var dummyData: ITodo = <any> {
     name: "topmost todo",
     content: "",
     children:
@@ -55,6 +65,13 @@ var dummyData: ITodo = {
                     content: "blaaah",
                     children: []
                 }]
+        }, {
+            name: "To test falling",
+            children: [{
+                name: "test",
+                content: "bleh",
+                children: []
+            }]
         }]
 };
 
@@ -67,19 +84,29 @@ class Util {
 }
 
 class TodoModel extends Backbone.Model {
-    /** The TodoView one view up (or null if there isn't one. */
-    parentTodo: TodoView;
+    /** The TodoModel one view up (or null if there isn't one. */
+    parent: TodoModel;
+    view: TodoView;
+
+    /** Unique identifier for this model */
+    uid: string;
+
     private _children: TodoModel[] = [];
 
     initialize() {
         this.name = "";
         this.content = "";
+        this.done = false;
+        this.selected = false;
+        this.childIndex = -1;
+        this.uid = Math.random() + " " + Math.random();
     }
 
     /** recursively create this todo and all sub-todos from the provided data. */
-    initWithData(data: ITodo): TodoModel {
+    initWithData(data: ITodo, parent: TodoModel): TodoModel {
         this.name = data.name;
         this.content = data.content;
+        this.parent = parent;
 
         if (data.depth) {
             this.depth = data.depth;
@@ -93,7 +120,7 @@ class TodoModel extends Backbone.Model {
 
             var childModel: TodoModel = new TodoModel();
 
-            childModel.initWithData(child);
+            childModel.initWithData(child, this);
             this._children.push(childModel);
         }
 
@@ -102,11 +129,26 @@ class TodoModel extends Backbone.Model {
 
     /** Recursively get the ITodo data of this Todo. */
     getData(): ITodo {
-        return {
-            content: this.content,
-            name: this.name,
-            children: _.map(this.children, (model: TodoModel) => model.getData())
-        };
+        var result = this.toJSON();
+        result['children'] = _.map(this.children, (model: TodoModel) => model.getData());
+
+        return result;
+    }
+
+    /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
+    get childIndex(): number {
+        if (this.parent == null) return -1;
+
+        for (var i = 0; i < this.parent.numChildren; i++) {
+            if (this.parent.children[i].uid == this.uid) {
+                return i;
+            }
+        }
+
+        console.error("childIndex is in weird state");
+        debugger;
+
+        return -1;
     }
 
     get depth(): number { return this.get('depth'); }
@@ -121,7 +163,36 @@ class TodoModel extends Backbone.Model {
     get done(): boolean { return this.get('done'); }
     set done(value: boolean) { this.set('done', value); }
 
+    get selected(): boolean { return this.get('selected'); }
+    set selected(value: boolean) { this.set('selected', value); }
+
     get children(): TodoModel[] { return this._children; }
+
+    get numChildren(): number { return this._children.length; }
+
+    /** Returns the next child in this list of children, or null if this is the last. */
+    get nextChild(): TodoModel {
+        console.log('nextchild');
+
+        if (this.childIndex + 1 >= this.parent.numChildren) {
+            return null;
+        } else {
+            if (this.parent == null) {
+                return null;
+            } else {
+                return this.parent.children[this.childIndex + 1];
+            }
+        }
+    }
+
+    /** Returns the previous child in this list of children, or null if this is the first. */
+    get previousChild(): TodoModel {
+        if (this.childIndex - 1 < 0) {
+            return null;
+        } else {
+            return this.parent.children[this.childIndex - 1];
+        }
+    }
 }
 
 class TodoUiState extends Backbone.Model {
@@ -194,12 +265,19 @@ class TodoView extends Backbone.View<TodoModel> {
     template: Template;
     childrenViews: TodoView[];
     uiState: TodoUiState;
+
+    /** The view for making a new todo. */
     editView: TodoEditView;
+
+    /** The view associated with the entire app. */
     mainView: MainView;
+
+    /** List of ALL todoViews. Just used for keypress handling... */
+    static todoViews: TodoView[];
 
     events() {
         return {
-            'click .todo-add-js': this.toggleTodo,
+            'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
@@ -209,12 +287,16 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     initialize(options: Backbone.ViewOptions<TodoModel>) {
-        _.bindAll(this, 'initEditView', 'addChildTodo', 'toggleTodo', 'render');
+        _.bindAll(this, 'initEditView', 'addChildTodo', 'toggleAddChildTodo', 'render', 'events', 'keydown');
+
+        if (!TodoView.todoViews) TodoView.todoViews = [];
+        TodoView.todoViews.push(this);
 
         this.mainView = options['mainView'];
         this.template = Util.getTemplate("todo");
         this.childrenViews = [];
         this.uiState = new TodoUiState();
+        this.model.view = this;
 
         this.initEditView();
 
@@ -223,8 +305,110 @@ class TodoView extends Backbone.View<TodoModel> {
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
     }
 
+    keydown(e: JQueryKeyEventObject): boolean {
+        if (!this.model.selected) return;
+
+        // Navigation
+        if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
+            return this.navigateBetweenTodos(e.which);
+        }
+
+        // Shift + Enter to add child
+        if (e.which == 13 && e.shiftKey) {
+            this.toggleAddChildTodo();
+
+            return false;
+        }
+
+        // Enter to edit name
+        if (!this.uiState.editingName && !this.uiState.editVisible &&
+            e.which == 13 && !e.shiftKey) {
+            this.uiState.editingName = true;
+            this.render();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /** Given a keypress, move appropriately between todos.
+        Return true to stop key event propagation. */
+    private navigateBetweenTodos(which: number): boolean {
+        var newSelection: TodoModel;
+
+        if (which == 40 || which == 39) { // down
+            if (this.model.numChildren != 0) {
+                newSelection = this.model.children[0];
+            } else {
+                newSelection = this.model.nextChild;
+
+                if (newSelection == null) {
+                    // We could potentially be falling off a big cliff of todos. e.g
+                    // we could be here:
+                    //
+                    // [ ] Todo blah blah
+                    //  *  [ ] Some inner todo
+                    //  *  [ ] bleh
+                    //      *  [ ] super inner todo
+                    //      *  [ ] oh no
+                    //          *  [ ] so inner! <------- HERE
+                    // [ ] Other stuff
+                    //
+                    // So we need to repeatedly ascend to the parent to see if
+                    // it has a nextChild -- all the way until there are no more
+                    // parents to check.
+
+                    var currentParent = this.model.parent;
+
+                    while (currentParent != null) {
+                        if (currentParent.nextChild != null) {
+                            newSelection = currentParent.nextChild;
+
+                            break;
+                        }
+
+                        currentParent = currentParent.parent;
+                    }
+                }
+            }
+        }
+
+        if (which == 38) { // up
+            newSelection = this.model.previousChild;
+
+            if (newSelection == null) {
+                newSelection = this.model.parent;
+            } else {
+                // Now we have to deal with the case where we're ASCENDING the cliff
+                // I just mentioned.
+                while (newSelection.numChildren != 0) {
+                    newSelection = newSelection.children[newSelection.numChildren - 1];
+                }
+            }
+        }
+
+        if (which == 37) { // left
+            newSelection = this.model.parent;
+        }
+
+        // If they did not try to navigate invalidly, then do our updates.
+        if (newSelection != null) {
+            this.model.selected = false;
+            newSelection.selected = true;
+
+            this.render();
+            newSelection.view.render();
+
+            return false;
+        }
+
+        return true;
+    }
+
     private completeTodo() {
-        console.log("done");
+        this.model.done = !this.model.done;
+        this.render();
 
         return false;
     }
@@ -241,7 +425,6 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private showTodoNameEdit(e: JQueryMouseEventObject) {
         this.uiState.editingName = true;
-
         this.render();
 
         return false;
@@ -249,18 +432,23 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private showTodoContentEdit(e: JQueryMouseEventObject) {
         this.uiState.editingContent = true;
-
         this.render();
 
         return false;
     }
 
+    // TODO: Eventually merge these into keydown, just check uiState to see which
+    // one is being edited.
+    // The problem I see right now is that there is a pathological case where
+    // you click on both and then uiState is true for both. I think that just
+    // allowing one to be edited would be sufficient.
     private editTodoName(e: JQueryKeyEventObject) {
         if (e.which === 13) {
             this.model.name = $(e.currentTarget).val();
             this.uiState.editingName = false;
 
             this.render();
+            return false;
         }
     }
 
@@ -270,6 +458,7 @@ class TodoView extends Backbone.View<TodoModel> {
             this.uiState.editingContent = false;
 
             this.render();
+            return false;
         }
     }
 
@@ -277,28 +466,37 @@ class TodoView extends Backbone.View<TodoModel> {
         var editModel = new TodoModel();
         var self = this;
 
+        editModel.parent = this.model;
+
         this.editView = new TodoEditView({ model: editModel });
 
-        this.listenTo(this.editView, 'cancel', this.toggleTodo);
+        this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', (model: TodoModel) => {
             self.addChildTodo(model);
-            self.toggleTodo();
+            self.toggleAddChildTodo();
         });
     }
 
     addChildTodo(childModel: TodoModel) {
         this.childrenViews.push(new TodoView({
-            model: childModel
+            model: childModel,
         }));
+
+        // The problem is that half the time we already have children inserted,
+        // but the other half we should be adding new children to the array.
+        // Should think about this more later.
+
+        if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) == -1) {
+            this.model.children.push(childModel);
+        }
 
         this.render();
     }
 
-    toggleTodo() {
+    toggleAddChildTodo() {
         this.uiState.editVisible = !this.uiState.editVisible;
 
         this.render();
-
         return false;
     }
 
@@ -307,7 +505,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.$el.html(this.template(this.model.toJSON()));
 
-        // use .children cto ensure only TOPMOST children so that we dont
+        // use .children to ensure only TOPMOST children so that we dont
         // append the current child to the children list of the other todos.
         var $childrenContainer = this.$('.children');
         var $addTodo = this.$('.todo-add');
@@ -352,28 +550,38 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.editView.render().$el.appendTo($addTodo);
 
+        if (this.uiState.editVisible) {
+            this.$(".name").focus();
+        }
+
         return this;
     }
 }
 
 // Global todo state. Could keep track of breadcrumbs etc.
-class MainModel extends Backbone.Model {
+class TodoAppModel extends Backbone.Model {
+    get selectedTodo(): TodoModel { return this.get('selectedTodo'); }
+    set selectedTodo(value: TodoModel) { this.set('selectedTodo', value); }
 }
 
-class MainView extends Backbone.View<MainModel> {
+class MainView extends Backbone.View<TodoAppModel> {
     template: Template;
     baseTodoModel: TodoModel;
     baseTodoView: TodoView;
 
     events() {
         return {
-            'click': "clickBody",
-            'click .save-btn-js': 'save'
+            'click': this.clickBody,
+            'click .save-btn-js': this.save
         };
     }
 
-    initialize(options: Backbone.ViewOptions<MainModel>) {
-        this.baseTodoModel = new TodoModel().initWithData(options['data']);
+    initialize(options: Backbone.ViewOptions<TodoAppModel>) {
+        this.model = new TodoAppModel();
+
+        this.baseTodoModel = new TodoModel().initWithData(options['data'], null);
+        this.baseTodoModel.selected = true;
+
         this.baseTodoView = new TodoView({
             model: this.baseTodoModel,
             mainView: this
@@ -382,7 +590,13 @@ class MainView extends Backbone.View<MainModel> {
         this.template = Util.getTemplate("main");
     }
 
-    render(): Backbone.View<MainModel> {
+    keydown(e: JQueryKeyEventObject): boolean {
+        console.log(e.which);
+
+        return true;
+    }
+
+    render(): Backbone.View<TodoAppModel> {
         this.$el.html(this.template);
         this.baseTodoView.render().$el.appendTo(this.$(".items"));
 
@@ -406,4 +620,11 @@ window.onload = () => {
     });
 
     mainView.render();
+
+    $("body").on("keydown", (e: JQueryKeyEventObject) => {
+        for (var i = 0; i < TodoView.todoViews.length; i++) {
+            if (TodoView.todoViews[i].keydown(e) == false)
+                break; // stop propagation
+        }
+    });
 };

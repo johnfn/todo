@@ -19,3 +19,15 @@ a {
     color: blue;
     cursor: pointer;
 }
+
+.todo-done {
+    text-decoration: line-through;
+}
+
+.selected {
+    border-left: 2px solid black;
+}
+
+.invisible {
+    display: none;
+}
