@@ -279,7 +279,7 @@ var NewTodoView = (function (_super) {
     NewTodoView.prototype.addTodo = function (e) {
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
-        this.trigger('add-child', this.model);
+        this.trigger('add-todo', this.model);
         return false;
     };
     NewTodoView.prototype.cancelTodo = function (e) {
@@ -346,6 +346,11 @@ var TodoView = (function (_super) {
         if (e.which === 13 && this.uiState.editingContent) {
             this.model.content = this.$('.content-edit-js').val();
             this.uiState.editingContent = false;
+            this.render();
+            return false;
+        }
+        if (e.which === 13 && this.uiState.addTodoVisible) {
+            this.editView.addTodo(null);
             this.render();
             return false;
         }
@@ -446,7 +451,7 @@ var TodoView = (function (_super) {
         editModel.parent = this.model;
         this.editView = new NewTodoView({ model: editModel });
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
-        this.listenTo(this.editView, 'add-child', function (model) {
+        this.listenTo(this.editView, 'add-todo', function (model) {
             self.addChildTodo(model);
             self.toggleAddChildTodo();
         });

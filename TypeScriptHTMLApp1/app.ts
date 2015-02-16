@@ -1,8 +1,7 @@
 ﻿// TODO (lol)
 
-// * Bugs with setting the name of multiple new TODOs.
-// * It's actually not intutive to add things at the top. Just show edit on bottom.
-
+// X Bugs with setting the name of multiple new TODOs.
+// X It's actually not intutive to add things at the top. Just show edit on bottom.
 // X indent inner items
 // X add todos
 // X edit todos
@@ -275,7 +274,7 @@ class NewTodoView extends Backbone.View<TodoModel> {
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
 
-        this.trigger('add-child', this.model);
+        this.trigger('add-todo', this.model);
 
         return false;
     }
@@ -367,6 +366,13 @@ class TodoView extends Backbone.View<TodoModel> {
         if (e.which === 13 && this.uiState.editingContent) {
             this.model.content = this.$('.content-edit-js').val();
             this.uiState.editingContent = false;
+
+            this.render();
+            return false;
+        }
+
+        if (e.which === 13 && this.uiState.addTodoVisible) {
+            this.editView.addTodo(null);
 
             this.render();
             return false;
@@ -495,7 +501,7 @@ class TodoView extends Backbone.View<TodoModel> {
         this.editView = new NewTodoView({ model: editModel });
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
-        this.listenTo(this.editView, 'add-child', (model: TodoModel) => {
+        this.listenTo(this.editView, 'add-todo', (model: TodoModel) => {
             self.addChildTodo(model);
             self.toggleAddChildTodo();
         });
