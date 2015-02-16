@@ -36,37 +36,37 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var dummyData = {
-    name: "topmost todo",
-    content: "",
+    name: 'topmost todo',
+    content: '',
     children: [{
-        name: "This is a todo",
-        content: "descriptive content",
+        name: 'This is a todo',
+        content: 'descriptive content',
         children: []
     }, {
-        name: "Another todo! No content.",
-        content: "",
+        name: 'Another todo! No content.',
+        content: '',
         children: [{
-            name: "Nested TODO.",
-            content: "bleh",
+            name: 'Nested TODO.',
+            content: 'bleh',
             children: []
         }, {
-            name: "Another nested TODO.",
-            content: "blaaah",
+            name: 'Another nested TODO.',
+            content: 'blaaah',
             children: []
         }, {
-            name: "Nr 3.",
-            content: "blaaah",
+            name: 'Nr 3.',
+            content: 'blaaah',
             children: []
         }, {
-            name: "Nr 4.",
-            content: "blaaah",
+            name: 'Nr 4.',
+            content: 'blaaah',
             children: []
         }]
     }, {
-        name: "To test falling",
+        name: 'To test falling',
         children: [{
-            name: "test",
-            content: "bleh",
+            name: 'test',
+            content: 'bleh',
             children: []
         }]
     }]
@@ -75,7 +75,7 @@ var Util = (function () {
     function Util() {
     }
     Util.getTemplate = function (name) {
-        var el = $("#" + name);
+        var el = $('#' + name);
         return _.template(el.html());
     };
     return Util;
@@ -87,12 +87,12 @@ var TodoModel = (function (_super) {
         this._children = [];
     }
     TodoModel.prototype.initialize = function () {
-        this.name = "";
-        this.content = "";
+        this.name = '';
+        this.content = '';
         this.done = false;
         this.selected = false;
         this.childIndex = -1;
-        this.uid = Math.random() + " " + Math.random();
+        this.uid = Math.random() + ' ' + Math.random();
     };
     /** recursively create this todo and all sub-todos from the provided data. */
     TodoModel.prototype.initWithData = function (data, parent) {
@@ -130,7 +130,7 @@ var TodoModel = (function (_super) {
                     return i;
                 }
             }
-            console.error("childIndex is in weird state");
+            console.error('childIndex is in weird state');
             debugger;
             return -1;
         },
@@ -294,16 +294,16 @@ var NewTodoView = (function (_super) {
         };
     };
     NewTodoView.prototype.initialize = function (options) {
-        this.template = Util.getTemplate("todo-edit");
+        this.template = Util.getTemplate('todo-edit');
     };
     NewTodoView.prototype.stopProp = function () {
         return false;
     };
     NewTodoView.prototype.getNameText = function () {
-        return this.$(".name").first().val();
+        return this.$('.name').first().val();
     };
     NewTodoView.prototype.getDescText = function () {
-        return this.$(".desc").first().val();
+        return this.$('.desc').first().val();
     };
     NewTodoView.prototype.addTodo = function (e) {
         this.model.name = this.getNameText();
@@ -342,7 +342,7 @@ var TodoView = (function (_super) {
             TodoView.todoViews = [];
         TodoView.todoViews.push(this);
         this.mainView = options['mainView'];
-        this.template = Util.getTemplate("todo");
+        this.template = Util.getTemplate('todo');
         this.childrenViews = [];
         this.uiState = new TodoUiState();
         this.model.view = this;
@@ -498,7 +498,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.render = function () {
         var self = this;
         this.$el.html(this.template(this.model.toJSON()));
-        var $childrenContainer = this.$('.children');
+        var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
         var $editName = this.$('.edit-name-js');
         var $editContent = this.$('.edit-content-js');
@@ -513,7 +513,7 @@ var TodoView = (function (_super) {
         });
         this.editView.render().$el.appendTo($addTodo);
         if (this.uiState.editVisible) {
-            this.$(".name").focus();
+            this.$('.name').focus();
         }
         return this;
     };
@@ -528,7 +528,7 @@ var TodoView = (function (_super) {
     /** Show the content text xor the content input. */
     TodoView.prototype.renderTodoContent = function () {
         this.$('.edit-content-js').toggle(!this.uiState.editingContent);
-        var $contentInput = this.$(".content-edit-js").toggle(this.uiState.editingContent).val(this.model.content);
+        var $contentInput = this.$('.content-edit-js').toggle(this.uiState.editingContent).val(this.model.content);
         if (this.uiState.editingContent && !this.uiState.previous('editingContent')) {
             $contentInput.select();
         }
@@ -572,8 +572,8 @@ var MainView = (function (_super) {
             model: this.baseTodoModel,
             mainView: this
         });
-        this.setElement($("#main-content"));
-        this.template = Util.getTemplate("main");
+        this.setElement($('#main-content'));
+        this.template = Util.getTemplate('main');
         $('body').on('click', this.clickBody);
     };
     MainView.prototype.keydown = function (e) {
@@ -582,7 +582,7 @@ var MainView = (function (_super) {
     };
     MainView.prototype.render = function () {
         this.$el.html(this.template);
-        this.baseTodoView.render().$el.appendTo(this.$(".items"));
+        this.baseTodoView.render().$el.appendTo(this.$('.items'));
         return this;
     };
     MainView.prototype.save = function () {
@@ -599,7 +599,7 @@ window.onload = function () {
         data: dummyData
     });
     mainView.render();
-    $("body").on("keydown", function (e) {
+    $('body').on('keydown', function (e) {
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (TodoView.todoViews[i].keydown(e) == false)
                 break; // stop propagation

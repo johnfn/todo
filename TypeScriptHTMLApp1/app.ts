@@ -52,38 +52,38 @@ interface ITodo {
 }
 
 var dummyData: ITodo = <any> {
-    name: "topmost todo",
-    content: "",
+    name: 'topmost todo',
+    content: '',
     children:
     [{
-        name: "This is a todo",
-        content: "descriptive content",
+        name: 'This is a todo',
+        content: 'descriptive content',
         children: []
     }, {
-            name: "Another todo! No content.",
-            content: "",
+            name: 'Another todo! No content.',
+            content: '',
             children: [{
-                name: "Nested TODO.",
-                content: "bleh",
+                name: 'Nested TODO.',
+                content: 'bleh',
                 children: []
             }, {
-                    name: "Another nested TODO.",
-                    content: "blaaah",
+                    name: 'Another nested TODO.',
+                    content: 'blaaah',
                     children: []
                 }, {
-                    name: "Nr 3.",
-                    content: "blaaah",
+                    name: 'Nr 3.',
+                    content: 'blaaah',
                     children: []
                 }, {
-                    name: "Nr 4.",
-                    content: "blaaah",
+                    name: 'Nr 4.',
+                    content: 'blaaah',
                     children: []
                 }]
         }, {
-            name: "To test falling",
+            name: 'To test falling',
             children: [{
-                name: "test",
-                content: "bleh",
+                name: 'test',
+                content: 'bleh',
                 children: []
             }]
         }]
@@ -91,7 +91,7 @@ var dummyData: ITodo = <any> {
 
 class Util {
     static getTemplate(name: string): Template {
-        var el: JQuery = $("#" + name);
+        var el: JQuery = $('#' + name);
 
         return _.template(el.html());
     }
@@ -108,12 +108,12 @@ class TodoModel extends Backbone.Model {
     private _children: TodoModel[] = [];
 
     initialize() {
-        this.name = "";
-        this.content = "";
+        this.name = '';
+        this.content = '';
         this.done = false;
         this.selected = false;
         this.childIndex = -1;
-        this.uid = Math.random() + " " + Math.random();
+        this.uid = Math.random() + ' ' + Math.random();
     }
 
     /** recursively create this todo and all sub-todos from the provided data. */
@@ -159,7 +159,7 @@ class TodoModel extends Backbone.Model {
             }
         }
 
-        console.error("childIndex is in weird state");
+        console.error('childIndex is in weird state');
         debugger;
 
         return -1;
@@ -250,7 +250,7 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 
     initialize(options: Backbone.ViewOptions<TodoModel>) {
-        this.template = Util.getTemplate("todo-edit");
+        this.template = Util.getTemplate('todo-edit');
     }
 
     private stopProp() {
@@ -258,11 +258,11 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 
     getNameText(): string {
-        return this.$(".name").first().val();
+        return this.$('.name').first().val();
     }
 
     getDescText(): string {
-        return this.$(".desc").first().val();
+        return this.$('.desc').first().val();
     }
 
     addTodo(e: JQueryMouseEventObject) {
@@ -319,7 +319,7 @@ class TodoView extends Backbone.View<TodoModel> {
         TodoView.todoViews.push(this);
 
         this.mainView = options['mainView'];
-        this.template = Util.getTemplate("todo");
+        this.template = Util.getTemplate('todo');
         this.childrenViews = [];
         this.uiState = new TodoUiState();
         this.model.view = this;
@@ -523,7 +523,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.$el.html(this.template(this.model.toJSON()));
 
-        var $childrenContainer = this.$('.children');
+        var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
         var $editName = this.$('.edit-name-js');
         var $editContent = this.$('.edit-content-js');
@@ -546,7 +546,7 @@ class TodoView extends Backbone.View<TodoModel> {
         this.editView.render().$el.appendTo($addTodo);
 
         if (this.uiState.editVisible) {
-            this.$(".name").focus();
+            this.$('.name').focus();
         }
 
         return this;
@@ -571,7 +571,7 @@ class TodoView extends Backbone.View<TodoModel> {
         this.$('.edit-content-js')
             .toggle(!this.uiState.editingContent);
 
-        var $contentInput = this.$(".content-edit-js")
+        var $contentInput = this.$('.content-edit-js')
             .toggle(this.uiState.editingContent)
             .val(this.model.content);
 
@@ -610,8 +610,8 @@ class MainView extends Backbone.View<TodoAppModel> {
             model: this.baseTodoModel,
             mainView: this
         });
-        this.setElement($("#main-content"));
-        this.template = Util.getTemplate("main");
+        this.setElement($('#main-content'));
+        this.template = Util.getTemplate('main');
 
         $('body').on('click', this.clickBody);
     }
@@ -624,7 +624,7 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     render(): Backbone.View<TodoAppModel> {
         this.$el.html(this.template);
-        this.baseTodoView.render().$el.appendTo(this.$(".items"));
+        this.baseTodoView.render().$el.appendTo(this.$('.items'));
 
         return this;
     }
@@ -647,7 +647,7 @@ window.onload = () => {
 
     mainView.render();
 
-    $("body").on("keydown", (e: JQueryKeyEventObject) => {
+    $('body').on('keydown', (e: JQueryKeyEventObject) => {
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (TodoView.todoViews[i].keydown(e) == false)
                 break; // stop propagation
