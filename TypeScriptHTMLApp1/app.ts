@@ -496,7 +496,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', (model: TodoModel) => {
-            self.addChildTodo(model, true);
+            self.addChildTodo(model);
             self.toggleAddChildTodo();
         });
     }

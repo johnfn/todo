@@ -447,7 +447,7 @@ var TodoView = (function (_super) {
         this.editView = new NewTodoView({ model: editModel });
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', function (model) {
-            self.addChildTodo(model, true);
+            self.addChildTodo(model);
             self.toggleAddChildTodo();
         });
     };
