@@ -74,6 +74,10 @@ class Util {
 
         return _.template(el.html());
     }
+
+	static id(a: any): any {
+		return a;
+	}
 }
 
 class TodoModel extends Backbone.Model {
@@ -157,19 +161,19 @@ class TodoModel extends Backbone.Model {
         return -1;
     }
 
-    public static selectedModel: TodoModel;
+    static selectedModel: TodoModel;
 
     get depth(): number { return this.get('depth'); }
     set depth(value: number) { this.set('depth', value); }
 
     get name(): string { return this.get('name'); }
-    set name(value: string) { this.set('name', value); }
+    set name(value: string) { this.set('name', value); this.goodTimeToSave(); }
 
     get content(): string { return this.get('content'); }
-    set content(value: string) { this.set('content', value); }
+    set content(value: string) { this.set('content', value); this.goodTimeToSave(); }
 
     get done(): boolean { return this.get('done'); }
-    set done(value: boolean) { this.set('done', value); }
+    set done(value: boolean) { this.set('done', value); this.goodTimeToSave(); }
 
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {

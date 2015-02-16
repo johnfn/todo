@@ -12,6 +12,9 @@ var Util = (function () {
         var el = $('#' + name);
         return _.template(el.html());
     };
+    Util.id = function (a) {
+        return a;
+    };
     return Util;
 })();
 var TodoModel = (function (_super) {
@@ -99,6 +102,7 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('name', value);
+            this.goodTimeToSave();
         },
         enumerable: true,
         configurable: true
@@ -109,6 +113,7 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('content', value);
+            this.goodTimeToSave();
         },
         enumerable: true,
         configurable: true
@@ -119,6 +124,7 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('done', value);
+            this.goodTimeToSave();
         },
         enumerable: true,
         configurable: true
@@ -318,7 +324,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.keydown = function (e) {
         if (!this.model.selected)
-            return false;
+            return true;
         var enter = e.which === 13 && !e.shiftKey;
         var shiftEnter = e.which === 13 && e.shiftKey;
         // Navigation
@@ -589,7 +595,7 @@ var MainView = (function (_super) {
     };
     return MainView;
 })(Backbone.View);
-window.onload = function () {
+$(function () {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
     var mainView = new MainView();
     mainView.render();
@@ -599,5 +605,5 @@ window.onload = function () {
                 break; // stop propagation
         }
     });
-};
+});
 //# sourceMappingURL=app.js.map
