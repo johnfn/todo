@@ -1,34 +1,4 @@
 // TODO (lol)
-// X indent inner items
-// X add todos
-// X edit todos
-//   X enter is done
-//   * only 1 at a time
-//   X if you click somewhere else it cancels
-//   X automatically select text.
-//   X Bug where now you can't create new todos
-// X Mark todos as done.
-// * option to add content if there isn't any.
-// * Click to focus
-// * TONS of keyboard shortcuts. just tons.
-//   X Up/down
-//   X left to go up a level
-//   X Enter to start editing
-//     X Enter to finish
-//       X Currently just leaves it blank.
-//       * Before I fix this I should just make the input nodes exist, just empty.
-//   X Shift+Enter to add a child.
-//     X Autofocus on new child.
-//     * If I click to open a new child on a nonselected thing, then i hit enter...
-//     X child on bottommost thing is not selected.
-//     * Enter to finish adding a new child.
-//   * Maybe Down while editing name to edit description.
-// * Clicking should also change selection.
-// * header items (just for organization)
-//   * I think todos will need a 'type' key
-// * mouseover one, highlight all
-// * zoomin
-// * breadcrumb trail visible
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -347,7 +317,9 @@ var TodoView = (function (_super) {
         this.uiState = new TodoUiState();
         this.model.view = this;
         this.initEditView();
-        _.each(this.model.children, this.addChildTodo);
+        for (var i = 0; i < this.model.children.length; i++) {
+            this.addChildTodo(this.model.children[i]);
+        }
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
     };
     TodoView.prototype.keydown = function (e) {
@@ -474,19 +446,21 @@ var TodoView = (function (_super) {
         this.editView = new NewTodoView({ model: editModel });
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', function (model) {
-            self.addChildTodo(model);
+            self.addChildTodo(model, true);
             self.toggleAddChildTodo();
         });
     };
-    TodoView.prototype.addChildTodo = function (childModel) {
-        this.childrenViews.push(new TodoView({
-            model: childModel,
-        }));
-        // The problem is that half the time we already have children inserted,
-        // but the other half we should be adding new children to the array.
+    TodoView.prototype.addChildTodo = function (childModel, prepend) {
+        if (prepend === void 0) { prepend = false; }
+        var newView = new TodoView({ model: childModel });
+        var index = prepend ? 0 : this.childrenViews.length;
+        this.childrenViews.splice(index, 0, newView);
+        // The problem is that half the time when we call this fn, we already
+        // have children inserted, but the other half we should be adding
+        // new children to the array.
         // TODO: Should think about this more later.
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) == -1) {
-            this.model.children.push(childModel);
+            this.model.children.splice(index, 0, childModel);
         }
         this.render();
     };

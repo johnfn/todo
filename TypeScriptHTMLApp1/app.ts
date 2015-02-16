@@ -1,4 +1,7 @@
 ﻿// TODO (lol)
+
+// * Bugs with setting the name of new TODOs.
+
 // X indent inner items
 // X add todos
 // X edit todos
@@ -326,7 +329,9 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.initEditView();
 
-        _.each(this.model.children, this.addChildTodo);
+        for (var i = 0; i < this.model.children.length; i++) {
+            this.addChildTodo(this.model.children[i]);
+        }
 
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
     }
@@ -490,22 +495,24 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', (model: TodoModel) => {
-            self.addChildTodo(model);
+            self.addChildTodo(model, true);
             self.toggleAddChildTodo();
         });
     }
 
-    addChildTodo(childModel: TodoModel) {
-        this.childrenViews.push(new TodoView({
-            model: childModel,
-        }));
+    addChildTodo(childModel: TodoModel, prepend: boolean = false) {
+        var newView = new TodoView({ model: childModel });
+        var index = prepend ? 0 : this.childrenViews.length;
 
-        // The problem is that half the time we already have children inserted,
-        // but the other half we should be adding new children to the array.
+        this.childrenViews.splice(index, 0, newView);
+
+        // The problem is that half the time when we call this fn, we already
+        // have children inserted, but the other half we should be adding
+        // new children to the array.
         // TODO: Should think about this more later.
 
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) == -1) {
-            this.model.children.push(childModel);
+            this.model.children.splice(index, 0, childModel);
         }
 
         this.render();
