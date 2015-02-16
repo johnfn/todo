@@ -4,11 +4,39 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var LocalStorageBackedModel = (function (_super) {
+    __extends(LocalStorageBackedModel, _super);
+    function LocalStorageBackedModel() {
+        _super.apply(this, arguments);
+        this.savedProps = ['circularBufferSize', 'circularBufferPosition'];
+    }
+    LocalStorageBackedModel.prototype.namespace = function () {
+        return '';
+    };
+    LocalStorageBackedModel.prototype.fetch = function (options) {
+        for (var i = 0; i < this.savedProps.length; i++) {
+            var prop = this.savedProps[i];
+            this[prop] = window.localStorage.getItem(this.namespace() + prop);
+        }
+        return null;
+    };
+    LocalStorageBackedModel.prototype.save = function () {
+        for (var i = 0; i < this.savedProps.length; i++) {
+            var prop = this.savedProps[i];
+            window.localStorage.setItem(prop, this[this.namespace() + prop]);
+        }
+    };
+    return LocalStorageBackedModel;
+})(Backbone.Model);
 var SavedSnapshot = (function (_super) {
     __extends(SavedSnapshot, _super);
     function SavedSnapshot() {
         _super.apply(this, arguments);
+        this.savedProps = ['data', 'date'];
     }
+    SavedSnapshot.prototype.namespace = function () {
+        return 'snapshot' + this.index + '-';
+    };
     Object.defineProperty(SavedSnapshot.prototype, "data", {
         // TODO: Actually grab from localstorage
         get: function () {
@@ -21,7 +49,7 @@ var SavedSnapshot = (function (_super) {
         configurable: true
     });
     return SavedSnapshot;
-})(Backbone.Model);
+})(LocalStorageBackedModel);
 /** State related to saving data. */
 var SavedDataState = (function (_super) {
     __extends(SavedDataState, _super);
@@ -29,19 +57,6 @@ var SavedDataState = (function (_super) {
         _super.apply(this, arguments);
         this.savedProps = ['circularBufferSize', 'circularBufferPosition'];
     }
-    SavedDataState.prototype.fetch = function (options) {
-        for (var i = 0; i < this.savedProps.length; i++) {
-            var prop = this.savedProps[i];
-            this[prop] = window.localStorage.getItem(prop);
-        }
-        return null;
-    };
-    SavedDataState.prototype.save = function () {
-        for (var i = 0; i < this.savedProps.length; i++) {
-            var prop = this.savedProps[i];
-            window.localStorage.setItem(prop, this[prop]);
-        }
-    };
     Object.defineProperty(SavedDataState.prototype, "circularBufferSize", {
         get: function () {
             return this.get('circularBufferSize');
@@ -63,7 +78,7 @@ var SavedDataState = (function (_super) {
         configurable: true
     });
     return SavedDataState;
-})(Backbone.Model);
+})(LocalStorageBackedModel);
 var SavedData = (function (_super) {
     __extends(SavedData, _super);
     function SavedData() {
@@ -77,6 +92,7 @@ var SavedData = (function (_super) {
     };
     /** Consider if we should save. */
     SavedData.prototype.maybeSave = function () {
+        console.log("maybe save");
     };
     SavedData.prototype.load = function () {
         var result;

@@ -1,20 +1,12 @@
-﻿class SavedSnapshot extends Backbone.Model {
-	private index: number;
-	
-	// TODO: Actually grab from localstorage
-    get data(): number { return this.get('data'); }
-    set data(value: number) { this.set('data', value); }
-}
-
-/** State related to saving data. */
-class SavedDataState extends Backbone.Model {
+﻿class LocalStorageBackedModel extends Backbone.Model {
 	savedProps: string[] = ['circularBufferSize', 'circularBufferPosition'];
+	namespace():string { return ''; }
 
 	fetch(options?: Backbone.ModelFetchOptions): JQueryXHR {
 		for (var i = 0; i < this.savedProps.length; i++) {
 			var prop = this.savedProps[i];
 
-			this[prop] = window.localStorage.getItem(prop);
+			this[prop] = window.localStorage.getItem(this.namespace() + prop);
 		}
 
 		return null;
@@ -24,10 +16,27 @@ class SavedDataState extends Backbone.Model {
 		for (var i = 0; i < this.savedProps.length; i++) {
 			var prop = this.savedProps[i];
 
-			window.localStorage.setItem(prop, this[prop]);
+			window.localStorage.setItem(prop, this[this.namespace() + prop]);
 		}
 	}
 	
+}
+
+class SavedSnapshot extends LocalStorageBackedModel {
+	savedProps: string[] = ['data', 'date'];
+	namespace():string { return 'snapshot' + this.index + '-'; }
+
+	private index: number;
+	
+	// TODO: Actually grab from localstorage
+    get data(): number { return this.get('data'); }
+    set data(value: number) { this.set('data', value); }
+}
+
+/** State related to saving data. */
+class SavedDataState extends LocalStorageBackedModel {
+	savedProps: string[] = ['circularBufferSize', 'circularBufferPosition'];
+
     get circularBufferSize(): number { return this.get('circularBufferSize'); }
     set circularBufferSize(value: number) { this.set('circularBufferSize', value); }
 
@@ -51,7 +60,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 
 	/** Consider if we should save. */
 	maybeSave():void {
-
+		console.log("maybe save");
 	}
 
 	load(): ITodo {

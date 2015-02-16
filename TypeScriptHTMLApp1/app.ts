@@ -344,7 +344,7 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
-        if (!this.model.selected) return false;
+        if (!this.model.selected) return true;
 
         var enter = e.which === 13 && !e.shiftKey;
         var shiftEnter = e.which === 13 && e.shiftKey;
@@ -488,7 +488,6 @@ class TodoView extends Backbone.View<TodoModel> {
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
             newSelection.selected = true;
-
             this.render();
 
             return false;
@@ -689,7 +688,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 }
 
-window.onload = () => {
+$(() => {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
 
     var mainView = new MainView();
@@ -701,4 +700,4 @@ window.onload = () => {
                 break; // stop propagation
         }
     });
-};
+});
