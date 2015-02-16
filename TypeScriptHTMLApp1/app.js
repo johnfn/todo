@@ -41,6 +41,11 @@ var dummyData = {
         }]
     }]
 };
+var saved = window.localStorage.getItem('data');
+if (saved) {
+    saved = JSON.parse(saved);
+    dummyData = saved;
+}
 var Util = (function () {
     function Util() {
     }
@@ -549,13 +554,8 @@ var MainView = (function (_super) {
     function MainView() {
         _super.apply(this, arguments);
     }
-    MainView.prototype.events = function () {
-        return {
-            'click .save-btn-js': this.save
-        };
-    };
     MainView.prototype.initialize = function (options) {
-        _.bindAll(this, 'clickBody');
+        _.bindAll(this, 'clickBody', 'save');
         this.model = new TodoAppModel();
         this.baseTodoModel = new TodoModel().initWithData(options['data'], null);
         this.baseTodoModel.selected = true;
@@ -566,6 +566,7 @@ var MainView = (function (_super) {
         this.setElement($('#main-content'));
         this.template = Util.getTemplate('main');
         $('body').on('click', this.clickBody);
+        window.setInterval(this.save, 400);
     };
     MainView.prototype.keydown = function (e) {
         console.log(e.which);
@@ -577,7 +578,7 @@ var MainView = (function (_super) {
         return this;
     };
     MainView.prototype.save = function () {
-        console.log(this.baseTodoModel.getData());
+        window.localStorage.setItem("data", JSON.stringify(this.baseTodoModel.getData()));
         return false;
     };
     MainView.prototype.clickBody = function (e) {

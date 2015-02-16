@@ -97,6 +97,12 @@ var dummyData: ITodo = <any> {
         }]
 };
 
+var saved = window.localStorage.getItem('data');
+if (saved) {
+    saved = JSON.parse(saved);
+    dummyData = saved;
+}
+
 class Util {
     static getTemplate(name: string): Template {
         var el: JQuery = $('#' + name);
@@ -627,14 +633,8 @@ class MainView extends Backbone.View<TodoAppModel> {
     baseTodoModel: TodoModel;
     baseTodoView: TodoView;
 
-    events() {
-        return {
-            'click .save-btn-js': this.save
-        };
-    }
-
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
-        _.bindAll(this, 'clickBody');
+        _.bindAll(this, 'clickBody', 'save');
 
         this.model = new TodoAppModel();
 
@@ -649,6 +649,8 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.template = Util.getTemplate('main');
 
         $('body').on('click', this.clickBody);
+
+        window.setInterval(this.save, 400);
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -665,7 +667,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     private save() {
-        console.log(this.baseTodoModel.getData());
+        window.localStorage.setItem("data", JSON.stringify(this.baseTodoModel.getData()));
 
         return false;
     }
