@@ -8,7 +8,7 @@ var LocalStorageBackedModel = (function (_super) {
     __extends(LocalStorageBackedModel, _super);
     function LocalStorageBackedModel() {
         _super.apply(this, arguments);
-        this.savedProps = ['circularBufferSize', 'circularBufferPosition'];
+        this.savedProps = ['bufferSize', 'bufferPosition'];
     }
     LocalStorageBackedModel.prototype.namespace = function () {
         return '';
@@ -88,24 +88,24 @@ var SavedDataState = (function (_super) {
     __extends(SavedDataState, _super);
     function SavedDataState() {
         _super.apply(this, arguments);
-        this.savedProps = ['circularBufferSize', 'circularBufferPosition', 'hasEverUsedApp'];
+        this.savedProps = ['bufferSize', 'bufferPosition', 'hasEverUsedApp'];
     }
-    Object.defineProperty(SavedDataState.prototype, "circularBufferSize", {
+    Object.defineProperty(SavedDataState.prototype, "bufferSize", {
         get: function () {
-            return this.get('circularBufferSize');
+            return this.get('bufferSize');
         },
         set: function (value) {
-            this.set('circularBufferSize', value);
+            this.set('bufferSize', value);
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(SavedDataState.prototype, "circularBufferPosition", {
+    Object.defineProperty(SavedDataState.prototype, "bufferPosition", {
         get: function () {
-            return this.get('circularBufferPosition');
+            return this.get('bufferPosition');
         },
         set: function (value) {
-            this.set('circularBufferPosition', value);
+            this.set('bufferPosition', value);
         },
         enumerable: true,
         configurable: true
@@ -131,15 +131,20 @@ var SavedData = (function (_super) {
     };
     SavedData.prototype.watch = function (todoModel) {
         this.baseTodoModel = todoModel;
-        this.listenTo(this.baseTodoModel, 'good-time-to-save', this.maybeSave);
+        this.listenTo(this.baseTodoModel, 'good-time-to-save', this.save);
     };
-    /** Consider if we should save. */
-    SavedData.prototype.maybeSave = function () {
+    /** Save, and potentially roll the buffer forwards. */
+    SavedData.prototype.save = function () {
+        if (true) {
+            this.savedDataState.bufferPosition = (this.savedDataState.bufferPosition + 1) % this.savedDataState.bufferSize;
+            this.savedDataState.save();
+        }
         this.activeTodo().data = this.baseTodoModel.getData();
+        this.activeTodo().date = (new Date()).toString();
         this.activeTodo().save();
     };
     SavedData.prototype.activeTodo = function () {
-        return this.at(this.savedDataState.circularBufferPosition);
+        return this.at(this.savedDataState.bufferPosition);
     };
     SavedData.prototype.load = function () {
         this.savedDataState = new SavedDataState();
@@ -153,8 +158,8 @@ var SavedData = (function (_super) {
         return this.activeTodo().data;
     };
     SavedData.prototype.firstTimeLoad = function () {
-        this.savedDataState.circularBufferPosition = 0;
-        this.savedDataState.circularBufferSize = 50;
+        this.savedDataState.bufferPosition = 0;
+        this.savedDataState.bufferSize = 50;
         this.savedDataState.hasEverUsedApp = true;
         this.savedDataState.save();
         var data = {
@@ -176,7 +181,7 @@ var SavedData = (function (_super) {
     };
     SavedData.prototype.createCircularBuffer = function (load) {
         if (load === void 0) { load = false; }
-        for (var i = 0; i < this.savedDataState.circularBufferSize; i++) {
+        for (var i = 0; i < this.savedDataState.bufferSize; i++) {
             var snapshot = new SavedSnapshot();
             snapshot.init(i);
             if (load) {

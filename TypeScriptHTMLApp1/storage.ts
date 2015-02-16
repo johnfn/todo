@@ -1,5 +1,5 @@
 ﻿class LocalStorageBackedModel extends Backbone.Model {
-	savedProps: string[] = ['circularBufferSize', 'circularBufferPosition'];
+	savedProps: string[] = ['bufferSize', 'bufferPosition'];
 	namespace():string { return ''; }
 
 	fetch(options?: Backbone.ModelFetchOptions): JQueryXHR {
@@ -68,13 +68,13 @@ class SavedSnapshot extends LocalStorageBackedModel {
 
 /** State related to saving data. */
 class SavedDataState extends LocalStorageBackedModel {
-	savedProps: string[] = ['circularBufferSize', 'circularBufferPosition', 'hasEverUsedApp'];
+	savedProps: string[] = ['bufferSize', 'bufferPosition', 'hasEverUsedApp'];
 
-    get circularBufferSize(): number { return this.get('circularBufferSize'); }
-    set circularBufferSize(value: number) { this.set('circularBufferSize', value); }
+    get bufferSize(): number { return this.get('bufferSize'); }
+    set bufferSize(value: number) { this.set('bufferSize', value); }
 
-    get circularBufferPosition(): number { return this.get('circularBufferPosition'); }
-    set circularBufferPosition(value: number) { this.set('circularBufferPosition', value); }
+    get bufferPosition(): number { return this.get('bufferPosition'); }
+    set bufferPosition(value: number) { this.set('bufferPosition', value); }
 
     get hasEverUsedApp(): boolean { return this.get('hasEverUsedApp'); }
     set hasEverUsedApp(value: boolean) { this.set('hasEverUsedApp', value); }
@@ -91,17 +91,24 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 	watch(todoModel: TodoModel) {
 		this.baseTodoModel = todoModel;
 
-		this.listenTo(this.baseTodoModel, 'good-time-to-save', this.maybeSave);
+		this.listenTo(this.baseTodoModel, 'good-time-to-save', this.save);
 	}
 
-	/** Consider if we should save. */
-	maybeSave():void {
+	/** Save, and potentially roll the buffer forwards. */
+	save():void {
+		if (true) { // TODO: Use better condition.
+			this.savedDataState.bufferPosition = (this.savedDataState.bufferPosition + 1) % this.savedDataState.bufferSize;
+			this.savedDataState.save();
+		}
+
 		this.activeTodo().data = this.baseTodoModel.getData();
+		this.activeTodo().date = (new Date()).toString();
+
 		this.activeTodo().save();
 	}
 
 	private activeTodo(): SavedSnapshot {
-		return this.at(this.savedDataState.circularBufferPosition);
+		return this.at(this.savedDataState.bufferPosition);
 	}
 
 	load(): ITodo {
@@ -118,8 +125,8 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 	}
 
 	firstTimeLoad():ITodo {
-		this.savedDataState.circularBufferPosition = 0;
-		this.savedDataState.circularBufferSize = 50;
+		this.savedDataState.bufferPosition = 0;
+		this.savedDataState.bufferSize = 50;
 		this.savedDataState.hasEverUsedApp = true;
 
 		this.savedDataState.save();
@@ -147,7 +154,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 	}
 
 	private createCircularBuffer(load:boolean = false):void {
-		for (var i = 0; i < this.savedDataState.circularBufferSize; i++) {
+		for (var i = 0; i < this.savedDataState.bufferSize; i++) {
 			var snapshot = new SavedSnapshot();
 
 			snapshot.init(i);
