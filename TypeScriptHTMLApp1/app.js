@@ -155,9 +155,10 @@ var TodoModel = (function (_super) {
             if (TodoModel.selectedModel && value) {
                 TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
             }
-            this.set('selected', value);
-            if (value)
+            if (value) {
                 TodoModel.selectedModel = this;
+            }
+            this.set('selected', value);
         },
         enumerable: true,
         configurable: true
@@ -214,16 +215,16 @@ var TodoUiState = (function (_super) {
     __extends(TodoUiState, _super);
     function TodoUiState(attrs) {
         _super.call(this, attrs);
-        this.editVisible = false;
+        this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
     }
-    Object.defineProperty(TodoUiState.prototype, "editVisible", {
+    Object.defineProperty(TodoUiState.prototype, "addTodoVisible", {
         get: function () {
-            return this.get('editVisible');
+            return this.get('addTodoVisible');
         },
         set: function (value) {
-            this.set('editVisible', value);
+            this.set('addTodoVisible', value);
         },
         enumerable: true,
         configurable: true
@@ -349,7 +350,7 @@ var TodoView = (function (_super) {
             return false;
         }
         // Enter to edit name
-        if (!this.uiState.editingName && !this.uiState.editVisible && e.which == 13 && !e.shiftKey) {
+        if (!this.uiState.editingName && !this.uiState.addTodoVisible && e.which == 13 && !e.shiftKey) {
             this.uiState.editingName = true;
             this.render();
             return false;
@@ -426,7 +427,7 @@ var TodoView = (function (_super) {
         });
         this.uiState.editingContent = false;
         this.uiState.editingName = false;
-        this.uiState.editVisible = false;
+        this.uiState.addTodoVisible = false;
         this.render();
     };
     TodoView.prototype.showTodoNameEdit = function (e) {
@@ -440,8 +441,8 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.initEditView = function () {
-        var editModel = new TodoModel();
         var self = this;
+        var editModel = new TodoModel();
         editModel.parent = this.model;
         this.editView = new NewTodoView({ model: editModel });
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
@@ -465,7 +466,11 @@ var TodoView = (function (_super) {
         this.render();
     };
     TodoView.prototype.toggleAddChildTodo = function () {
-        this.uiState.editVisible = !this.uiState.editVisible;
+        this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
+        // TODO: Just pass in parent to TodoModel.
+        var editModel = new TodoModel();
+        editModel.parent = this.model;
+        this.editView.model = editModel;
         this.render();
         return false;
     };
@@ -477,7 +482,7 @@ var TodoView = (function (_super) {
         var $editName = this.$('.edit-name-js');
         var $editContent = this.$('.edit-content-js');
         // Update state per uiState
-        $addTodo.toggle(this.uiState.editVisible);
+        $addTodo.toggle(this.uiState.addTodoVisible);
         this.renderTodoName();
         this.renderTodoContent();
         this.delegateEvents(); // We might lose our own events. D:
@@ -486,7 +491,7 @@ var TodoView = (function (_super) {
             child.render().$el.appendTo($childrenContainer);
         });
         this.editView.render().$el.appendTo($addTodo);
-        if (this.uiState.editVisible) {
+        if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
         return this;

@@ -1,6 +1,7 @@
 ﻿// TODO (lol)
 
-// * Bugs with setting the name of new TODOs.
+// * Bugs with setting the name of multiple new TODOs.
+// * It's actually not intutive to add things at the top. Just show edit on bottom.
 
 // X indent inner items
 // X add todos
@@ -187,9 +188,11 @@ class TodoModel extends Backbone.Model {
         if (TodoModel.selectedModel && value) {
             TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
         }
+        if (value) {
+            TodoModel.selectedModel = this;
+        }
 
         this.set('selected', value);
-        if (value) TodoModel.selectedModel = this;
     }
 
     get children(): TodoModel[] { return this._children; }
@@ -225,13 +228,13 @@ class TodoUiState extends Backbone.Model {
     constructor(attrs?: any) {
         super(attrs);
 
-        this.editVisible = false;
+        this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
     }
 
-    get editVisible(): boolean { return this.get('editVisible'); }
-    set editVisible(value: boolean) { this.set('editVisible', value); }
+    get addTodoVisible(): boolean { return this.get('addTodoVisible'); }
+    set addTodoVisible(value: boolean) { this.set('addTodoVisible', value); }
 
     get editingName(): boolean { return this.get('editingName'); }
     set editingName(value: boolean) { this.set('editingName', value); }
@@ -370,7 +373,7 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         // Enter to edit name
-        if (!this.uiState.editingName && !this.uiState.editVisible &&
+        if (!this.uiState.editingName && !this.uiState.addTodoVisible &&
             e.which == 13 && !e.shiftKey) {
             this.uiState.editingName = true;
             this.render();
@@ -466,7 +469,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.uiState.editingContent = false;
         this.uiState.editingName = false;
-        this.uiState.editVisible = false;
+        this.uiState.addTodoVisible = false;
 
         this.render();
     }
@@ -486,11 +489,9 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     private initEditView() {
-        var editModel = new TodoModel();
         var self = this;
-
+        var editModel = new TodoModel();
         editModel.parent = this.model;
-
         this.editView = new NewTodoView({ model: editModel });
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
@@ -519,7 +520,12 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     toggleAddChildTodo() {
-        this.uiState.editVisible = !this.uiState.editVisible;
+        this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
+
+        // TODO: Just pass in parent to TodoModel.
+        var editModel = new TodoModel();
+        editModel.parent = this.model;
+        this.editView.model = editModel;
 
         this.render();
         return false;
@@ -537,7 +543,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // Update state per uiState
 
-        $addTodo.toggle(this.uiState.editVisible);
+        $addTodo.toggle(this.uiState.addTodoVisible);
 
         this.renderTodoName();
         this.renderTodoContent();
@@ -552,7 +558,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.editView.render().$el.appendTo($addTodo);
 
-        if (this.uiState.editVisible) {
+        if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
 
