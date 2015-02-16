@@ -1,5 +1,10 @@
 ﻿// TODO (lol)
 
+// * Save to disk
+// * Save to server
+// * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
+// * Generalized search
+
 // X Bugs with setting the name of multiple new TODOs.
 // X It's actually not intutive to add things at the top. Just show edit on bottom.
 // X indent inner items
@@ -19,10 +24,10 @@
 //   X Enter to start editing
 //     X Enter to finish
 //       X Currently just leaves it blank.
-//       * Before I fix this I should just make the input nodes exist, just empty.
+//       X Before I fix this I should just make the input nodes exist, just empty.
 //   X Shift+Enter to add a child.
 //     X Autofocus on new child.
-//     * If I click to open a new child on a nonselected thing, then i hit enter...
+//     X If I click to open a new child on a nonselected thing, then i hit enter...
 //     X child on bottommost thing is not selected.
 //     * Enter to finish adding a new child.
 //   * Maybe Down while editing name to edit description.
@@ -186,12 +191,17 @@ class TodoModel extends Backbone.Model {
     set selected(value: boolean) {
         if (TodoModel.selectedModel && value) {
             TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
+            TodoModel.selectedModel.view.render();
         }
         if (value) {
             TodoModel.selectedModel = this;
         }
 
         this.set('selected', value);
+
+        if (this.view) {
+            this.view.render();
+        }
     }
 
     get children(): TodoModel[] { return this._children; }
@@ -455,7 +465,6 @@ class TodoView extends Backbone.View<TodoModel> {
             newSelection.selected = true;
 
             this.render();
-            newSelection.view.render();
 
             return false;
         }
@@ -482,6 +491,8 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private showTodoNameEdit(e: JQueryMouseEventObject) {
         this.uiState.editingName = true;
+        this.model.selected = true;
+
         this.render();
 
         return false;
@@ -489,6 +500,8 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private showTodoContentEdit(e: JQueryMouseEventObject) {
         this.uiState.editingContent = true;
+        this.model.selected = true;
+
         this.render();
 
         return false;

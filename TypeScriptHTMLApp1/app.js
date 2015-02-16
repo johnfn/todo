@@ -154,11 +154,15 @@ var TodoModel = (function (_super) {
         set: function (value) {
             if (TodoModel.selectedModel && value) {
                 TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
+                TodoModel.selectedModel.view.render();
             }
             if (value) {
                 TodoModel.selectedModel = this;
             }
             this.set('selected', value);
+            if (this.view) {
+                this.view.render();
+            }
         },
         enumerable: true,
         configurable: true
@@ -416,7 +420,6 @@ var TodoView = (function (_super) {
         if (newSelection != null) {
             newSelection.selected = true;
             this.render();
-            newSelection.view.render();
             return false;
         }
         return true;
@@ -437,11 +440,13 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.showTodoNameEdit = function (e) {
         this.uiState.editingName = true;
+        this.model.selected = true;
         this.render();
         return false;
     };
     TodoView.prototype.showTodoContentEdit = function (e) {
         this.uiState.editingContent = true;
+        this.model.selected = true;
         this.render();
         return false;
     };
