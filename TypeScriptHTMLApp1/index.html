@@ -34,14 +34,17 @@
         <div class="todo <% if (selected) print ('selected') %>">
             <div class="todo-name">
                 <span class="edit-name-js <% if (done) print('todo-done') %>"><%= name %></span>
+                <input class='name-edit' />
+
                 <a href="#" class="todo-add-js"> + </a>
                 <a href="#" class="todo-done-js"> ✓ </a>
             </div>
+
             <div class="todo-content edit-content-js"> <%= content %> </div>
-            <div class="todo-add">
-            </div>
-            <div class="children">
-            </div>
+            <input class='content-edit-js' />
+
+            <div class="todo-add"> </div>
+            <div class="children"> </div>
         </div>
     </script>
 

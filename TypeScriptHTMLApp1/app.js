@@ -7,16 +7,20 @@
 //   X if you click somewhere else it cancels
 //   X automatically select text.
 //   X Bug where now you can't create new todos
-// * Mark todos as done.
+// X Mark todos as done.
 // * option to add content if there isn't any.
+// * Click to focus
 // * TONS of keyboard shortcuts. just tons.
 //   X Up/down
 //   X left to go up a level
 //   X Enter to start editing
+//     X Enter to finish
+//       X Currently just leaves it blank.
+//       * Before I fix this I should just make the input nodes exist, just empty.
 //   X Shift+Enter to add a child.
 //     X Autofocus on new child.
 //     * If I click to open a new child on a nonselected thing, then i hit enter...
-//     * child on bottommost thing is not selected.
+//     X child on bottommost thing is not selected.
 //     * Enter to finish adding a new child.
 //   * Maybe Down while editing name to edit description.
 // * Clicking should also change selection.
@@ -25,8 +29,6 @@
 // * mouseover one, highlight all
 // * zoomin
 // * breadcrumb trail visible
-// X pay the power bill
-// * listen to debussy
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -180,7 +182,12 @@ var TodoModel = (function (_super) {
             return this.get('selected');
         },
         set: function (value) {
+            if (TodoModel.selectedModel && value) {
+                TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
+            }
             this.set('selected', value);
+            if (value)
+                TodoModel.selectedModel = this;
         },
         enumerable: true,
         configurable: true
@@ -273,44 +280,47 @@ var TodoUiState = (function (_super) {
     });
     return TodoUiState;
 })(Backbone.Model);
-var TodoEditView = (function (_super) {
-    __extends(TodoEditView, _super);
-    function TodoEditView() {
+var NewTodoView = (function (_super) {
+    __extends(NewTodoView, _super);
+    function NewTodoView() {
         _super.apply(this, arguments);
     }
-    TodoEditView.prototype.events = function () {
+    NewTodoView.prototype.events = function () {
         return {
             'click .edit-add-js': 'addTodo',
             'click .edit-cancel-js': 'cancelTodo',
-            'click .name-js': function () { return false; },
-            'click .desc-js': function () { return false; }
+            'click .name-js': this.stopProp,
+            'click .desc-js': this.stopProp
         };
     };
-    TodoEditView.prototype.initialize = function (options) {
+    NewTodoView.prototype.initialize = function (options) {
         this.template = Util.getTemplate("todo-edit");
     };
-    TodoEditView.prototype.getNameText = function () {
+    NewTodoView.prototype.stopProp = function () {
+        return false;
+    };
+    NewTodoView.prototype.getNameText = function () {
         return this.$(".name").first().val();
     };
-    TodoEditView.prototype.getDescText = function () {
+    NewTodoView.prototype.getDescText = function () {
         return this.$(".desc").first().val();
     };
-    TodoEditView.prototype.addTodo = function (e) {
+    NewTodoView.prototype.addTodo = function (e) {
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
         this.trigger('add-child', this.model);
         return false;
     };
-    TodoEditView.prototype.cancelTodo = function (e) {
+    NewTodoView.prototype.cancelTodo = function (e) {
         this.trigger('cancel');
         return false;
     };
-    TodoEditView.prototype.render = function () {
+    NewTodoView.prototype.render = function () {
         this.$el.html(this.template());
         this.delegateEvents();
         return this;
     };
-    return TodoEditView;
+    return NewTodoView;
 })(Backbone.View);
 var TodoView = (function (_super) {
     __extends(TodoView, _super);
@@ -323,8 +333,7 @@ var TodoView = (function (_super) {
             'click .todo-done-js': this.completeTodo,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
-            'keydown .name-edit': this.editTodoName,
-            'keydown .content-edit': this.editTodoContent
+            'click input': function () { return false; }
         };
     };
     TodoView.prototype.initialize = function (options) {
@@ -351,6 +360,20 @@ var TodoView = (function (_super) {
         // Shift + Enter to add child
         if (e.which == 13 && e.shiftKey) {
             this.toggleAddChildTodo();
+            return false;
+        }
+        // Enter to finish editing name
+        if (e.which === 13 && this.uiState.editingName) {
+            this.model.name = this.$('.name-edit').val();
+            this.uiState.editingName = false;
+            this.render();
+            return false;
+        }
+        // Enter to finish editing content
+        if (e.which === 13 && this.uiState.editingContent) {
+            this.model.content = this.$('.content-edit-js').val();
+            this.uiState.editingContent = false;
+            this.render();
             return false;
         }
         // Enter to edit name
@@ -413,7 +436,6 @@ var TodoView = (function (_super) {
         }
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
-            this.model.selected = false;
             newSelection.selected = true;
             this.render();
             newSelection.view.render();
@@ -445,32 +467,11 @@ var TodoView = (function (_super) {
         this.render();
         return false;
     };
-    // TODO: Eventually merge these into keydown, just check uiState to see which
-    // one is being edited.
-    // The problem I see right now is that there is a pathological case where
-    // you click on both and then uiState is true for both. I think that just
-    // allowing one to be edited would be sufficient.
-    TodoView.prototype.editTodoName = function (e) {
-        if (e.which === 13) {
-            this.model.name = $(e.currentTarget).val();
-            this.uiState.editingName = false;
-            this.render();
-            return false;
-        }
-    };
-    TodoView.prototype.editTodoContent = function (e) {
-        if (e.which === 13) {
-            this.model.content = $(e.currentTarget).val();
-            this.uiState.editingContent = false;
-            this.render();
-            return false;
-        }
-    };
     TodoView.prototype.initEditView = function () {
         var editModel = new TodoModel();
         var self = this;
         editModel.parent = this.model;
-        this.editView = new TodoEditView({ model: editModel });
+        this.editView = new NewTodoView({ model: editModel });
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', function (model) {
             self.addChildTodo(model);
@@ -483,7 +484,7 @@ var TodoView = (function (_super) {
         }));
         // The problem is that half the time we already have children inserted,
         // but the other half we should be adding new children to the array.
-        // Should think about this more later.
+        // TODO: Should think about this more later.
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) == -1) {
             this.model.children.push(childModel);
         }
@@ -497,28 +498,14 @@ var TodoView = (function (_super) {
     TodoView.prototype.render = function () {
         var self = this;
         this.$el.html(this.template(this.model.toJSON()));
-        // use .children to ensure only TOPMOST children so that we dont
-        // append the current child to the children list of the other todos.
         var $childrenContainer = this.$('.children');
         var $addTodo = this.$('.todo-add');
         var $editName = this.$('.edit-name-js');
         var $editContent = this.$('.edit-content-js');
-        // update state per uiState
+        // Update state per uiState
         $addTodo.toggle(this.uiState.editVisible);
-        if (this.uiState.editingName) {
-            var $nameInput = $("<input>").addClass('name-edit').val(this.model.name);
-            $editName.replaceWith($nameInput);
-            if (!this.uiState.previous('editingName')) {
-                $nameInput.select();
-            }
-        }
-        if (this.uiState.editingContent) {
-            var $contentInput = $("<input>").addClass('content-edit').val(this.model.content);
-            $editContent.replaceWith($contentInput);
-            if (!this.uiState.previous('editingContent')) {
-                $contentInput.select();
-            }
-        }
+        this.renderTodoName();
+        this.renderTodoContent();
         this.delegateEvents(); // We might lose our own events. D:
         // render children
         _.each(this.childrenViews, function (child) {
@@ -529,6 +516,22 @@ var TodoView = (function (_super) {
             this.$(".name").focus();
         }
         return this;
+    };
+    /** Show the name text xor the name input. */
+    TodoView.prototype.renderTodoName = function () {
+        this.$('.edit-name-js').toggle(!this.uiState.editingName);
+        var $nameInput = this.$('.name-edit').toggle(this.uiState.editingName).val(this.model.name);
+        if (this.uiState.editingName && !this.uiState.previous('editingName')) {
+            $nameInput.select();
+        }
+    };
+    /** Show the content text xor the content input. */
+    TodoView.prototype.renderTodoContent = function () {
+        this.$('.edit-content-js').toggle(!this.uiState.editingContent);
+        var $contentInput = this.$(".content-edit-js").toggle(this.uiState.editingContent).val(this.model.content);
+        if (this.uiState.editingContent && !this.uiState.previous('editingContent')) {
+            $contentInput.select();
+        }
     };
     return TodoView;
 })(Backbone.View);
@@ -557,11 +560,11 @@ var MainView = (function (_super) {
     }
     MainView.prototype.events = function () {
         return {
-            'click': this.clickBody,
             'click .save-btn-js': this.save
         };
     };
     MainView.prototype.initialize = function (options) {
+        _.bindAll(this, 'clickBody');
         this.model = new TodoAppModel();
         this.baseTodoModel = new TodoModel().initWithData(options['data'], null);
         this.baseTodoModel.selected = true;
@@ -571,6 +574,7 @@ var MainView = (function (_super) {
         });
         this.setElement($("#main-content"));
         this.template = Util.getTemplate("main");
+        $('body').on('click', this.clickBody);
     };
     MainView.prototype.keydown = function (e) {
         console.log(e.which);

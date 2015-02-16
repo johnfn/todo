@@ -7,16 +7,20 @@
 //   X if you click somewhere else it cancels
 //   X automatically select text.
 //   X Bug where now you can't create new todos
-// * Mark todos as done.
+// X Mark todos as done.
 // * option to add content if there isn't any.
+// * Click to focus
 // * TONS of keyboard shortcuts. just tons.
 //   X Up/down
 //   X left to go up a level
 //   X Enter to start editing
+//     X Enter to finish
+//       X Currently just leaves it blank.
+//       * Before I fix this I should just make the input nodes exist, just empty.
 //   X Shift+Enter to add a child.
 //     X Autofocus on new child.
 //     * If I click to open a new child on a nonselected thing, then i hit enter...
-//     * child on bottommost thing is not selected.
+//     X child on bottommost thing is not selected.
 //     * Enter to finish adding a new child.
 //   * Maybe Down while editing name to edit description.
 // * Clicking should also change selection.
@@ -25,6 +29,16 @@
 // * mouseover one, highlight all
 // * zoomin
 // * breadcrumb trail visible
+
+// X If you click on a textbox, it shouldn't collapse.
+//   X This is happening because it's considered a click on body.
+
+// TODO: Eventually merge these into keydown, just check uiState to see which
+// one is being edited.
+// The problem I see right now is that there is a pathological case where
+// you click on both and then uiState is true for both. I think that just
+// allowing one to be edited would be sufficient.
+
 // X pay the power bill
 // * listen to debussy
 
@@ -151,6 +165,8 @@ class TodoModel extends Backbone.Model {
         return -1;
     }
 
+    public static selectedModel: TodoModel;
+
     get depth(): number { return this.get('depth'); }
     set depth(value: number) { this.set('depth', value); }
 
@@ -164,7 +180,14 @@ class TodoModel extends Backbone.Model {
     set done(value: boolean) { this.set('done', value); }
 
     get selected(): boolean { return this.get('selected'); }
-    set selected(value: boolean) { this.set('selected', value); }
+    set selected(value: boolean) {
+        if (TodoModel.selectedModel && value) {
+            TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
+        }
+
+        this.set('selected', value);
+        if (value) TodoModel.selectedModel = this;
+    }
 
     get children(): TodoModel[] { return this._children; }
 
@@ -214,20 +237,24 @@ class TodoUiState extends Backbone.Model {
     set editingContent(value: boolean) { this.set('editingContent', value); }
 }
 
-class TodoEditView extends Backbone.View<TodoModel> {
+class NewTodoView extends Backbone.View<TodoModel> {
     template: Template;
 
     events() {
         return {
             'click .edit-add-js': 'addTodo',
             'click .edit-cancel-js': 'cancelTodo',
-            'click .name-js': () => false,
-            'click .desc-js': () => false
+            'click .name-js': this.stopProp,
+            'click .desc-js': this.stopProp
         };
     }
 
     initialize(options: Backbone.ViewOptions<TodoModel>) {
         this.template = Util.getTemplate("todo-edit");
+    }
+
+    private stopProp() {
+        return false;
     }
 
     getNameText(): string {
@@ -267,7 +294,7 @@ class TodoView extends Backbone.View<TodoModel> {
     uiState: TodoUiState;
 
     /** The view for making a new todo. */
-    editView: TodoEditView;
+    editView: NewTodoView;
 
     /** The view associated with the entire app. */
     mainView: MainView;
@@ -281,8 +308,7 @@ class TodoView extends Backbone.View<TodoModel> {
             'click .todo-done-js': this.completeTodo,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
-            'keydown .name-edit': this.editTodoName,
-            'keydown .content-edit': this.editTodoContent
+            'click input': () => false
         };
     }
 
@@ -317,6 +343,24 @@ class TodoView extends Backbone.View<TodoModel> {
         if (e.which == 13 && e.shiftKey) {
             this.toggleAddChildTodo();
 
+            return false;
+        }
+
+        // Enter to finish editing name
+        if (e.which === 13 && this.uiState.editingName) {
+            this.model.name = this.$('.name-edit').val();
+            this.uiState.editingName = false;
+
+            this.render();
+            return false;
+        }
+
+        // Enter to finish editing content
+        if (e.which === 13 && this.uiState.editingContent) {
+            this.model.content = this.$('.content-edit-js').val();
+            this.uiState.editingContent = false;
+
+            this.render();
             return false;
         }
 
@@ -394,7 +438,6 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
-            this.model.selected = false;
             newSelection.selected = true;
 
             this.render();
@@ -437,38 +480,13 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
-    // TODO: Eventually merge these into keydown, just check uiState to see which
-    // one is being edited.
-    // The problem I see right now is that there is a pathological case where
-    // you click on both and then uiState is true for both. I think that just
-    // allowing one to be edited would be sufficient.
-    private editTodoName(e: JQueryKeyEventObject) {
-        if (e.which === 13) {
-            this.model.name = $(e.currentTarget).val();
-            this.uiState.editingName = false;
-
-            this.render();
-            return false;
-        }
-    }
-
-    private editTodoContent(e: JQueryKeyEventObject) {
-        if (e.which === 13) {
-            this.model.content = $(e.currentTarget).val();
-            this.uiState.editingContent = false;
-
-            this.render();
-            return false;
-        }
-    }
-
     private initEditView() {
         var editModel = new TodoModel();
         var self = this;
 
         editModel.parent = this.model;
 
-        this.editView = new TodoEditView({ model: editModel });
+        this.editView = new NewTodoView({ model: editModel });
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-child', (model: TodoModel) => {
@@ -484,7 +502,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // The problem is that half the time we already have children inserted,
         // but the other half we should be adding new children to the array.
-        // Should think about this more later.
+        // TODO: Should think about this more later.
 
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) == -1) {
             this.model.children.push(childModel);
@@ -505,40 +523,17 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.$el.html(this.template(this.model.toJSON()));
 
-        // use .children to ensure only TOPMOST children so that we dont
-        // append the current child to the children list of the other todos.
         var $childrenContainer = this.$('.children');
         var $addTodo = this.$('.todo-add');
         var $editName = this.$('.edit-name-js');
         var $editContent = this.$('.edit-content-js');
 
-        // update state per uiState
+        // Update state per uiState
 
         $addTodo.toggle(this.uiState.editVisible);
 
-        if (this.uiState.editingName) {
-            var $nameInput = $("<input>")
-                .addClass('name-edit')
-                .val(this.model.name);
-
-            $editName.replaceWith($nameInput);
-
-            if (!this.uiState.previous('editingName')) {
-                $nameInput.select();
-            }
-        }
-
-        if (this.uiState.editingContent) {
-            var $contentInput = $("<input>")
-                .addClass('content-edit')
-                .val(this.model.content);
-
-            $editContent.replaceWith($contentInput);
-
-            if (!this.uiState.previous('editingContent')) {
-                $contentInput.select();
-            }
-        }
+        this.renderTodoName();
+        this.renderTodoContent();
 
         this.delegateEvents(); // We might lose our own events. D:
 
@@ -556,6 +551,34 @@ class TodoView extends Backbone.View<TodoModel> {
 
         return this;
     }
+
+    /** Show the name text xor the name input. */
+    private renderTodoName() {
+        this.$('.edit-name-js')
+            .toggle(!this.uiState.editingName);
+
+        var $nameInput = this.$('.name-edit')
+            .toggle(this.uiState.editingName)
+            .val(this.model.name);
+
+        if (this.uiState.editingName && !this.uiState.previous('editingName')) {
+            $nameInput.select();
+        }
+    }
+
+    /** Show the content text xor the content input. */
+    private renderTodoContent() {
+        this.$('.edit-content-js')
+            .toggle(!this.uiState.editingContent);
+
+        var $contentInput = this.$(".content-edit-js")
+            .toggle(this.uiState.editingContent)
+            .val(this.model.content);
+
+        if (this.uiState.editingContent && !this.uiState.previous('editingContent')) {
+            $contentInput.select();
+        }
+    }
 }
 
 // Global todo state. Could keep track of breadcrumbs etc.
@@ -571,12 +594,13 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     events() {
         return {
-            'click': this.clickBody,
             'click .save-btn-js': this.save
         };
     }
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
+        _.bindAll(this, 'clickBody');
+
         this.model = new TodoAppModel();
 
         this.baseTodoModel = new TodoModel().initWithData(options['data'], null);
@@ -588,6 +612,8 @@ class MainView extends Backbone.View<TodoAppModel> {
         });
         this.setElement($("#main-content"));
         this.template = Util.getTemplate("main");
+
+        $('body').on('click', this.clickBody);
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
