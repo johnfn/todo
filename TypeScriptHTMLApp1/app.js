@@ -499,6 +499,8 @@ var TodoView = (function (_super) {
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
+        window['keyboardShortcuts'].setModel(this.uiState);
+        window['keyboardShortcuts'].render();
         return this;
     };
     /** Show the name text xor the name input. */
@@ -579,6 +581,7 @@ var MainView = (function (_super) {
     return MainView;
 })(Backbone.View);
 window.onload = function () {
+    window['keyboardShortcuts'] = new KeyboardShortcuts();
     var mainView = new MainView({
         data: dummyData
     });

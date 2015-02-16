@@ -568,6 +568,9 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$('.name').focus();
         }
 
+        window['keyboardShortcuts'].setModel(this.uiState);
+        window['keyboardShortcuts'].render();
+
         return this;
     }
 
@@ -660,6 +663,8 @@ class MainView extends Backbone.View<TodoAppModel> {
 }
 
 window.onload = () => {
+    window['keyboardShortcuts'] = new KeyboardShortcuts();
+
     var mainView = new MainView({
         data: dummyData
     });

@@ -16,6 +16,7 @@
     <script src="/Scripts/bootstrap.js"></script>
 
     <script src="app.js"></script>
+    <script src="keyboard-shortcuts.js"></script>
 
     <script type="text/template" id="todo-edit">
         <div class="children">
@@ -58,9 +59,25 @@
 
         <input type="button" class="save-btn-js" value="save" />
     </script>
+
+    <script type="text/template" id="normal-shortcuts">
+        <ul>
+            <li> <b>Enter:</b> Edit todo name. </li>
+            <li> <b>Shift + Enter:</b> Add a sub-todo. </li>
+        </ul>
+    </script>
 </head>
 <body>
     <div id="main-content">
+    </div>
+
+    <div class="keyboard-shortcuts">
+        <span class="keyboard-header">
+            Relevant shortcuts here:
+        </span>
+        <a href="#" class="exit">x</a>
+
+        <div class="shortcuts-js"> One </div>
     </div>
 </body>
 </html>

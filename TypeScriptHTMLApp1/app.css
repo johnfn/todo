@@ -31,3 +31,15 @@ a {
 .invisible {
     display: none;
 }
+
+.keyboard-shortcuts {
+    position: fixed;
+    border: 1px solid #f3f3f3;
+    bottom: 0;
+    right: 0;
+    width: 20%;
+}
+
+    .keyboard-shortcuts .exit {
+        float: right;
+    }
