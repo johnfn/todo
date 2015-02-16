@@ -20,7 +20,7 @@ var KeyboardShortcuts = (function (_super) {
     };
     KeyboardShortcuts.prototype.render = function () {
         var keyboardShortcutTemplate;
-        if (this.model.addTodoVisible || this.model.editingContent || this.model.editingName) {
+        if (this.model.isEditing) {
             keyboardShortcutTemplate = this.editingShortcuts;
         }
         else {

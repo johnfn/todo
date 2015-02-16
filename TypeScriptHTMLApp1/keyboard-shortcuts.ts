@@ -18,9 +18,7 @@
     render() {
         var keyboardShortcutTemplate: Template;
 
-        if (this.model.addTodoVisible ||
-            this.model.editingContent ||
-            this.model.editingName) {
+        if (this.model.isEditing) {
             keyboardShortcutTemplate = this.editingShortcuts;
         } else {
             keyboardShortcutTemplate = this.normalShortcuts;

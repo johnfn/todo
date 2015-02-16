@@ -5,40 +5,16 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+console.log("test");
 var dummyData = {
-    name: 'topmost todo',
+    name: 'Ariel is a cutie!',
     content: '',
     children: [{
-        name: 'This is a todo',
-        content: 'descriptive content',
+        name: 'Put some stuff here',
         children: []
     }, {
-        name: 'Another todo! No content.',
-        content: '',
-        children: [{
-            name: 'Nested TODO.',
-            content: 'bleh',
-            children: []
-        }, {
-            name: 'Another nested TODO.',
-            content: 'blaaah',
-            children: []
-        }, {
-            name: 'Nr 3.',
-            content: 'blaaah',
-            children: []
-        }, {
-            name: 'Nr 4.',
-            content: 'blaaah',
-            children: []
-        }]
-    }, {
-        name: 'To test falling',
-        children: [{
-            name: 'test',
-            content: 'bleh',
-            children: []
-        }]
+        name: 'More stuff here.',
+        children: []
     }]
 };
 var saved = window.localStorage.getItem('data');
@@ -73,6 +49,7 @@ var TodoModel = (function (_super) {
     TodoModel.prototype.initWithData = function (data, parent) {
         this.name = data.name;
         this.content = data.content;
+        this.done = data.done;
         this.parent = parent;
         if (data.depth) {
             this.depth = data.depth;
@@ -228,6 +205,19 @@ var TodoUiState = (function (_super) {
         this.editingName = false;
         this.editingContent = false;
     }
+    Object.defineProperty(TodoUiState.prototype, "isEditing", {
+        /** Returns true if the user is currently editing anything. */
+        get: function () {
+            return this.addTodoVisible || this.editingName || this.editingContent;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    TodoUiState.prototype.stopAllEditing = function () {
+        this.addTodoVisible = false;
+        this.editingName = false;
+        this.editingContent = false;
+    };
     Object.defineProperty(TodoUiState.prototype, "addTodoVisible", {
         get: function () {
             return this.get('addTodoVisible');
@@ -337,11 +327,19 @@ var TodoView = (function (_super) {
             return;
         // Navigation
         if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
-            return this.navigateBetweenTodos(e.which);
+            if (!this.uiState.isEditing) {
+                return this.navigateBetweenTodos(e.which);
+            }
         }
         // Shift + Enter to add child
         if (e.which == 13 && e.shiftKey) {
             this.toggleAddChildTodo();
+            return false;
+        }
+        // Esc to stop editing
+        if (e.which == 27 && this.uiState.isEditing) {
+            this.uiState.stopAllEditing();
+            this.render();
             return false;
         }
         // Enter to finish editing name
@@ -358,6 +356,7 @@ var TodoView = (function (_super) {
             this.render();
             return false;
         }
+        // Enter to finish adding child
         if (e.which === 13 && this.uiState.addTodoVisible) {
             this.editView.addTodo(null);
             this.render();
@@ -599,4 +598,3 @@ window.onload = function () {
         }
     });
 };
-//# sourceMappingURL=app.js.map

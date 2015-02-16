@@ -1,5 +1,10 @@
 ﻿// TODO (lol)
 
+console.log("test");
+
+// * Escape to cancel editing
+// * You shouldn't be able to navigate while editing.
+// * Shift + Enter inside text to edit description
 // * Save to disk
 // * Save to server
 // * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
@@ -60,40 +65,15 @@ interface ITodo {
 }
 
 var dummyData: ITodo = <any> {
-    name: 'topmost todo',
+    name: 'Ariel is a cutie!',
     content: '',
     children:
     [{
-        name: 'This is a todo',
-        content: 'descriptive content',
+        name: 'Put some stuff here',
         children: []
     }, {
-            name: 'Another todo! No content.',
-            content: '',
-            children: [{
-                name: 'Nested TODO.',
-                content: 'bleh',
-                children: []
-            }, {
-                    name: 'Another nested TODO.',
-                    content: 'blaaah',
-                    children: []
-                }, {
-                    name: 'Nr 3.',
-                    content: 'blaaah',
-                    children: []
-                }, {
-                    name: 'Nr 4.',
-                    content: 'blaaah',
-                    children: []
-                }]
-        }, {
-            name: 'To test falling',
-            children: [{
-                name: 'test',
-                content: 'bleh',
-                children: []
-            }]
+            name: 'More stuff here.',
+            children: []
         }]
 };
 
@@ -134,6 +114,7 @@ class TodoModel extends Backbone.Model {
     initWithData(data: ITodo, parent: TodoModel): TodoModel {
         this.name = data.name;
         this.content = data.content;
+        this.done = data.done;
         this.parent = parent;
 
         if (data.depth) {
@@ -158,7 +139,7 @@ class TodoModel extends Backbone.Model {
     /** Recursively get the ITodo data of this Todo. */
     getData(): ITodo {
         var result = this.toJSON();
-        result['children'] = _.map(this.children, (model: TodoModel) => model.getData());
+        result['children'] = _.map(this.children,(model: TodoModel) => model.getData());
 
         return result;
     }
@@ -243,6 +224,17 @@ class TodoUiState extends Backbone.Model {
     constructor(attrs?: any) {
         super(attrs);
 
+        this.addTodoVisible = false;
+        this.editingName = false;
+        this.editingContent = false;
+    }
+
+    /** Returns true if the user is currently editing anything. */
+    get isEditing(): boolean {
+        return this.addTodoVisible || this.editingName || this.editingContent;
+    }
+
+    stopAllEditing() {
         this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
@@ -359,13 +351,23 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // Navigation
         if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
-            return this.navigateBetweenTodos(e.which);
+            if (!this.uiState.isEditing) {
+                return this.navigateBetweenTodos(e.which);
+            }
         }
 
         // Shift + Enter to add child
         if (e.which == 13 && e.shiftKey) {
             this.toggleAddChildTodo();
 
+            return false;
+        }
+
+        // Esc to stop editing
+        if (e.which == 27 && this.uiState.isEditing) {
+            this.uiState.stopAllEditing();
+
+            this.render();
             return false;
         }
 
@@ -387,6 +389,7 @@ class TodoView extends Backbone.View<TodoModel> {
             return false;
         }
 
+        // Enter to finish adding child
         if (e.which === 13 && this.uiState.addTodoVisible) {
             this.editView.addTodo(null);
 
@@ -486,7 +489,7 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     private hideAllEditNodes(e: JQueryMouseEventObject) {
-        _.each(this.childrenViews, (view: TodoView) => { view.trigger('click-body'); });
+        _.each(this.childrenViews,(view: TodoView) => { view.trigger('click-body'); });
 
         this.uiState.editingContent = false;
         this.uiState.editingName = false;
@@ -520,7 +523,7 @@ class TodoView extends Backbone.View<TodoModel> {
         this.editView = new NewTodoView({ model: editModel });
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
-        this.listenTo(this.editView, 'add-todo', (model: TodoModel) => {
+        this.listenTo(this.editView, 'add-todo',(model: TodoModel) => {
             self.addChildTodo(model);
             self.toggleAddChildTodo();
         });
@@ -577,7 +580,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // render children
 
-        _.each(this.childrenViews, (child: TodoView) => {
+        _.each(this.childrenViews,(child: TodoView) => {
             child.render().$el.appendTo($childrenContainer);
         });
 
@@ -686,7 +689,7 @@ window.onload = () => {
 
     mainView.render();
 
-    $('body').on('keydown', (e: JQueryKeyEventObject) => {
+    $('body').on('keydown',(e: JQueryKeyEventObject) => {
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (TodoView.todoViews[i].keydown(e) == false)
                 break; // stop propagation
