@@ -1,6 +1,6 @@
 ﻿class KeyboardShortcuts extends Backbone.View<TodoUiState> {
-    normalShortcuts: Template;
-    editingShortcuts: Template;
+    normalShortcuts: ITemplate;
+    editingShortcuts: ITemplate;
 
     initialize() {
         this.normalShortcuts = Util.getTemplate("normal-shortcuts");
@@ -16,7 +16,7 @@
     }
 
     render() {
-        var keyboardShortcutTemplate: Template;
+        var keyboardShortcutTemplate: ITemplate;
 
         if (this.model.isEditing) {
             keyboardShortcutTemplate = this.editingShortcuts;

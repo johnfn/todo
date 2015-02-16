@@ -5,23 +5,6 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-console.log("test");
-var dummyData = {
-    name: 'Ariel is a cutie!',
-    content: '',
-    children: [{
-        name: 'Put some stuff here',
-        children: []
-    }, {
-        name: 'More stuff here.',
-        children: []
-    }]
-};
-var saved = window.localStorage.getItem('data');
-if (saved) {
-    saved = JSON.parse(saved);
-    dummyData = saved;
-}
 var Util = (function () {
     function Util() {
     }
@@ -38,12 +21,19 @@ var TodoModel = (function (_super) {
         this._children = [];
     }
     TodoModel.prototype.initialize = function () {
+        var _this = this;
         this.name = '';
         this.content = '';
         this.done = false;
         this.selected = false;
         this.childIndex = -1;
         this.uid = Math.random() + ' ' + Math.random();
+        // Pass this event up the hierarchy, so we can use it in SavedData.
+        this.listenTo(this, 'good-time-to-save', function () {
+            if (_this.parent) {
+                _this.parent.trigger('good-time-to-save');
+            }
+        });
     };
     /** recursively create this todo and all sub-todos from the provided data. */
     TodoModel.prototype.initWithData = function (data, parent) {
@@ -72,13 +62,17 @@ var TodoModel = (function (_super) {
         result['children'] = _.map(this.children, function (model) { return model.getData(); });
         return result;
     };
+    /** Indicate that now would be a good time to save. */
+    TodoModel.prototype.goodTimeToSave = function () {
+        this.trigger('good-time-to-save');
+    };
     Object.defineProperty(TodoModel.prototype, "childIndex", {
         /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
         get: function () {
             if (this.parent == null)
                 return -1;
             for (var i = 0; i < this.parent.numChildren; i++) {
-                if (this.parent.children[i].uid == this.uid) {
+                if (this.parent.children[i].uid === this.uid) {
                     return i;
                 }
             }
@@ -324,46 +318,61 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.keydown = function (e) {
         if (!this.model.selected)
-            return;
+            return false;
+        var enter = e.which === 13 && !e.shiftKey;
+        var shiftEnter = e.which === 13 && e.shiftKey;
         // Navigation
-        if (e.which == 38 || e.which == 40 || e.which == 37 || e.which == 39) {
+        if (e.which === 38 || e.which === 40 || e.which === 37 || e.which === 39) {
             if (!this.uiState.isEditing) {
                 return this.navigateBetweenTodos(e.which);
             }
         }
+        // Shift + Enter to toggle between name and content editing
+        if (shiftEnter && this.uiState.editingName) {
+            this.uiState.editingName = false;
+            this.uiState.editingContent = true;
+            this.render();
+            return false;
+        }
+        if (shiftEnter && this.uiState.editingContent) {
+            this.uiState.editingName = true;
+            this.uiState.editingContent = false;
+            this.render();
+            return false;
+        }
         // Shift + Enter to add child
-        if (e.which == 13 && e.shiftKey) {
+        if (shiftEnter) {
             this.toggleAddChildTodo();
             return false;
         }
         // Esc to stop editing
-        if (e.which == 27 && this.uiState.isEditing) {
+        if (e.which === 27 && this.uiState.isEditing) {
             this.uiState.stopAllEditing();
             this.render();
             return false;
         }
         // Enter to finish editing name
-        if (e.which === 13 && this.uiState.editingName) {
+        if (enter && this.uiState.editingName) {
             this.model.name = this.$('.name-edit').val();
             this.uiState.editingName = false;
             this.render();
             return false;
         }
         // Enter to finish editing content
-        if (e.which === 13 && this.uiState.editingContent) {
+        if (enter && this.uiState.editingContent) {
             this.model.content = this.$('.content-edit-js').val();
             this.uiState.editingContent = false;
             this.render();
             return false;
         }
         // Enter to finish adding child
-        if (e.which === 13 && this.uiState.addTodoVisible) {
+        if (enter && this.uiState.addTodoVisible) {
             this.editView.addTodo(null);
             this.render();
             return false;
         }
         // Enter to edit name
-        if (!this.uiState.editingName && !this.uiState.addTodoVisible && e.which == 13 && !e.shiftKey) {
+        if (enter && !this.uiState.editingName && !this.uiState.addTodoVisible) {
             this.uiState.editingName = true;
             this.render();
             return false;
@@ -374,8 +383,8 @@ var TodoView = (function (_super) {
         Return true to stop key event propagation. */
     TodoView.prototype.navigateBetweenTodos = function (which) {
         var newSelection;
-        if (which == 40 || which == 39) {
-            if (this.model.numChildren != 0) {
+        if (which === 40 || which === 39) {
+            if (this.model.numChildren !== 0) {
                 newSelection = this.model.children[0];
             }
             else {
@@ -406,18 +415,18 @@ var TodoView = (function (_super) {
                 }
             }
         }
-        if (which == 38) {
+        if (which === 38) {
             newSelection = this.model.previousChild;
             if (newSelection == null) {
                 newSelection = this.model.parent;
             }
             else {
-                while (newSelection.numChildren != 0) {
+                while (newSelection.numChildren !== 0) {
                     newSelection = newSelection.children[newSelection.numChildren - 1];
                 }
             }
         }
-        if (which == 37) {
+        if (which === 37) {
             newSelection = this.model.parent;
         }
         // If they did not try to navigate invalidly, then do our updates.
@@ -474,7 +483,7 @@ var TodoView = (function (_super) {
         // have children inserted, but the other half we should be adding
         // new children to the array.
         // TODO: Should think about this more later.
-        if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) == -1) {
+        if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) === -1) {
             this.model.children.splice(index, 0, childModel);
         }
         this.render();
@@ -489,12 +498,9 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.render = function () {
-        var self = this;
         this.$el.html(this.template(this.model.toJSON()));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
-        var $editName = this.$('.edit-name-js');
-        var $editContent = this.$('.edit-content-js');
         // Update state per uiState
         $addTodo.toggle(this.uiState.addTodoVisible);
         this.renderTodoName();
@@ -554,10 +560,13 @@ var MainView = (function (_super) {
         _super.apply(this, arguments);
     }
     MainView.prototype.initialize = function (options) {
-        _.bindAll(this, 'clickBody', 'save');
+        _.bindAll(this, 'clickBody');
         this.model = new TodoAppModel();
-        this.baseTodoModel = new TodoModel().initWithData(options['data'], null);
+        this.savedData = new SavedData();
+        var data = this.savedData.load();
+        this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
+        this.savedData.watch(this.baseTodoModel);
         this.baseTodoView = new TodoView({
             model: this.baseTodoModel,
             mainView: this
@@ -565,7 +574,6 @@ var MainView = (function (_super) {
         this.setElement($('#main-content'));
         this.template = Util.getTemplate('main');
         $('body').on('click', this.clickBody);
-        window.setInterval(this.save, 400);
     };
     MainView.prototype.keydown = function (e) {
         console.log(e.which);
@@ -576,10 +584,6 @@ var MainView = (function (_super) {
         this.baseTodoView.render().$el.appendTo(this.$('.items'));
         return this;
     };
-    MainView.prototype.save = function () {
-        window.localStorage.setItem("data", JSON.stringify(this.baseTodoModel.getData()));
-        return false;
-    };
     MainView.prototype.clickBody = function (e) {
         this.baseTodoView.trigger('click-body');
     };
@@ -587,14 +591,13 @@ var MainView = (function (_super) {
 })(Backbone.View);
 window.onload = function () {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
-    var mainView = new MainView({
-        data: dummyData
-    });
+    var mainView = new MainView();
     mainView.render();
     $('body').on('keydown', function (e) {
         for (var i = 0; i < TodoView.todoViews.length; i++) {
-            if (TodoView.todoViews[i].keydown(e) == false)
+            if (!TodoView.todoViews[i].keydown(e))
                 break; // stop propagation
         }
     });
 };
+//# sourceMappingURL=app.js.map
