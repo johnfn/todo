@@ -40,15 +40,13 @@ class LocalStorageBackedModel extends Backbone.Model {
 /** The state of the entire todo list at some point in time. */
 class SavedSnapshot extends LocalStorageBackedModel {
 	namespace(): string {
-		if (this.index === -1) throw 'SavedSnapshot not initialized';
+		if (this.id === -1) throw 'SavedSnapshot not initialized';
 
-		return 'snapshot' + this.index + '-';
+		return 'snapshot' + this.id + '-';
 	}
 
-	private index = -1;
-
-	init(index: number) {
-		this.index = index;
+	init(id: number) {
+		this.id = id;
 	}
 
 	savedProps: string[] = ['data', 'date'];
@@ -94,6 +92,7 @@ class SavedDataState extends LocalStorageBackedModel {
 class SavedData extends Backbone.Collection<SavedSnapshot> {
 	baseTodoModel: TodoModel;
 	savedDataState: SavedDataState;
+	lastSave:number = 0;
 
 	initialize(attributes?: any, options?: any) {
 		
@@ -107,9 +106,11 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 
 	/** Save, and potentially roll the buffer forwards. */
 	save():void {
-		if (true) { // TODO: Use better condition.
+		if (this.lastSave - (+new Date()) > 2 * 1000) { // TODO: Use better condition.
 			this.savedDataState.bufferPosition = (this.savedDataState.bufferPosition + 1) % this.savedDataState.bufferSize;
 			this.savedDataState.save();
+
+			this.lastSave = +new Date();
 		}
 
 		this.activeTodo().data = this.baseTodoModel.getData();
@@ -185,7 +186,8 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 				snapshot.save();
 			}
 
-			this.add(snapshot);
+			if (!this.get(snapshot.id))
+				this.add(snapshot);
 		}
 	}
 

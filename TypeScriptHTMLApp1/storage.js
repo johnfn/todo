@@ -45,16 +45,15 @@ var SavedSnapshot = (function (_super) {
     __extends(SavedSnapshot, _super);
     function SavedSnapshot() {
         _super.apply(this, arguments);
-        this.index = -1;
         this.savedProps = ['data', 'date'];
     }
     SavedSnapshot.prototype.namespace = function () {
-        if (this.index === -1)
+        if (this.id === -1)
             throw 'SavedSnapshot not initialized';
-        return 'snapshot' + this.index + '-';
+        return 'snapshot' + this.id + '-';
     };
-    SavedSnapshot.prototype.init = function (index) {
-        this.index = index;
+    SavedSnapshot.prototype.init = function (id) {
+        this.id = id;
     };
     Object.defineProperty(SavedSnapshot.prototype, "hasData", {
         get: function () {
@@ -141,6 +140,7 @@ var SavedData = (function (_super) {
     __extends(SavedData, _super);
     function SavedData() {
         _super.apply(this, arguments);
+        this.lastSave = 0;
     }
     SavedData.prototype.initialize = function (attributes, options) {
     };
@@ -150,9 +150,10 @@ var SavedData = (function (_super) {
     };
     /** Save, and potentially roll the buffer forwards. */
     SavedData.prototype.save = function () {
-        if (true) {
+        if (this.lastSave - (+new Date()) > 2 * 1000) {
             this.savedDataState.bufferPosition = (this.savedDataState.bufferPosition + 1) % this.savedDataState.bufferSize;
             this.savedDataState.save();
+            this.lastSave = +new Date();
         }
         this.activeTodo().data = this.baseTodoModel.getData();
         this.activeTodo().date = (new Date()).toString();
@@ -211,7 +212,8 @@ var SavedData = (function (_super) {
             else {
                 snapshot.save();
             }
-            this.add(snapshot);
+            if (!this.get(snapshot.id))
+                this.add(snapshot);
         }
     };
     SavedData.prototype.loadCircularBuffer = function () {
