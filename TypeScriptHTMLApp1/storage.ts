@@ -133,6 +133,15 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 		return this.activeTodo().data;
 	}
 
+	loadModel(model: SavedSnapshot) {
+		var index = this.indexOf(model);
+
+		this.savedDataState.bufferPosition = index;
+		this.savedDataState.save();
+
+		this.trigger('load');
+	}
+
 	firstTimeLoad():ITodo {
 		this.savedDataState.bufferPosition = 0;
 		this.savedDataState.bufferSize = 50;
@@ -186,6 +195,12 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 class IndividualSavedItemView extends Backbone.View<SavedSnapshot> {
 	individualItem: ITemplate;
 
+    events() {
+        return {
+            'click a': 'load'
+        };
+    }
+
 	initialize(options: Backbone.ViewOptions<SavedSnapshot>) {
 		this.individualItem = Util.getTemplate('autosave-list-item');
 	}
@@ -195,6 +210,10 @@ class IndividualSavedItemView extends Backbone.View<SavedSnapshot> {
 
 		return this;
 	}
+
+	load() {
+		this.trigger('load', this.model);
+	}
 }
 
 class SavedDataView extends Backbone.View<SavedSnapshot> {
@@ -202,9 +221,17 @@ class SavedDataView extends Backbone.View<SavedSnapshot> {
 		this.setElement($('.modal'));
 	}
 
+	load(model: SavedSnapshot):void {
+		(<any> this.$el).modal('hide');
+
+		// TODO: Dumb.
+		(<any> this.collection).loadModel(model);
+	}
+
 	render():SavedDataView {
 		(<any> this.$el).modal();
 
+		var self = this;
 		var $body = this.$('.modal-body').empty();
 
 		this.collection.each((item: SavedSnapshot, i: number) => {
@@ -218,6 +245,7 @@ class SavedDataView extends Backbone.View<SavedSnapshot> {
 			});
 
 			view.render().$el.appendTo($body);
+			this.listenTo(view, 'load', self.load);
 		});
 
 		return this;

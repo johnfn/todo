@@ -659,6 +659,11 @@ class MainView extends Backbone.View<TodoAppModel> {
 		this.savedData = new SavedData();
 	    var data = this.savedData.load();
 
+	    this.listenTo(this.savedData, 'load', () => {
+			// Do something intelligent.
+		    console.log("load");
+	    });
+
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
 

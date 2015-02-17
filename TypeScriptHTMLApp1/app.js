@@ -570,6 +570,10 @@ var MainView = (function (_super) {
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
         var data = this.savedData.load();
+        this.listenTo(this.savedData, 'load', function () {
+            // Do something intelligent.
+            console.log("load");
+        });
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
         this.savedData.watch(this.baseTodoModel);

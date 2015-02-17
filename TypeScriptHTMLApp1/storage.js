@@ -170,6 +170,12 @@ var SavedData = (function (_super) {
         }
         return this.activeTodo().data;
     };
+    SavedData.prototype.loadModel = function (model) {
+        var index = this.indexOf(model);
+        this.savedDataState.bufferPosition = index;
+        this.savedDataState.save();
+        this.trigger('load');
+    };
     SavedData.prototype.firstTimeLoad = function () {
         this.savedDataState.bufferPosition = 0;
         this.savedDataState.bufferSize = 50;
@@ -216,12 +222,20 @@ var IndividualSavedItemView = (function (_super) {
     function IndividualSavedItemView() {
         _super.apply(this, arguments);
     }
+    IndividualSavedItemView.prototype.events = function () {
+        return {
+            'click a': 'load'
+        };
+    };
     IndividualSavedItemView.prototype.initialize = function (options) {
         this.individualItem = Util.getTemplate('autosave-list-item');
     };
     IndividualSavedItemView.prototype.render = function () {
         this.$el.html(this.individualItem(this.model.toJSON()));
         return this;
+    };
+    IndividualSavedItemView.prototype.load = function () {
+        this.trigger('load', this.model);
     };
     return IndividualSavedItemView;
 })(Backbone.View);
@@ -233,8 +247,15 @@ var SavedDataView = (function (_super) {
     SavedDataView.prototype.initialize = function () {
         this.setElement($('.modal'));
     };
+    SavedDataView.prototype.load = function (model) {
+        this.$el.modal('hide');
+        // TODO: Dumb.
+        this.collection.loadModel(model);
+    };
     SavedDataView.prototype.render = function () {
+        var _this = this;
         this.$el.modal();
+        var self = this;
         var $body = this.$('.modal-body').empty();
         this.collection.each(function (item, i) {
             if (!item.hasData)
@@ -244,6 +265,7 @@ var SavedDataView = (function (_super) {
                 model: item
             });
             view.render().$el.appendTo($body);
+            _this.listenTo(view, 'load', self.load);
         });
         return this;
     };
