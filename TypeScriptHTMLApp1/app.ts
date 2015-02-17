@@ -651,6 +651,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     baseTodoModel: TodoModel;
     baseTodoView: TodoView;
 	savedData: SavedData;
+	autosaveView: SavedDataView;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
         _.bindAll(this, 'clickBody');
@@ -658,6 +659,12 @@ class MainView extends Backbone.View<TodoAppModel> {
 
 		this.savedData = new SavedData();
 	    var data = this.savedData.load();
+
+		this.autosaveView = new SavedDataView(<any> {
+			collection: this.savedData
+		});
+
+	    this.autosaveView.render();
 
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;

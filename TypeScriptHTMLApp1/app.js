@@ -570,6 +570,10 @@ var MainView = (function (_super) {
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
         var data = this.savedData.load();
+        this.autosaveView = new SavedDataView({
+            collection: this.savedData
+        });
+        this.autosaveView.render();
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
         this.savedData.watch(this.baseTodoModel);

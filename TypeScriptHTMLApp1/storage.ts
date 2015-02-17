@@ -1,4 +1,9 @@
-﻿class LocalStorageBackedModel extends Backbone.Model {
+﻿// TODO: 
+// * skip undefined
+// * shortcut to open
+// * load on click
+
+class LocalStorageBackedModel extends Backbone.Model {
 	savedProps: string[] = ['bufferSize', 'bufferPosition'];
 	namespace():string { return ''; }
 
@@ -44,6 +49,10 @@ class SavedSnapshot extends LocalStorageBackedModel {
 	}
 
 	savedProps: string[] = ['data', 'date'];
+
+	get hasData(): boolean {
+		return this.get('data') !== "null";
+	}
 	
     get data(): ITodo {
 		if (!this.get('data')) {
@@ -174,6 +183,43 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 	}
 }
 
-class SavedDataView extends Backbone.View<SavedSnapshot> {
+class IndividualSavedItemView extends Backbone.View<SavedSnapshot> {
+	individualItem: ITemplate;
 
+	initialize(options: Backbone.ViewOptions<SavedSnapshot>) {
+		this.individualItem = Util.getTemplate('autosave-list-item');
+	}
+
+	render():IndividualSavedItemView {
+		this.$el.html(this.individualItem(this.model.toJSON()));
+
+		return this;
+	}
+}
+
+class SavedDataView extends Backbone.View<SavedSnapshot> {
+	initialize() {
+		this.setElement($('.modal'));
+	}
+
+	render():SavedDataView {
+		(<any> this.$el).modal();
+
+		var $body = this.$('.modal-body').empty();
+
+		this.collection.each((item: SavedSnapshot, i: number) => {
+			if (!item.hasData)
+				return;
+
+			item.set('index', i);
+
+			var view = new IndividualSavedItemView(<any>{
+				model: item
+			});
+
+			view.render().$el.appendTo($body);
+		});
+
+		return this;
+	}
 }

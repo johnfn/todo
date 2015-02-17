@@ -1,3 +1,7 @@
+// TODO: 
+// * skip undefined
+// * shortcut to open
+// * load on click
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -49,6 +53,13 @@ var SavedSnapshot = (function (_super) {
     SavedSnapshot.prototype.init = function (index) {
         this.index = index;
     };
+    Object.defineProperty(SavedSnapshot.prototype, "hasData", {
+        get: function () {
+            return this.get('data') !== "null";
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(SavedSnapshot.prototype, "data", {
         get: function () {
             if (!this.get('data')) {
@@ -198,11 +209,42 @@ var SavedData = (function (_super) {
     };
     return SavedData;
 })(Backbone.Collection);
+var IndividualSavedItemView = (function (_super) {
+    __extends(IndividualSavedItemView, _super);
+    function IndividualSavedItemView() {
+        _super.apply(this, arguments);
+    }
+    IndividualSavedItemView.prototype.initialize = function (options) {
+        this.individualItem = Util.getTemplate('autosave-list-item');
+    };
+    IndividualSavedItemView.prototype.render = function () {
+        this.$el.html(this.individualItem(this.model.toJSON()));
+        return this;
+    };
+    return IndividualSavedItemView;
+})(Backbone.View);
 var SavedDataView = (function (_super) {
     __extends(SavedDataView, _super);
     function SavedDataView() {
         _super.apply(this, arguments);
     }
+    SavedDataView.prototype.initialize = function () {
+        this.setElement($('.modal'));
+    };
+    SavedDataView.prototype.render = function () {
+        this.$el.modal();
+        var $body = this.$('.modal-body').empty();
+        this.collection.each(function (item, i) {
+            if (!item.hasData)
+                return;
+            item.set('index', i);
+            var view = new IndividualSavedItemView({
+                model: item
+            });
+            view.render().$el.appendTo($body);
+        });
+        return this;
+    };
     return SavedDataView;
 })(Backbone.View);
 //# sourceMappingURL=storage.js.map
