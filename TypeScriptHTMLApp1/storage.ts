@@ -1,9 +1,4 @@
 ﻿// TODO: 
-// X skip undefined
-// X shortcut to open
-// X Bug with buffer position increment
-// X load on click
-//   * Bug: tons of random items added
 // * Indicate which one you're on.
 
 class LocalStorageBackedModel extends Backbone.Model {
@@ -52,7 +47,7 @@ class SavedSnapshot extends LocalStorageBackedModel {
 	savedProps: string[] = ['data', 'date'];
 
 	get hasData(): boolean {
-		return this.get('data') !== "null";
+		return this.get('data') !== 'null' && this.get('data') !== undefined;
 	}
 	
     get data(): ITodo {
@@ -106,17 +101,20 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 
 	/** Save, and potentially roll the buffer forwards. */
 	save():void {
-		if (this.lastSave - (+new Date()) > 2 * 1000) { // TODO: Use better condition.
+		if ((+new Date()) - this.lastSave > 2 * 1000) { // TODO: Use better condition.
 			this.savedDataState.bufferPosition = (this.savedDataState.bufferPosition + 1) % this.savedDataState.bufferSize;
 			this.savedDataState.save();
 
 			this.lastSave = +new Date();
 		}
 
+
 		this.activeTodo().data = this.baseTodoModel.getData();
-		this.activeTodo().date = (new Date()).toString();
+		this.activeTodo().date = (new Date()).toUTCString();
 
 		this.activeTodo().save();
+
+		console.log('save');
 	}
 
 	private activeTodo(): SavedSnapshot {
@@ -169,6 +167,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 
 		var active = this.activeTodo();
 		active.data = data;
+		active.date = (new Date()).toUTCString();
 		active.save();
 
 		return data;
@@ -209,14 +208,15 @@ class IndividualSavedItemView extends Backbone.View<SavedSnapshot> {
 		this.individualItem = Util.getTemplate('autosave-list-item');
 	}
 
-	render():IndividualSavedItemView {
-		this.$el.html(this.individualItem(this.model.toJSON()));
-
-		return this;
-	}
-
 	load() {
 		this.trigger('load', this.model);
+	}
+
+	render():IndividualSavedItemView {
+		this.$el.html(this.individualItem(this.model.toJSON()));
+		this.$('.timeago-js').timeago();
+
+		return this;
 	}
 }
 
@@ -226,17 +226,17 @@ class SavedDataView extends Backbone.View<SavedSnapshot> {
 	}
 
 	load(model: SavedSnapshot):void {
-		(<any> this.$el).modal('hide');
+		this.$el.modal('hide');
 
 		// TODO: Dumb.
 		(<any> this.collection).loadModel(model);
 	}
 
 	render():SavedDataView {
-		(<any> this.$el).modal();
+		this.$el.modal();
 
 		var self = this;
-		var $body = this.$('.modal-body').empty();
+		var $body = this.$('.modal-body .items').empty();
 
 		this.collection.each((item: SavedSnapshot, i: number) => {
 			if (!item.hasData)

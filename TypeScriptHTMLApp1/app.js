@@ -301,6 +301,7 @@ var TodoView = (function (_super) {
         return {
             'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
+            'click .todo-remove-js': this.clickRemoveTodo,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': function () { return false; }
@@ -321,6 +322,7 @@ var TodoView = (function (_super) {
             this.addChildTodo(this.model.children[i]);
         }
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
+        this.listenTo(this, 'remove-todo', this.removeTodo);
     };
     TodoView.prototype.keydown = function (e) {
         if (!this.model.selected)
@@ -447,6 +449,18 @@ var TodoView = (function (_super) {
         this.model.done = !this.model.done;
         this.render();
         return false;
+    };
+    TodoView.prototype.clickRemoveTodo = function () {
+        if (this.model.parent) {
+            this.model.parent.selected = true;
+            this.model.parent.view.trigger('remove-todo', this.model.childIndex);
+        }
+        return false;
+    };
+    TodoView.prototype.removeTodo = function (index) {
+        this.childrenViews.splice(index, 1);
+        this.model.children.splice(index, 1);
+        this.render();
     };
     TodoView.prototype.hideAllEditNodes = function (e) {
         _.each(this.childrenViews, function (view) {

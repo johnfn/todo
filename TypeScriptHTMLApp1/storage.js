@@ -1,9 +1,4 @@
 // TODO: 
-// X skip undefined
-// X shortcut to open
-// X Bug with buffer position increment
-// X load on click
-//   * Bug: tons of random items added
 // * Indicate which one you're on.
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -57,7 +52,7 @@ var SavedSnapshot = (function (_super) {
     };
     Object.defineProperty(SavedSnapshot.prototype, "hasData", {
         get: function () {
-            return this.get('data') !== "null";
+            return this.get('data') !== 'null' && this.get('data') !== undefined;
         },
         enumerable: true,
         configurable: true
@@ -150,14 +145,15 @@ var SavedData = (function (_super) {
     };
     /** Save, and potentially roll the buffer forwards. */
     SavedData.prototype.save = function () {
-        if (this.lastSave - (+new Date()) > 2 * 1000) {
+        if ((+new Date()) - this.lastSave > 2 * 1000) {
             this.savedDataState.bufferPosition = (this.savedDataState.bufferPosition + 1) % this.savedDataState.bufferSize;
             this.savedDataState.save();
             this.lastSave = +new Date();
         }
         this.activeTodo().data = this.baseTodoModel.getData();
-        this.activeTodo().date = (new Date()).toString();
+        this.activeTodo().date = (new Date()).toUTCString();
         this.activeTodo().save();
+        console.log('save');
     };
     SavedData.prototype.activeTodo = function () {
         return this.at(this.savedDataState.bufferPosition);
@@ -198,6 +194,7 @@ var SavedData = (function (_super) {
         this.createCircularBuffer();
         var active = this.activeTodo();
         active.data = data;
+        active.date = (new Date()).toUTCString();
         active.save();
         return data;
     };
@@ -234,12 +231,13 @@ var IndividualSavedItemView = (function (_super) {
     IndividualSavedItemView.prototype.initialize = function (options) {
         this.individualItem = Util.getTemplate('autosave-list-item');
     };
-    IndividualSavedItemView.prototype.render = function () {
-        this.$el.html(this.individualItem(this.model.toJSON()));
-        return this;
-    };
     IndividualSavedItemView.prototype.load = function () {
         this.trigger('load', this.model);
+    };
+    IndividualSavedItemView.prototype.render = function () {
+        this.$el.html(this.individualItem(this.model.toJSON()));
+        this.$('.timeago-js').timeago();
+        return this;
     };
     return IndividualSavedItemView;
 })(Backbone.View);
@@ -260,7 +258,7 @@ var SavedDataView = (function (_super) {
         var _this = this;
         this.$el.modal();
         var self = this;
-        var $body = this.$('.modal-body').empty();
+        var $body = this.$('.modal-body .items').empty();
         this.collection.each(function (item, i) {
             if (!item.hasData)
                 return;

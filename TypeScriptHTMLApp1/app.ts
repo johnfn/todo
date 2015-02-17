@@ -1,14 +1,15 @@
 ﻿// TODO (lol)
 
+// * You can't delete a thingy.
 // X Escape to cancel editing
 // X You shouldn't be able to navigate while editing.
 // X Shift + Enter inside text to edit description
 //   * Annoyingly it doesn't select properly yet.
 // * Save to disk
 //   * I want some sort of procedural back up thing. I don't want to lose my data.
-//     * 'Current' buffer which is constantly being saved to
-//     * Rotating circular backup buffer to which the idx is updated every hour or so.
-//     * Overlay that shows all recent backups.
+//     X 'Current' buffer which is constantly being saved to
+//     X Rotating circular backup buffer to which the idx is updated every hour or so.
+//     X Overlay that shows all recent backups.
 // * Individual view.
 // * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
 // * Save to server
@@ -38,9 +39,9 @@
 //     X Autofocus on new child.
 //     X If I click to open a new child on a nonselected thing, then i hit enter...
 //     X child on bottommost thing is not selected.
-//     * Enter to finish adding a new child.
+//     X Enter to finish adding a new child.
 //   * Maybe Down while editing name to edit description.
-// * Clicking should also change selection.
+// X Clicking should also change selection.
 // * header items (just for organization)
 //   * I think todos will need a 'type' key
 // * mouseover one, highlight all
@@ -320,6 +321,7 @@ class TodoView extends Backbone.View<TodoModel> {
         return {
             'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
+            'click .todo-remove-js': this.clickRemoveTodo,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': () => false
@@ -345,6 +347,7 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
+	    this.listenTo(this, 'remove-todo', this.removeTodo);
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -506,6 +509,23 @@ class TodoView extends Backbone.View<TodoModel> {
 
         return false;
     }
+
+    private clickRemoveTodo() {
+	    if (this.model.parent) {
+		    this.model.parent.selected = true;
+
+		    this.model.parent.view.trigger('remove-todo', this.model.childIndex);
+	    }
+
+	    return false;
+    }
+
+	private removeTodo(index: number) {
+		this.childrenViews.splice(index, 1);
+		this.model.children.splice(index, 1);
+
+		this.render();
+	}
 
     private hideAllEditNodes(e: JQueryMouseEventObject) {
         _.each(this.childrenViews,(view: TodoView) => { view.trigger('click-body'); });
