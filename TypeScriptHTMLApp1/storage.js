@@ -2,7 +2,9 @@
 // X skip undefined
 // X shortcut to open
 // X Bug with buffer position increment
-// * load on click
+// X load on click
+//   * Bug: tons of random items added
+// * Indicate which one you're on.
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

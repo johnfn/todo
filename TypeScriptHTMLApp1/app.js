@@ -566,14 +566,22 @@ var MainView = (function (_super) {
         _super.apply(this, arguments);
     }
     MainView.prototype.initialize = function (options) {
+        var _this = this;
+        var self = this;
         _.bindAll(this, 'clickBody');
+        $('body').on('click', this.clickBody);
+        this.template = Util.getTemplate('main');
+        this.setElement($('#main-content'));
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
-        var data = this.savedData.load();
+        this.initializeTodoTree(this.savedData.load());
         this.listenTo(this.savedData, 'load', function () {
             // Do something intelligent.
-            console.log("load");
+            self.initializeTodoTree(_this.savedData.load());
+            self.render();
         });
+    };
+    MainView.prototype.initializeTodoTree = function (data) {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
         this.savedData.watch(this.baseTodoModel);
@@ -581,9 +589,6 @@ var MainView = (function (_super) {
             model: this.baseTodoModel,
             mainView: this
         });
-        this.setElement($('#main-content'));
-        this.template = Util.getTemplate('main');
-        $('body').on('click', this.clickBody);
     };
     MainView.prototype.keydown = function (e) {
         console.log(e.which);

@@ -653,17 +653,27 @@ class MainView extends Backbone.View<TodoAppModel> {
 	savedData: SavedData;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
+	    var self = this;
         _.bindAll(this, 'clickBody');
+
+        $('body').on('click', this.clickBody);
+
+        this.template = Util.getTemplate('main');
+        this.setElement($('#main-content'));
+
         this.model = new TodoAppModel();
 
 		this.savedData = new SavedData();
-	    var data = this.savedData.load();
+	    this.initializeTodoTree(this.savedData.load());
 
 	    this.listenTo(this.savedData, 'load', () => {
 			// Do something intelligent.
-		    console.log("load");
+		    self.initializeTodoTree(this.savedData.load());
+		    self.render();
 	    });
+    }
 
+	private initializeTodoTree(data: ITodo) {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
 
@@ -673,11 +683,7 @@ class MainView extends Backbone.View<TodoAppModel> {
             model: this.baseTodoModel,
             mainView: this
         });
-        this.setElement($('#main-content'));
-        this.template = Util.getTemplate('main');
-
-        $('body').on('click', this.clickBody);
-    }
+	}
 
     keydown(e: JQueryKeyEventObject): boolean {
         console.log(e.which);
