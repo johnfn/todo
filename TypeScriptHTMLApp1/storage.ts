@@ -1,7 +1,7 @@
 ﻿// TODO: 
 // X skip undefined
 // X shortcut to open
-// * Bug with buffer position increment
+// X Bug with buffer position increment
 // * load on click
 
 class LocalStorageBackedModel extends Backbone.Model {
@@ -67,9 +67,7 @@ class SavedSnapshot extends LocalStorageBackedModel {
 	// These methods will be called by LocalStorageBackedModel.
 	serializedata(data: ITodo):string { return JSON.stringify(data); }
 	unserializedata(data: string): ITodo {
-		if (data === 'undefined') return undefined;
-
-		return JSON.parse(data);
+		return (data === 'undefined') ? undefined : JSON.parse(data);
 	}
 	
     get date(): string { return this.get('date'); }
@@ -85,6 +83,7 @@ class SavedDataState extends LocalStorageBackedModel {
 
     get bufferPosition(): number { return this.get('bufferPosition'); }
     set bufferPosition(value: number) { this.set('bufferPosition', value); }
+	unserializebufferPosition(value: string) { return parseInt(value, 10); }
 
     get hasEverUsedApp(): boolean { return this.get('hasEverUsedApp'); }
     set hasEverUsedApp(value: boolean) { this.set('hasEverUsedApp', value); }

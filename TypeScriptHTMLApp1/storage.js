@@ -1,7 +1,7 @@
 // TODO: 
 // X skip undefined
 // X shortcut to open
-// * Bug with buffer position increment
+// X Bug with buffer position increment
 // * load on click
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -79,9 +79,7 @@ var SavedSnapshot = (function (_super) {
         return JSON.stringify(data);
     };
     SavedSnapshot.prototype.unserializedata = function (data) {
-        if (data === 'undefined')
-            return undefined;
-        return JSON.parse(data);
+        return (data === 'undefined') ? undefined : JSON.parse(data);
     };
     Object.defineProperty(SavedSnapshot.prototype, "date", {
         get: function () {
@@ -122,6 +120,9 @@ var SavedDataState = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    SavedDataState.prototype.unserializebufferPosition = function (value) {
+        return parseInt(value, 10);
+    };
     Object.defineProperty(SavedDataState.prototype, "hasEverUsedApp", {
         get: function () {
             return this.get('hasEverUsedApp');
