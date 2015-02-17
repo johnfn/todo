@@ -1,6 +1,7 @@
 // TODO: 
-// * skip undefined
-// * shortcut to open
+// X skip undefined
+// X shortcut to open
+// * Bug with buffer position increment
 // * load on click
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];

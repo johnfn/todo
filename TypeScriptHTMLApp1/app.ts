@@ -651,7 +651,6 @@ class MainView extends Backbone.View<TodoAppModel> {
     baseTodoModel: TodoModel;
     baseTodoView: TodoView;
 	savedData: SavedData;
-	autosaveView: SavedDataView;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
         _.bindAll(this, 'clickBody');
@@ -659,12 +658,6 @@ class MainView extends Backbone.View<TodoAppModel> {
 
 		this.savedData = new SavedData();
 	    var data = this.savedData.load();
-
-		this.autosaveView = new SavedDataView(<any> {
-			collection: this.savedData
-		});
-
-	    this.autosaveView.render();
 
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
@@ -705,7 +698,18 @@ $(() => {
     var mainView = new MainView();
     mainView.render();
 
+	var autosaveView = new SavedDataView(<any> {
+		collection: mainView.savedData
+	});
+
     $('body').on('keydown',(e: JQueryKeyEventObject) => {
+		if (e.which === 83 && e.ctrlKey) {
+			e.preventDefault();
+			autosaveView.render();
+
+			return;
+		}
+
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e))
                 break; // stop propagation

@@ -1,6 +1,7 @@
 ﻿// TODO: 
-// * skip undefined
-// * shortcut to open
+// X skip undefined
+// X shortcut to open
+// * Bug with buffer position increment
 // * load on click
 
 class LocalStorageBackedModel extends Backbone.Model {

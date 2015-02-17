@@ -570,10 +570,6 @@ var MainView = (function (_super) {
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
         var data = this.savedData.load();
-        this.autosaveView = new SavedDataView({
-            collection: this.savedData
-        });
-        this.autosaveView.render();
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
         this.savedData.watch(this.baseTodoModel);
@@ -603,7 +599,15 @@ $(function () {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
     var mainView = new MainView();
     mainView.render();
+    var autosaveView = new SavedDataView({
+        collection: mainView.savedData
+    });
     $('body').on('keydown', function (e) {
+        if (e.which === 83 && e.ctrlKey) {
+            e.preventDefault();
+            autosaveView.render();
+            return;
+        }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e))
                 break; // stop propagation
