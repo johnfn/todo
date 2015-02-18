@@ -348,7 +348,7 @@ var TodoView = (function (_super) {
             this.render();
             return false;
         }
-        // Shift + Enter to add child
+        // Shift + Enter to start to add child
         if (shiftEnter) {
             this.toggleAddChildTodo();
             return false;
@@ -458,9 +458,9 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.removeTodo = function (index) {
-        this.childrenViews.splice(index, 1);
+        var deleted = this.childrenViews.splice(index, 1)[0];
         this.model.children.splice(index, 1);
-        this.render();
+        deleted.$el.slideUp(100, this.render);
     };
     TodoView.prototype.hideAllEditNodes = function (e) {
         _.each(this.childrenViews, function (view) {

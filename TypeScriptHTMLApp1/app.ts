@@ -1,6 +1,6 @@
 ﻿// TODO (lol)
 
-// * You can't delete a thingy.
+// X You can't delete a thingy.
 // X Escape to cancel editing
 // X You shouldn't be able to navigate while editing.
 // X Shift + Enter inside text to edit description
@@ -380,7 +380,7 @@ class TodoView extends Backbone.View<TodoModel> {
             return false;
         }
 
-        // Shift + Enter to add child
+        // Shift + Enter to start to add child
         if (shiftEnter) {
             this.toggleAddChildTodo();
 
@@ -521,10 +521,10 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
 	private removeTodo(index: number) {
-		this.childrenViews.splice(index, 1);
+		var deleted = this.childrenViews.splice(index, 1)[0];
 		this.model.children.splice(index, 1);
 
-		this.render();
+		deleted.$el.slideUp(100, this.render);
 	}
 
     private hideAllEditNodes(e: JQueryMouseEventObject) {
@@ -562,8 +562,8 @@ class TodoView extends Backbone.View<TodoModel> {
         this.editView = new NewTodoView(<any> { model: editModel });
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
-        this.listenTo(this.editView, 'add-todo',(model: TodoModel) => {
-            self.addChildTodo(model);
+        this.listenTo(this.editView, 'add-todo', (model: TodoModel) => {
+			self.addChildTodo(model);
             self.toggleAddChildTodo();
         });
     }
