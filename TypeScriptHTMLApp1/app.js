@@ -627,7 +627,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.renderTodoName = function () {
         this.$('.edit-name-js').toggle(!this.uiState.editingName);
         var $nameInput = this.$('.name-edit').toggle(this.uiState.editingName).val(this.model.name);
-        if (this.uiState.editingName && !this.uiState.previous('editingName')) {
+        if (this.uiState.editingName) {
             $nameInput.select();
         }
     };
@@ -635,7 +635,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.renderTodoContent = function () {
         this.$('.edit-content-js').toggle(!this.uiState.editingContent);
         var $contentInput = this.$('.content-edit-js').toggle(this.uiState.editingContent).val(this.model.content);
-        if (this.uiState.editingContent && !this.uiState.previous('editingContent')) {
+        if (this.uiState.editingContent) {
             $contentInput.select();
         }
     };

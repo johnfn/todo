@@ -1,57 +1,15 @@
 ﻿// TODO (lol)
 
-// X Fix saving bug
-
-// X Have a left and right panel? More todo properties on the right side
-// X Have the date be somewhere. Right panel?
-// X Shift + Enter inside text to edit description
-//   * Annoyingly it doesn't select properly yet.
-// * Individual view.
-// * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
-// * Save to server
-// * Generalized search
-
-// X Bugs with setting the name of multiple new TODOs.
-// X It's actually not intutive to add things at the top. Just show edit on bottom.
-// X indent inner items
-// X add todos
-// X edit todos
-//   X enter is done
-//   * only 1 at a time
-//   X if you click somewhere else it cancels
-//   X automatically select text.
-//   X Bug where now you can't create new todos
-// X Mark todos as done.
-// * option to add content if there isn't any.
-// * Click to focus
-// * TONS of keyboard shortcuts. just tons.
-//   X Up/down
-//   X left to go up a level
-//   X Enter to start editing
-//     X Enter to finish
-//       X Currently just leaves it blank.
-//       X Before I fix this I should just make the input nodes exist, just empty.
-//   X Shift+Enter to add a child.
-//     X Autofocus on new child.
-//     X If I click to open a new child on a nonselected thing, then i hit enter...
-//     X child on bottommost thing is not selected.
-//     X Enter to finish adding a new child.
-//   * Maybe Down while editing name to edit description.
-// X Clicking should also change selection.
 // * header items (just for organization)
 //   * I think todos will need a 'type' key
+// * Dragging items around
+// * Save to server
+// * Generalized search
+// * Individual view.
+//   * breadcrumb trail visible
+// * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
+
 // * mouseover one, highlight all
-// * zoomin
-// * breadcrumb trail visible
-
-// X If you click on a textbox, it shouldn't collapse.
-//   X This is happening because it's considered a click on body.
-
-// TODO: Eventually merge these into keydown, just check uiState to see which
-// one is being edited.
-// The problem I see right now is that there is a pathological case where
-// you click on both and then uiState is true for both. I think that just
-// allowing one to be edited would be sufficient.
 
 // X pay the power bill
 // * listen to debussy
@@ -732,7 +690,7 @@ class TodoView extends Backbone.View<TodoModel> {
             .toggle(this.uiState.editingName)
             .val(this.model.name);
 
-        if (this.uiState.editingName && !this.uiState.previous('editingName')) {
+        if (this.uiState.editingName) {
             $nameInput.select();
         }
     }
@@ -746,7 +704,7 @@ class TodoView extends Backbone.View<TodoModel> {
             .toggle(this.uiState.editingContent)
             .val(this.model.content);
 
-        if (this.uiState.editingContent && !this.uiState.previous('editingContent')) {
+        if (this.uiState.editingContent) {
             $contentInput.select();
         }
     }
