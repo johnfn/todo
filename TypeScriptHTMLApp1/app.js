@@ -49,6 +49,7 @@ var TodoModel = (function (_super) {
         this.parent = parent;
         this.createdDate = data.createdDate;
         this.modifiedDate = data.modifiedDate;
+        this.isHeader = data.isHeader;
         if (data.depth) {
             this.depth = data.depth;
         }
@@ -87,6 +88,16 @@ var TodoModel = (function (_super) {
             console.error('childIndex is in weird state');
             debugger;
             return -1;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "isHeader", {
+        get: function () {
+            return this.get('isHeader');
+        },
+        set: function (value) {
+            this.set('isHeader', value);
         },
         enumerable: true,
         configurable: true
@@ -356,6 +367,11 @@ var TodoDetailView = (function (_super) {
     function TodoDetailView() {
         _super.apply(this, arguments);
     }
+    TodoDetailView.prototype.events = function () {
+        return {
+            'click .header-checkbox-js': this.toggleHeader
+        };
+    };
     TodoDetailView.prototype.initialize = function () {
         if (TodoDetailView.instance) {
             console.error('Multiple instantiation of TodoDetailView');
@@ -364,6 +380,12 @@ var TodoDetailView = (function (_super) {
         this.template = Util.getTemplate("right-panel");
         this.setElement($('.right-panel'));
         TodoDetailView.instance = this;
+    };
+    TodoDetailView.prototype.toggleHeader = function (e) {
+        this.model.isHeader = $(e.currentTarget).is(':checked');
+        this.model.view.render();
+        this.render();
+        return false;
     };
     TodoDetailView.prototype.render = function () {
         this.$el.empty().html(this.template(this.model.toJSON()));

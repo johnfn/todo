@@ -35,10 +35,12 @@
         </div>
     </script>
 
-    <script type="text/template" id="todo">
+	<script type="text/template" id="todo">
         <div class="todo <% if (selected) print ('selected') %>">
             <div class="todo-name">
-                <span class="edit-name-js <% if (done) print('todo-done') %>"><%= name %></span>
+                <span class="edit-name-js 
+					  <% if (done) print('todo-done') %>
+					  <% if (isHeader) print('todo-header') %>"><%= name %></span>
                 <input class='name-edit' />
 
                 <a href="#" class="todo-add-js"> + </a>
@@ -86,6 +88,9 @@
 		<div> <%= name %> </div>
 		<small> at <%= createdDate %> </small>
 		<div> <%= content %> </div>
+		<div>
+			<input type="checkbox" class="header-checkbox-js" value="Car" <% if (isHeader) print('checked') %>/>Header
+		</div>
 	</script>
 </head>
 <body>

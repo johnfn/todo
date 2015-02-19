@@ -153,6 +153,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 			modifiedDate: Util.fairlyLegibleDateTime(),
 			content: '',
 			done: false,
+			isHeader: true,
 			children:
 			[{
 				createdDate: Util.fairlyLegibleDateTime(),
@@ -160,6 +161,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 				name: 'Put some stuff here',
 				content: '',
 				done: false,
+				isHeader: false,
 				children: []
 			}, {
 				createdDate: Util.fairlyLegibleDateTime(),
@@ -167,6 +169,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 				name: 'More stuff here.',
 				content: '',
 				done: false,
+				isHeader: false,
 				children: []
 			}]
 		};

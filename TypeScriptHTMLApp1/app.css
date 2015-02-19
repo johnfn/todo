@@ -28,6 +28,10 @@ a {
     text-decoration: line-through;
 }
 
+.todo-header {
+	font-size: 1.5em;
+}
+
 .selected {
     border-left: 2px solid black;
 }

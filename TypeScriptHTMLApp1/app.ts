@@ -17,6 +17,7 @@
 interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
+	isHeader: boolean;
     content: string;
 	createdDate: string;
 	modifiedDate: string;
@@ -41,7 +42,7 @@ class Util {
 	}
 }
 
-class TodoModel extends Backbone.Model {
+class TodoModel extends Backbone.Model implements ITodo {
     /** The TodoModel one view up (or null if there isn't one. */
     parent: TodoModel;
     view: TodoView;
@@ -75,6 +76,7 @@ class TodoModel extends Backbone.Model {
         this.parent = parent;
 		this.createdDate = data.createdDate;
 		this.modifiedDate = data.modifiedDate;
+	    this.isHeader = data.isHeader;
 
         if (data.depth) {
             this.depth = data.depth;
@@ -125,6 +127,9 @@ class TodoModel extends Backbone.Model {
     }
 
     static selectedModel: TodoModel;
+
+    get isHeader(): boolean { return this.get('isHeader'); }
+    set isHeader(value: boolean) { this.set('isHeader', value); }
 
     get createdDate(): string { return this.get('createdDate'); }
     set createdDate(value: string) { this.set('createdDate', value); }
@@ -320,6 +325,13 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 	private template:ITemplate;
 
+    events() {
+        return {
+            'click .header-checkbox-js': this.toggleHeader
+        };
+    }
+
+
 	initialize() {
 		if (TodoDetailView.instance) {
 			console.error('Multiple instantiation of TodoDetailView');
@@ -330,6 +342,14 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 		this.setElement($('.right-panel'));
 
 		TodoDetailView.instance = this;
+	}
+
+	toggleHeader(e:JQueryMouseEventObject) {
+		this.model.isHeader = $(e.currentTarget).is(':checked');
+		this.model.view.render();
+		this.render();
+
+		return false;
 	}
 
 	render():TodoDetailView {

@@ -185,12 +185,14 @@ var SavedData = (function (_super) {
             modifiedDate: Util.fairlyLegibleDateTime(),
             content: '',
             done: false,
+            isHeader: true,
             children: [{
                 createdDate: Util.fairlyLegibleDateTime(),
                 modifiedDate: Util.fairlyLegibleDateTime(),
                 name: 'Put some stuff here',
                 content: '',
                 done: false,
+                isHeader: false,
                 children: []
             }, {
                 createdDate: Util.fairlyLegibleDateTime(),
@@ -198,6 +200,7 @@ var SavedData = (function (_super) {
                 name: 'More stuff here.',
                 content: '',
                 done: false,
+                isHeader: false,
                 children: []
             }]
         };
