@@ -60,7 +60,7 @@ interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
     content: string;
-	date: string;
+	createdDate: string;
     depth?: number; // TODO: This really shouldn't be optional - it's currently that way bc of my dummy data
     done: boolean;
     children: ITodo[];
@@ -186,8 +186,10 @@ class TodoModel extends Backbone.Model {
             TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
             TodoModel.selectedModel.view.render();
         }
+
         if (value) {
             TodoModel.selectedModel = this;
+	        this.trigger('selected');
         }
 
         this.set('selected', value);
@@ -313,10 +315,39 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 }
 
+class TodoDetailView extends Backbone.View<TodoModel> {
+	static instance: TodoDetailView;
+
+	private template:ITemplate;
+
+	initialize() {
+		if (TodoDetailView.instance) {
+			console.error('Multiple instantiation of TodoDetailView');
+			return;
+		}
+
+		this.template = Util.getTemplate("right-panel");
+		this.setElement($('.right-panel'));
+
+		TodoDetailView.instance = this;
+	}
+
+	render():TodoDetailView {
+		this.$el
+			.empty()
+			.html(this.template(this.model.toJSON()));
+
+		return this;
+	}
+}
+
 class TodoView extends Backbone.View<TodoModel> {
     template: ITemplate;
     childrenViews: TodoView[];
     uiState: TodoUiState;
+
+	/** The right-panel view for detailed todo editing. */
+	detailView: TodoDetailView;
 
     /** The view for making a new todo. */
     editView: NewTodoView;
@@ -358,6 +389,10 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
 	    this.listenTo(this, 'remove-todo', this.removeTodo);
+	    this.listenTo(this.model, 'selected', () => {
+		    TodoDetailView.instance.model = this.model;
+		    TodoDetailView.instance.render();
+	    });
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -712,6 +747,9 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
 
+		TodoDetailView.instance.model = this.baseTodoModel;
+		TodoDetailView.instance.render();
+
 	    this.savedData.watch(this.baseTodoModel);
 
         this.baseTodoView = new TodoView(<any> {
@@ -741,6 +779,7 @@ class MainView extends Backbone.View<TodoAppModel> {
 $(() => {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
 
+	var view = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();
 

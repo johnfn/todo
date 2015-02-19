@@ -153,6 +153,7 @@ var TodoModel = (function (_super) {
             }
             if (value) {
                 TodoModel.selectedModel = this;
+                this.trigger('selected');
             }
             this.set('selected', value);
             if (this.view) {
@@ -309,6 +310,26 @@ var NewTodoView = (function (_super) {
     };
     return NewTodoView;
 })(Backbone.View);
+var TodoDetailView = (function (_super) {
+    __extends(TodoDetailView, _super);
+    function TodoDetailView() {
+        _super.apply(this, arguments);
+    }
+    TodoDetailView.prototype.initialize = function () {
+        if (TodoDetailView.instance) {
+            console.error('Multiple instantiation of TodoDetailView');
+            return;
+        }
+        this.template = Util.getTemplate("right-panel");
+        this.setElement($('.right-panel'));
+        TodoDetailView.instance = this;
+    };
+    TodoDetailView.prototype.render = function () {
+        this.$el.empty().html(this.template(this.model.toJSON()));
+        return this;
+    };
+    return TodoDetailView;
+})(Backbone.View);
 var TodoView = (function (_super) {
     __extends(TodoView, _super);
     function TodoView() {
@@ -325,6 +346,7 @@ var TodoView = (function (_super) {
         };
     };
     TodoView.prototype.initialize = function (options) {
+        var _this = this;
         _.bindAll(this, 'initEditView', 'addChildTodo', 'toggleAddChildTodo', 'render', 'events', 'keydown');
         if (!TodoView.todoViews)
             TodoView.todoViews = [];
@@ -340,6 +362,10 @@ var TodoView = (function (_super) {
         }
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
         this.listenTo(this, 'remove-todo', this.removeTodo);
+        this.listenTo(this.model, 'selected', function () {
+            TodoDetailView.instance.model = _this.model;
+            TodoDetailView.instance.render();
+        });
     };
     TodoView.prototype.keydown = function (e) {
         if (!this.model.selected)
@@ -618,6 +644,8 @@ var MainView = (function (_super) {
     MainView.prototype.initializeTodoTree = function (data) {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         this.baseTodoModel.selected = true;
+        TodoDetailView.instance.model = this.baseTodoModel;
+        TodoDetailView.instance.render();
         this.savedData.watch(this.baseTodoModel);
         this.baseTodoView = new TodoView({
             model: this.baseTodoModel,
@@ -640,6 +668,7 @@ var MainView = (function (_super) {
 })(Backbone.View);
 $(function () {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
+    var view = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();
     var autosaveView = new SavedDataView({

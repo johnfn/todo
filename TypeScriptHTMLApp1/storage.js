@@ -181,17 +181,20 @@ var SavedData = (function (_super) {
         this.savedDataState.save();
         var data = {
             name: 'This is a starter todo list.',
-            date: Util.fairlyLegibleDateTime(),
+            createdDate: Util.fairlyLegibleDateTime(),
+            modifiedDate: Util.fairlyLegibleDateTime(),
             content: '',
             done: false,
             children: [{
-                date: Util.fairlyLegibleDateTime(),
+                createdDate: Util.fairlyLegibleDateTime(),
+                modifiedDate: Util.fairlyLegibleDateTime(),
                 name: 'Put some stuff here',
                 content: '',
                 done: false,
                 children: []
             }, {
-                date: Util.fairlyLegibleDateTime(),
+                createdDate: Util.fairlyLegibleDateTime(),
+                modifiedDate: Util.fairlyLegibleDateTime(),
                 name: 'More stuff here.',
                 content: '',
                 done: false,

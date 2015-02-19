@@ -149,18 +149,21 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 
 		var data: ITodo =  {
 			name: 'This is a starter todo list.',
-			date: Util.fairlyLegibleDateTime(),
+			createdDate: Util.fairlyLegibleDateTime(),
+			modifiedDate: Util.fairlyLegibleDateTime(),
 			content: '',
 			done: false,
 			children:
 			[{
-				date: Util.fairlyLegibleDateTime(),
+				createdDate: Util.fairlyLegibleDateTime(),
+				modifiedDate: Util.fairlyLegibleDateTime(),
 				name: 'Put some stuff here',
 				content: '',
 				done: false,
 				children: []
 			}, {
-				date: Util.fairlyLegibleDateTime(),
+				createdDate: Util.fairlyLegibleDateTime(),
+				modifiedDate: Util.fairlyLegibleDateTime(),
 				name: 'More stuff here.',
 				content: '',
 				done: false,
