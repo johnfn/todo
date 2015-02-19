@@ -47,6 +47,8 @@ var TodoModel = (function (_super) {
         this.content = data.content;
         this.done = data.done;
         this.parent = parent;
+        this.createdDate = data.createdDate;
+        this.modifiedDate = data.modifiedDate;
         if (data.depth) {
             this.depth = data.depth;
         }
@@ -89,12 +91,22 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TodoModel.prototype, "creationDate", {
+    Object.defineProperty(TodoModel.prototype, "createdDate", {
         get: function () {
-            return this.get('creationDate');
+            return this.get('createdDate');
         },
         set: function (value) {
-            this.set('creationDate', value);
+            this.set('createdDate', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "modifiedDate", {
+        get: function () {
+            return this.get('modifiedDate');
+        },
+        set: function (value) {
+            this.set('modifiedDate', value);
         },
         enumerable: true,
         configurable: true
@@ -149,7 +161,7 @@ var TodoModel = (function (_super) {
         set: function (value) {
             if (TodoModel.selectedModel && value) {
                 TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
-                TodoModel.selectedModel.view.render();
+                TodoModel.selectedModel.view.render(false);
             }
             if (value) {
                 TodoModel.selectedModel = this;
@@ -157,7 +169,7 @@ var TodoModel = (function (_super) {
             }
             this.set('selected', value);
             if (this.view) {
-                this.view.render();
+                this.view.render(value);
             }
         },
         enumerable: true,
@@ -346,7 +358,6 @@ var TodoView = (function (_super) {
         };
     };
     TodoView.prototype.initialize = function (options) {
-        var _this = this;
         _.bindAll(this, 'initEditView', 'addChildTodo', 'toggleAddChildTodo', 'render', 'events', 'keydown');
         if (!TodoView.todoViews)
             TodoView.todoViews = [];
@@ -362,10 +373,6 @@ var TodoView = (function (_super) {
         }
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
         this.listenTo(this, 'remove-todo', this.removeTodo);
-        this.listenTo(this.model, 'selected', function () {
-            TodoDetailView.instance.model = _this.model;
-            TodoDetailView.instance.render();
-        });
     };
     TodoView.prototype.keydown = function (e) {
         if (!this.model.selected)
@@ -529,10 +536,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.initEditView = function () {
         var self = this;
-        var editModel = new TodoModel();
-        editModel.parent = this.model;
-        editModel.creationDate = Util.fairlyLegibleDateTime();
-        this.editView = new NewTodoView({ model: editModel });
+        this.editView = new NewTodoView();
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo', function (model) {
             self.addChildTodo(model);
@@ -555,15 +559,17 @@ var TodoView = (function (_super) {
         this.render();
     };
     TodoView.prototype.toggleAddChildTodo = function () {
-        this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
-        // TODO: Just pass in parent to TodoModel.
         var editModel = new TodoModel();
         editModel.parent = this.model;
+        editModel.createdDate = Util.fairlyLegibleDateTime();
+        editModel.modifiedDate = Util.fairlyLegibleDateTime();
         this.editView.model = editModel;
+        this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
         this.render();
         return false;
     };
-    TodoView.prototype.render = function () {
+    TodoView.prototype.render = function (updateSidebar) {
+        if (updateSidebar === void 0) { updateSidebar = true; }
         this.$el.html(this.template(this.model.toJSON()));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
@@ -574,7 +580,7 @@ var TodoView = (function (_super) {
         this.delegateEvents(); // We might lose our own events. D:
         // render children
         _.each(this.childrenViews, function (child) {
-            child.render().$el.appendTo($childrenContainer);
+            child.render(false).$el.appendTo($childrenContainer);
         });
         this.editView.render().$el.appendTo($addTodo);
         if (this.uiState.addTodoVisible) {
@@ -582,6 +588,10 @@ var TodoView = (function (_super) {
         }
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
+        if (updateSidebar && this.model.selected) {
+            TodoDetailView.instance.model = this.model;
+            TodoDetailView.instance.render();
+        }
         return this;
     };
     /** Show the name text xor the name input. */

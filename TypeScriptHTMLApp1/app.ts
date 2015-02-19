@@ -61,6 +61,7 @@ interface ITodo {
     name: string;
     content: string;
 	createdDate: string;
+	modifiedDate: string;
     depth?: number; // TODO: This really shouldn't be optional - it's currently that way bc of my dummy data
     done: boolean;
     children: ITodo[];
@@ -114,6 +115,8 @@ class TodoModel extends Backbone.Model {
         this.content = data.content;
         this.done = data.done;
         this.parent = parent;
+		this.createdDate = data.createdDate;
+		this.modifiedDate = data.modifiedDate;
 
         if (data.depth) {
             this.depth = data.depth;
@@ -165,8 +168,11 @@ class TodoModel extends Backbone.Model {
 
     static selectedModel: TodoModel;
 
-    get creationDate(): string { return this.get('creationDate'); }
-    set creationDate(value: string) { this.set('creationDate', value); }
+    get createdDate(): string { return this.get('createdDate'); }
+    set createdDate(value: string) { this.set('createdDate', value); }
+
+    get modifiedDate(): string { return this.get('modifiedDate'); }
+    set modifiedDate(value: string) { this.set('modifiedDate', value); }
 
     get depth(): number { return this.get('depth'); }
     set depth(value: number) { this.set('depth', value); }
@@ -184,7 +190,7 @@ class TodoModel extends Backbone.Model {
     set selected(value: boolean) {
         if (TodoModel.selectedModel && value) {
             TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
-            TodoModel.selectedModel.view.render();
+            TodoModel.selectedModel.view.render(false);
         }
 
         if (value) {
@@ -195,7 +201,7 @@ class TodoModel extends Backbone.Model {
         this.set('selected', value);
 
         if (this.view) {
-            this.view.render();
+            this.view.render(value);
         }
     }
 
@@ -389,10 +395,6 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
 	    this.listenTo(this, 'remove-todo', this.removeTodo);
-	    this.listenTo(this.model, 'selected', () => {
-		    TodoDetailView.instance.model = this.model;
-		    TodoDetailView.instance.render();
-	    });
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -603,11 +605,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private initEditView() {
         var self = this;
-        var editModel = new TodoModel();
-        editModel.parent = this.model;
-		editModel.creationDate = Util.fairlyLegibleDateTime();
-
-        this.editView = new NewTodoView(<any> { model: editModel });
+        this.editView = new NewTodoView();
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo', (model: TodoModel) => {
@@ -637,18 +635,21 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     toggleAddChildTodo() {
-        this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
-
-        // TODO: Just pass in parent to TodoModel.
         var editModel = new TodoModel();
+
         editModel.parent = this.model;
+		editModel.createdDate = Util.fairlyLegibleDateTime();
+		editModel.modifiedDate = Util.fairlyLegibleDateTime();
+
         this.editView.model = editModel;
+
+        this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
 
         this.render();
         return false;
     }
 
-    render() {
+    render(updateSidebar: boolean = true) {
         this.$el.html(this.template(this.model.toJSON()));
 
         var $childrenContainer = this.$('.children-js');
@@ -666,7 +667,7 @@ class TodoView extends Backbone.View<TodoModel> {
         // render children
 
         _.each(this.childrenViews,(child: TodoView) => {
-            child.render().$el.appendTo($childrenContainer);
+            child.render(false).$el.appendTo($childrenContainer);
         });
 
         this.editView.render().$el.appendTo($addTodo);
@@ -678,7 +679,12 @@ class TodoView extends Backbone.View<TodoModel> {
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
 
-        return this;
+	    if (updateSidebar && this.model.selected) {
+		    TodoDetailView.instance.model = this.model;
+		    TodoDetailView.instance.render();
+	    }
+
+	    return this;
     }
 
     /** Show the name text xor the name input. */
