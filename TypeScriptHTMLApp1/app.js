@@ -16,7 +16,7 @@ var Util = (function () {
         return a;
     };
     Util.fairlyLegibleDateTime = function () {
-        return (new Date()).toString().slice(0, -15);
+        return (new Date()).toString().slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
     };
     return Util;
 })();

@@ -2,8 +2,8 @@
 
 // X Fix saving bug
 
-// * Have a left and right panel? More todo properties on the right side
-// * Have the date be somewhere. Right panel?
+// X Have a left and right panel? More todo properties on the right side
+// X Have the date be somewhere. Right panel?
 // X Shift + Enter inside text to edit description
 //   * Annoyingly it doesn't select properly yet.
 // * Individual view.
@@ -79,7 +79,7 @@ class Util {
 	}
 
 	static fairlyLegibleDateTime(): string {
-		return (new Date()).toString().slice(0, -15);
+		return (new Date()).toString().slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
 	}
 }
 
