@@ -87,7 +87,7 @@ class SavedDataState extends LocalStorageBackedModel {
 class SavedData extends Backbone.Collection<SavedSnapshot> {
 	baseTodoModel: TodoModel;
 	savedDataState: SavedDataState;
-	lastSave:number = 0;
+	lastSave = 0;
 
 	initialize(attributes?: any, options?: any) {
 		
@@ -108,13 +108,10 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 			this.lastSave = +new Date();
 		}
 
-
 		this.activeTodo().data = this.baseTodoModel.getData();
 		this.activeTodo().date = (new Date()).toUTCString();
 
 		this.activeTodo().save();
-
-		console.log('save');
 	}
 
 	private activeTodo(): SavedSnapshot {
@@ -150,15 +147,23 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 
 		this.savedDataState.save();
 
-		var data: ITodo = <any> {
+		var data: ITodo =  {
 			name: 'This is a starter todo list.',
+			date: Util.fairlyLegibleDateTime(),
 			content: '',
+			done: false,
 			children:
 			[{
+				date: Util.fairlyLegibleDateTime(),
 				name: 'Put some stuff here',
+				content: '',
+				done: false,
 				children: []
 			}, {
+				date: Util.fairlyLegibleDateTime(),
 				name: 'More stuff here.',
+				content: '',
+				done: false,
 				children: []
 			}]
 		};

@@ -1,6 +1,6 @@
 ﻿// TODO (lol)
 
-// * Fix saving bug
+// X Fix saving bug
 
 // * Have a left and right panel? More todo properties on the right side
 // * Have the date be somewhere. Right panel?
@@ -60,8 +60,9 @@ interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
     content: string;
+	date: string;
     depth?: number; // TODO: This really shouldn't be optional - it's currently that way bc of my dummy data
-    done?: boolean; // Also shouldn't be optional.
+    done: boolean;
     children: ITodo[];
 }
 
@@ -74,6 +75,10 @@ class Util {
 
 	static id(a: any): any {
 		return a;
+	}
+
+	static fairlyLegibleDateTime(): string {
+		return (new Date()).toString().slice(0, -15);
 	}
 }
 
@@ -159,6 +164,9 @@ class TodoModel extends Backbone.Model {
     }
 
     static selectedModel: TodoModel;
+
+    get creationDate(): string { return this.get('creationDate'); }
+    set creationDate(value: string) { this.set('creationDate', value); }
 
     get depth(): number { return this.get('depth'); }
     set depth(value: number) { this.set('depth', value); }
@@ -562,6 +570,8 @@ class TodoView extends Backbone.View<TodoModel> {
         var self = this;
         var editModel = new TodoModel();
         editModel.parent = this.model;
+		editModel.creationDate = Util.fairlyLegibleDateTime();
+
         this.editView = new NewTodoView(<any> { model: editModel });
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);

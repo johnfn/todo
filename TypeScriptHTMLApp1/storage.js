@@ -153,7 +153,6 @@ var SavedData = (function (_super) {
         this.activeTodo().data = this.baseTodoModel.getData();
         this.activeTodo().date = (new Date()).toUTCString();
         this.activeTodo().save();
-        console.log('save');
     };
     SavedData.prototype.activeTodo = function () {
         return this.at(this.savedDataState.bufferPosition);
@@ -182,12 +181,20 @@ var SavedData = (function (_super) {
         this.savedDataState.save();
         var data = {
             name: 'This is a starter todo list.',
+            date: Util.fairlyLegibleDateTime(),
             content: '',
+            done: false,
             children: [{
+                date: Util.fairlyLegibleDateTime(),
                 name: 'Put some stuff here',
+                content: '',
+                done: false,
                 children: []
             }, {
+                date: Util.fairlyLegibleDateTime(),
                 name: 'More stuff here.',
+                content: '',
+                done: false,
                 children: []
             }]
         };

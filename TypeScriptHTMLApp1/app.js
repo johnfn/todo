@@ -15,6 +15,9 @@ var Util = (function () {
     Util.id = function (a) {
         return a;
     };
+    Util.fairlyLegibleDateTime = function () {
+        return (new Date()).toString().slice(0, -15);
+    };
     return Util;
 })();
 var TodoModel = (function (_super) {
@@ -82,6 +85,16 @@ var TodoModel = (function (_super) {
             console.error('childIndex is in weird state');
             debugger;
             return -1;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "creationDate", {
+        get: function () {
+            return this.get('creationDate');
+        },
+        set: function (value) {
+            this.set('creationDate', value);
         },
         enumerable: true,
         configurable: true
@@ -492,6 +505,7 @@ var TodoView = (function (_super) {
         var self = this;
         var editModel = new TodoModel();
         editModel.parent = this.model;
+        editModel.creationDate = Util.fairlyLegibleDateTime();
         this.editView = new NewTodoView({ model: editModel });
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo', function (model) {
