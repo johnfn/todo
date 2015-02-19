@@ -189,6 +189,9 @@ class TodoModel extends Backbone.Model {
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {
         if (TodoModel.selectedModel && value) {
+			// Totally refuse to change the selection during an edit.
+			if (TodoModel.selectedModel.view.uiState.isEditing) return;
+
             TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
             TodoModel.selectedModel.view.render(false);
         }
@@ -235,6 +238,9 @@ class TodoModel extends Backbone.Model {
 }
 
 class TodoUiState extends Backbone.Model {
+	static isAnyoneEditingName: boolean;
+	static isAnyoneEditingContent: boolean;
+
     constructor(attrs?: any) {
         super(attrs);
 
@@ -258,7 +264,22 @@ class TodoUiState extends Backbone.Model {
     set addTodoVisible(value: boolean) { this.set('addTodoVisible', value); }
 
     get editingName(): boolean { return this.get('editingName'); }
-    set editingName(value: boolean) { this.set('editingName', value); }
+    set editingName(value: boolean) {
+	    if (TodoUiState.isAnyoneEditingName) {
+		    if (value) {
+			    return;
+		    } else {
+			    TodoUiState.isAnyoneEditingName = false;
+		    }
+	    } else {
+		    if (value) {
+			    TodoUiState.isAnyoneEditingName = true;
+		    }
+			// else { console.log("??? bad code ???"); }
+	    }
+
+	    this.set('editingName', value);
+    }
 
     get editingContent(): boolean { return this.get('editingContent'); }
     set editingContent(value: boolean) { this.set('editingContent', value); }

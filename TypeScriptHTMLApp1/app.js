@@ -160,6 +160,9 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             if (TodoModel.selectedModel && value) {
+                // Totally refuse to change the selection during an edit.
+                if (TodoModel.selectedModel.view.uiState.isEditing)
+                    return;
                 TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
                 TodoModel.selectedModel.view.render(false);
             }
@@ -259,6 +262,19 @@ var TodoUiState = (function (_super) {
             return this.get('editingName');
         },
         set: function (value) {
+            if (TodoUiState.isAnyoneEditingName) {
+                if (value) {
+                    return;
+                }
+                else {
+                    TodoUiState.isAnyoneEditingName = false;
+                }
+            }
+            else {
+                if (value) {
+                    TodoUiState.isAnyoneEditingName = true;
+                }
+            }
             this.set('editingName', value);
         },
         enumerable: true,
