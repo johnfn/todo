@@ -285,6 +285,19 @@ var TodoUiState = (function (_super) {
             return this.get('editingContent');
         },
         set: function (value) {
+            if (TodoUiState.isAnyoneEditingContent) {
+                if (value) {
+                    return;
+                }
+                else {
+                    TodoUiState.isAnyoneEditingContent = false;
+                }
+            }
+            else {
+                if (value) {
+                    TodoUiState.isAnyoneEditingContent = true;
+                }
+            }
             this.set('editingContent', value);
         },
         enumerable: true,

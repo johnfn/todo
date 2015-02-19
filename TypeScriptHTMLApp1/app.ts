@@ -282,7 +282,22 @@ class TodoUiState extends Backbone.Model {
     }
 
     get editingContent(): boolean { return this.get('editingContent'); }
-    set editingContent(value: boolean) { this.set('editingContent', value); }
+    set editingContent(value: boolean) {
+	    if (TodoUiState.isAnyoneEditingContent) {
+		    if (value) {
+			    return;
+		    } else {
+			    TodoUiState.isAnyoneEditingContent = false;
+		    }
+	    } else {
+		    if (value) {
+			    TodoUiState.isAnyoneEditingContent = true;
+		    }
+			// else { console.log("??? bad code ???"); }
+	    }
+
+	     this.set('editingContent', value);
+    }
 }
 
 class NewTodoView extends Backbone.View<TodoModel> {
