@@ -1,15 +1,11 @@
 ﻿// TODO (lol)
 
-// X You can't delete a thingy.
-// X Escape to cancel editing
-// X You shouldn't be able to navigate while editing.
+// * Fix saving bug
+
+// * Have a left and right panel? More todo properties on the right side
+// * Have the date be somewhere. Right panel?
 // X Shift + Enter inside text to edit description
 //   * Annoyingly it doesn't select properly yet.
-// * Save to disk
-//   * I want some sort of procedural back up thing. I don't want to lose my data.
-//     X 'Current' buffer which is constantly being saved to
-//     X Rotating circular backup buffer to which the idx is updated every hour or so.
-//     X Overlay that shows all recent backups.
 // * Individual view.
 // * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
 // * Save to server
@@ -281,6 +277,12 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 
     addTodo(e: JQueryMouseEventObject) {
+		if (this.getNameText() === "") {
+			this.trigger('cancel');
+
+			return false;
+		}
+
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
 
@@ -523,6 +525,7 @@ class TodoView extends Backbone.View<TodoModel> {
 	private removeTodo(index: number) {
 		var deleted = this.childrenViews.splice(index, 1)[0];
 		this.model.children.splice(index, 1);
+		this.model.goodTimeToSave();
 
 		deleted.$el.slideUp(100, this.render);
 	}
@@ -582,6 +585,8 @@ class TodoView extends Backbone.View<TodoModel> {
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) === -1) {
             this.model.children.splice(index, 0, childModel);
         }
+		 
+		this.model.goodTimeToSave();
 
         this.render();
     }

@@ -48,3 +48,7 @@ a {
     .keyboard-shortcuts .exit {
         float: right;
     }
+
+.name-edit, .content-edit {
+	width: 90%;
+}
