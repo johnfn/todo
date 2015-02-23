@@ -44,18 +44,17 @@
                 <span class="edit-name-js 
 					  <% if (done) print('todo-done') %>
 					  <% if (isHeader) print('todo-header') %>">
-					<input type="checkbox" class="todo-done-js" <% if (done) print('checked') %> />
+					<input type="checkbox" class="todo-done-js" <% if (done) print('checked') %> draggable="true" />
 					<%= name %>
 				</span>
                 <input class='name-edit' />
 
                 <a href="#" class="todo-add-js"> + </a>
                 <a href="#" class="todo-remove-js"> X </a>
-                <a href="#" class="todo-move-js" draggable="true"> M </a>
             </div>
 
             <div class="todo-content edit-content-js"> <%= content %> </div>
-            <input class='content-edit-js' />
+            <input class='content-edit-js'/>
 
             <div class="children-js children"> </div>
             <div class="todo-add"> </div>
@@ -91,9 +90,11 @@
 
 	<script type="text/template" id="right-panel">
 		<%= breadcrumbs %> 
-		<div> <b> <%= name %> </b> </div>
+		<div> 
+			<b> <%= name %> </b>
+			<small class="right-panel-time"> (added <%= createdDate %>) </small>
+		</div>
 
-		<small class="right-panel-time"> <%= createdDate %> </small>
 		<div> <%= content %> </div>
 		<div>
 			<input type="checkbox" class="header-checkbox-js" value="Car" <% if (isHeader) print('checked') %>/>Header

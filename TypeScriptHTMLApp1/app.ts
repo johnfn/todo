@@ -1,8 +1,10 @@
 ﻿// TODO (lol)
 
-// * Make the check unicode into a checkbox
-//   * and have it be draggable
+// X Make the check unicode into a checkbox
+//   X and have it be draggable
 // * Content on rightpanel
+//   * Markdown?
+// * Have the breadcrumbs in a little titlebar like thing.
 // X timeago on rightpanel
 // * Dragging items around
 //   X Can't drag item as child of itself.
@@ -468,8 +470,8 @@ class TodoView extends Backbone.View<TodoModel> {
             'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
-			'dragstart .todo-move-js': this.startDrag,
-			'mouseover .todo-move-js': this.mouseoverStartDrag,
+			'dragstart .todo-done-js': this.startDrag,
+			'mouseover .todo-done-js': this.mouseoverStartDrag,
 			'dragover': this.dragTodoOver,
 			'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
@@ -794,7 +796,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		 
 		this.model.goodTimeToSave();
 
-        this.render();
+	    this.render();
     }
 
     toggleAddChildTodo() {
