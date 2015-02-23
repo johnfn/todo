@@ -31,9 +31,11 @@ var TodoModel = (function (_super) {
         this.name = '';
         this.content = '';
         this.done = false;
-        this.selected = false;
         this.childIndex = -1;
+        this.isHeader = false;
         this.uid = Math.random() + ' ' + Math.random();
+        this.createdDate = Util.fairlyLegibleDateTime();
+        this.modifiedDate = Util.fairlyLegibleDateTime();
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'good-time-to-save', function () {
             if (_this.parent) {
@@ -88,6 +90,13 @@ var TodoModel = (function (_super) {
             console.error('childIndex is in weird state');
             debugger;
             return -1;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "uiState", {
+        get: function () {
+            return this.view.uiState;
         },
         enumerable: true,
         configurable: true
@@ -165,30 +174,6 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TodoModel.prototype, "selected", {
-        get: function () {
-            return this.get('selected');
-        },
-        set: function (value) {
-            if (TodoModel.selectedModel && value) {
-                // Totally refuse to change the selection during an edit.
-                if (TodoModel.selectedModel.view.uiState.isEditing)
-                    return;
-                TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
-                TodoModel.selectedModel.view.render(false);
-            }
-            if (value) {
-                TodoModel.selectedModel = this;
-                this.trigger('selected');
-            }
-            this.set('selected', value);
-            if (this.view) {
-                this.view.render(value);
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(TodoModel.prototype, "children", {
         get: function () {
             return this._children;
@@ -244,7 +229,18 @@ var TodoUiState = (function (_super) {
         this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
+        this.selected = false;
+        if (!attrs['view'])
+            console.error('No view assigned for TodoUiState');
+        this.view = attrs['view'];
     }
+    Object.defineProperty(TodoUiState.prototype, "model", {
+        get: function () {
+            return this.view.model;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoUiState.prototype, "isEditing", {
         /** Returns true if the user is currently editing anything. */
         get: function () {
@@ -310,6 +306,30 @@ var TodoUiState = (function (_super) {
                 }
             }
             this.set('editingContent', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoUiState.prototype, "selected", {
+        get: function () {
+            return this.get('selected');
+        },
+        set: function (value) {
+            if (TodoUiState.selectedModel && value) {
+                // Totally refuse to change the selection during an edit.
+                if (TodoUiState.selectedModel.isEditing)
+                    return;
+                TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
+                TodoUiState.selectedModel.view.render(false);
+            }
+            if (value) {
+                TodoUiState.selectedModel = this;
+                this.trigger('selected');
+            }
+            this.set('selected', value);
+            if (this.view) {
+                this.view.render(value);
+            }
         },
         enumerable: true,
         configurable: true
@@ -416,7 +436,7 @@ var TodoView = (function (_super) {
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
         this.childrenViews = [];
-        this.uiState = new TodoUiState();
+        this.uiState = new TodoUiState({ view: this });
         this.model.view = this;
         this.initEditView();
         for (var i = 0; i < this.model.children.length; i++) {
@@ -426,7 +446,7 @@ var TodoView = (function (_super) {
         this.listenTo(this, 'remove-todo', this.removeTodo);
     };
     TodoView.prototype.keydown = function (e) {
-        if (!this.model.selected)
+        if (!this.uiState.selected)
             return true;
         var enter = e.which === 13 && !e.shiftKey;
         var shiftEnter = e.which === 13 && e.shiftKey;
@@ -540,7 +560,7 @@ var TodoView = (function (_super) {
         }
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
-            newSelection.selected = true;
+            newSelection.view.uiState.selected = true;
             this.render();
             return false;
         }
@@ -553,7 +573,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.clickRemoveTodo = function () {
         if (this.model.parent) {
-            this.model.parent.selected = true;
+            this.model.parent.view.uiState.selected = true;
             this.model.parent.view.trigger('remove-todo', this.model.childIndex);
         }
         return false;
@@ -575,13 +595,13 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.showTodoNameEdit = function (e) {
         this.uiState.editingName = true;
-        this.model.selected = true;
+        this.uiState.selected = true;
         this.render();
         return false;
     };
     TodoView.prototype.showTodoContentEdit = function (e) {
         this.uiState.editingContent = true;
-        this.model.selected = true;
+        this.uiState.selected = true;
         this.render();
         return false;
     };
@@ -612,8 +632,6 @@ var TodoView = (function (_super) {
     TodoView.prototype.toggleAddChildTodo = function () {
         var editModel = new TodoModel();
         editModel.parent = this.model;
-        editModel.createdDate = Util.fairlyLegibleDateTime();
-        editModel.modifiedDate = Util.fairlyLegibleDateTime();
         this.editView.model = editModel;
         this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
         this.render();
@@ -621,7 +639,8 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
-        this.$el.html(this.template(this.model.toJSON()));
+        var renderOptions = _.extend({}, this.model.toJSON(), this.uiState.toJSON());
+        this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
         // Update state per uiState
@@ -639,7 +658,7 @@ var TodoView = (function (_super) {
         }
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
-        if (updateSidebar && this.model.selected) {
+        if (updateSidebar && this.uiState.selected) {
             TodoDetailView.instance.model = this.model;
             TodoDetailView.instance.render();
         }
@@ -704,7 +723,6 @@ var MainView = (function (_super) {
     };
     MainView.prototype.initializeTodoTree = function (data) {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
-        this.baseTodoModel.selected = true;
         TodoDetailView.instance.model = this.baseTodoModel;
         TodoDetailView.instance.render();
         this.savedData.watch(this.baseTodoModel);
@@ -712,6 +730,7 @@ var MainView = (function (_super) {
             model: this.baseTodoModel,
             mainView: this
         });
+        this.baseTodoModel.uiState.selected = true;
     };
     MainView.prototype.keydown = function (e) {
         console.log(e.which);

@@ -1,7 +1,5 @@
 ﻿// TODO (lol)
 
-// * header items (just for organization)
-//   * I think todos will need a 'type' key
 // * Dragging items around
 // * Save to server
 // * Generalized search
@@ -56,9 +54,11 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.name = '';
         this.content = '';
         this.done = false;
-        this.selected = false;
         this.childIndex = -1;
+	    this.isHeader = false;
         this.uid = Math.random() + ' ' + Math.random();
+		this.createdDate = Util.fairlyLegibleDateTime();
+		this.modifiedDate = Util.fairlyLegibleDateTime();
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'good-time-to-save', () => {
@@ -126,7 +126,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         return -1;
     }
 
-    static selectedModel: TodoModel;
+	public get uiState(): TodoUiState { return this.view.uiState; }
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
@@ -148,28 +148,6 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     get done(): boolean { return this.get('done'); }
     set done(value: boolean) { this.set('done', value); this.goodTimeToSave(); }
-
-    get selected(): boolean { return this.get('selected'); }
-    set selected(value: boolean) {
-        if (TodoModel.selectedModel && value) {
-			// Totally refuse to change the selection during an edit.
-			if (TodoModel.selectedModel.view.uiState.isEditing) return;
-
-            TodoModel.selectedModel.set('selected', false); // don't infinitely recurse
-            TodoModel.selectedModel.view.render(false);
-        }
-
-        if (value) {
-            TodoModel.selectedModel = this;
-	        this.trigger('selected');
-        }
-
-        this.set('selected', value);
-
-        if (this.view) {
-            this.view.render(value);
-        }
-    }
 
     get children(): TodoModel[] { return this._children; }
 
@@ -204,13 +182,22 @@ class TodoUiState extends Backbone.Model {
 	static isAnyoneEditingName: boolean;
 	static isAnyoneEditingContent: boolean;
 
+	view: TodoView;
+
     constructor(attrs?: any) {
         super(attrs);
 
         this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
+	    this.selected = false;
+
+	    if (!attrs['view']) console.error('No view assigned for TodoUiState');
+
+	    this.view = attrs['view'];
     }
+
+	get model(): TodoModel { return this.view.model; }
 
     /** Returns true if the user is currently editing anything. */
     get isEditing(): boolean {
@@ -261,6 +248,31 @@ class TodoUiState extends Backbone.Model {
 
 	     this.set('editingContent', value);
     }
+
+    static selectedModel: TodoUiState;
+
+    get selected(): boolean { return this.get('selected'); }
+    set selected(value: boolean) {
+        if (TodoUiState.selectedModel && value) {
+			// Totally refuse to change the selection during an edit.
+			if (TodoUiState.selectedModel.isEditing) return;
+
+            TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
+            TodoUiState.selectedModel.view.render(false);
+        }
+
+        if (value) {
+            TodoUiState.selectedModel = this;
+	        this.trigger('selected');
+        }
+
+        this.set('selected', value);
+
+        if (this.view) {
+            this.view.render(value);
+        }
+    }
+
 }
 
 class NewTodoView extends Backbone.View<TodoModel> {
@@ -398,7 +410,7 @@ class TodoView extends Backbone.View<TodoModel> {
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
         this.childrenViews = [];
-        this.uiState = new TodoUiState();
+        this.uiState = new TodoUiState({ view: this });
         this.model.view = this;
 
         this.initEditView();
@@ -412,7 +424,7 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
-        if (!this.model.selected) return true;
+        if (!this.uiState.selected) return true;
 
         var enter = e.which === 13 && !e.shiftKey;
         var shiftEnter = e.which === 13 && e.shiftKey;
@@ -555,7 +567,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
-            newSelection.selected = true;
+            newSelection.view.uiState.selected = true;
             this.render();
 
             return false;
@@ -573,7 +585,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private clickRemoveTodo() {
 	    if (this.model.parent) {
-		    this.model.parent.selected = true;
+		    this.model.parent.view.uiState.selected = true;
 
 		    this.model.parent.view.trigger('remove-todo', this.model.childIndex);
 	    }
@@ -601,7 +613,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private showTodoNameEdit(e: JQueryMouseEventObject) {
         this.uiState.editingName = true;
-        this.model.selected = true;
+        this.uiState.selected = true;
 
         this.render();
 
@@ -610,7 +622,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private showTodoContentEdit(e: JQueryMouseEventObject) {
         this.uiState.editingContent = true;
-        this.model.selected = true;
+        this.uiState.selected = true;
 
         this.render();
 
@@ -652,8 +664,6 @@ class TodoView extends Backbone.View<TodoModel> {
         var editModel = new TodoModel();
 
         editModel.parent = this.model;
-		editModel.createdDate = Util.fairlyLegibleDateTime();
-		editModel.modifiedDate = Util.fairlyLegibleDateTime();
 
         this.editView.model = editModel;
 
@@ -664,7 +674,9 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     render(updateSidebar: boolean = true) {
-        this.$el.html(this.template(this.model.toJSON()));
+		var renderOptions = _.extend({}, this.model.toJSON(), this.uiState.toJSON());
+
+        this.$el.html(this.template(renderOptions));
 
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
@@ -693,7 +705,7 @@ class TodoView extends Backbone.View<TodoModel> {
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
 
-	    if (updateSidebar && this.model.selected) {
+	    if (updateSidebar && this.uiState.selected) {
 		    TodoDetailView.instance.model = this.model;
 		    TodoDetailView.instance.render();
 	    }
@@ -765,7 +777,6 @@ class MainView extends Backbone.View<TodoAppModel> {
 
 	private initializeTodoTree(data: ITodo) {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
-        this.baseTodoModel.selected = true;
 
 		TodoDetailView.instance.model = this.baseTodoModel;
 		TodoDetailView.instance.render();
@@ -776,6 +787,8 @@ class MainView extends Backbone.View<TodoAppModel> {
             model: this.baseTodoModel,
             mainView: this
         });
+
+		this.baseTodoModel.uiState.selected = true;
 	}
 
     keydown(e: JQueryKeyEventObject): boolean {
