@@ -88,9 +88,8 @@
 	</script>
 
 	<script type="text/template" id="right-panel">
-		<h3> Task </h3>
-		<div> <%= name %> </div>
-		<small> at <%= createdDate %> </small>
+		<div class="right-panel-name"> <%= name %> </div>
+		<small class="right-panel-time"> <%= createdDate %> </small>
 		<div> <%= content %> </div>
 		<div>
 			<input type="checkbox" class="header-checkbox-js" value="Car" <% if (isHeader) print('checked') %>/>Header

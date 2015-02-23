@@ -34,8 +34,8 @@ var TodoModel = (function (_super) {
         this.childIndex = -1;
         this.isHeader = false;
         this.uid = Math.random() + ' ' + Math.random();
-        this.createdDate = Util.fairlyLegibleDateTime();
-        this.modifiedDate = Util.fairlyLegibleDateTime();
+        this.createdDate = (new Date()).toString();
+        this.modifiedDate = (new Date()).toString();
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'good-time-to-save', function () {
             if (_this.parent) {
@@ -455,7 +455,8 @@ var TodoDetailView = (function (_super) {
         return false;
     };
     TodoDetailView.prototype.render = function () {
-        this.$el.empty().html(this.template(this.model.toJSON()));
+        var createdDateAgo = $.timeago(new Date(this.model.createdDate));
+        this.$el.html(this.template(_.extend(this.model.toJSON(), { createdDate: createdDateAgo })));
         return this;
     };
     return TodoDetailView;

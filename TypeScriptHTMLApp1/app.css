@@ -72,3 +72,15 @@ a {
 	background: #f3f3f3;
 	border-bottom: 4px solid gray;
 }
+
+.right-panel {
+	margin-top: 20px;
+}
+
+.right-panel-name {
+	font-size: 1.5em;
+}
+
+.right-panel-time {
+	font-size: .8em;
+}

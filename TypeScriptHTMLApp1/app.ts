@@ -1,5 +1,6 @@
 ﻿// TODO (lol)
 
+// * timeago on rightpanel
 // * Dragging items around
 //   X Can't drag item as child of itself.
 //     X Can't add item as subchild of itself.
@@ -66,8 +67,8 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.childIndex = -1;
 	    this.isHeader = false;
         this.uid = Math.random() + ' ' + Math.random();
-		this.createdDate = Util.fairlyLegibleDateTime();
-		this.modifiedDate = Util.fairlyLegibleDateTime();
+	    this.createdDate = (new Date()).toString();
+	    this.modifiedDate = (new Date()).toString();
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'good-time-to-save', () => {
@@ -418,9 +419,9 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 	}
 
 	render():TodoDetailView {
-		this.$el
-			.empty()
-			.html(this.template(this.model.toJSON()));
+		var createdDateAgo = $.timeago(new Date(this.model.createdDate));
+
+		this.$el.html(this.template(_.extend(this.model.toJSON(), { createdDate: createdDateAgo })));
 
 		return this;
 	}
