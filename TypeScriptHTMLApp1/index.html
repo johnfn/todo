@@ -36,7 +36,9 @@
     </script>
 
 	<script type="text/template" id="todo">
-        <div class="todo <% if (selected) print ('selected') %>">
+        <div class="todo 
+			 <% if (selected) print ('selected') %>
+			 <% if (isDraggedOver) print ('dragged-over') %>">
             <div class="todo-name">
                 <span class="edit-name-js 
 					  <% if (done) print('todo-done') %>

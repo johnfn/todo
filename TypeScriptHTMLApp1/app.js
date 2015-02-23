@@ -230,6 +230,7 @@ var TodoUiState = (function (_super) {
         this.editingName = false;
         this.editingContent = false;
         this.selected = false;
+        this.isDraggedOver = false;
         if (!attrs['view'])
             console.error('No view assigned for TodoUiState');
         this.view = attrs['view'];
@@ -315,6 +316,7 @@ var TodoUiState = (function (_super) {
             return this.get('selected');
         },
         set: function (value) {
+            // Deselect the old one.
             if (TodoUiState.selectedModel && value) {
                 // Totally refuse to change the selection during an edit.
                 if (TodoUiState.selectedModel.isEditing)
@@ -330,6 +332,26 @@ var TodoUiState = (function (_super) {
             if (this.view) {
                 this.view.render(value);
             }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoUiState.prototype, "isDraggedOver", {
+        get: function () {
+            return this.get('isDraggedOver');
+        },
+        set: function (value) {
+            var oldValue = this.isDraggedOver;
+            // Turn off the value on the previously-dragged-over element.
+            if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel != this) {
+                TodoUiState.draggedOverModel.set('isDraggedOver', false);
+                TodoUiState.draggedOverModel.view.render();
+            }
+            if (value)
+                TodoUiState.draggedOverModel = this;
+            this.set('isDraggedOver', value);
+            if (this.view && oldValue !== value)
+                this.view.render();
         },
         enumerable: true,
         configurable: true
@@ -423,6 +445,8 @@ var TodoView = (function (_super) {
             'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
+            'dragstart .todo-move-js': this.startDrag,
+            'dragover': this.dragTodoOver,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': function () { return false; }
@@ -444,6 +468,14 @@ var TodoView = (function (_super) {
         }
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
         this.listenTo(this, 'remove-todo', this.removeTodo);
+    };
+    TodoView.prototype.startDrag = function () {
+        // this.uiState.selected = true;
+    };
+    TodoView.prototype.dragTodoOver = function (e) {
+        console.log('dragover', this.uiState.isDraggedOver);
+        this.uiState.isDraggedOver = true;
+        return false;
     };
     TodoView.prototype.keydown = function (e) {
         if (!this.uiState.selected)
@@ -656,8 +688,8 @@ var TodoView = (function (_super) {
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
-        window['keyboardShortcuts'].setModel(this.uiState);
-        window['keyboardShortcuts'].render();
+        // window['keyboardShortcuts'].setModel(this.uiState);
+        // window['keyboardShortcuts'].render();
         if (updateSidebar && this.uiState.selected) {
             TodoDetailView.instance.model = this.model;
             TodoDetailView.instance.render();

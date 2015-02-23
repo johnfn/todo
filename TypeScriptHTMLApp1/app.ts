@@ -191,6 +191,7 @@ class TodoUiState extends Backbone.Model {
         this.editingName = false;
         this.editingContent = false;
 	    this.selected = false;
+	    this.isDraggedOver = false;
 
 	    if (!attrs['view']) console.error('No view assigned for TodoUiState');
 
@@ -253,6 +254,7 @@ class TodoUiState extends Backbone.Model {
 
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {
+		// Deselect the old one.
         if (TodoUiState.selectedModel && value) {
 			// Totally refuse to change the selection during an edit.
 			if (TodoUiState.selectedModel.isEditing) return;
@@ -273,6 +275,24 @@ class TodoUiState extends Backbone.Model {
         }
     }
 
+	static draggedOverModel: TodoUiState;
+
+	get isDraggedOver(): boolean { return this.get('isDraggedOver');  }
+	set isDraggedOver(value: boolean) {
+		var oldValue = this.isDraggedOver;
+
+		// Turn off the value on the previously-dragged-over element.
+		if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel != this) {
+			TodoUiState.draggedOverModel.set('isDraggedOver', false);
+			TodoUiState.draggedOverModel.view.render();
+		}
+
+		if (value) TodoUiState.draggedOverModel = this;
+
+		this.set('isDraggedOver', value);
+
+		if (this.view && oldValue !== value) this.view.render();
+	}
 }
 
 class NewTodoView extends Backbone.View<TodoModel> {
@@ -395,6 +415,8 @@ class TodoView extends Backbone.View<TodoModel> {
             'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
+			'dragstart .todo-move-js': this.startDrag,
+			'dragover': this.dragTodoOver,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': () => false
@@ -422,6 +444,18 @@ class TodoView extends Backbone.View<TodoModel> {
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
 	    this.listenTo(this, 'remove-todo', this.removeTodo);
     }
+
+	startDrag() {
+		// this.uiState.selected = true;
+	}
+
+	dragTodoOver(e: JQueryInputEventObject): boolean {
+		console.log('dragover', this.uiState.isDraggedOver);
+
+		this.uiState.isDraggedOver = true;
+
+		return false;
+	}
 
     keydown(e: JQueryKeyEventObject): boolean {
         if (!this.uiState.selected) return true;
@@ -702,8 +736,8 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$('.name').focus();
         }
 
-        window['keyboardShortcuts'].setModel(this.uiState);
-        window['keyboardShortcuts'].render();
+        // window['keyboardShortcuts'].setModel(this.uiState);
+        // window['keyboardShortcuts'].render();
 
 	    if (updateSidebar && this.uiState.selected) {
 		    TodoDetailView.instance.model = this.model;
