@@ -334,6 +334,8 @@ var TodoUiState = (function (_super) {
             return this.get('selected');
         },
         set: function (value) {
+            if (value === this.selected)
+                return;
             // Deselect the old one.
             if (TodoUiState.selectedModel && value) {
                 // Totally refuse to change the selection during an edit.
@@ -523,6 +525,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.mouseoverStartDrag = function () {
         if (!this.mainView.model.isDragging)
             this.uiState.selected = true;
+        return false;
     };
     TodoView.prototype.dragTodoOver = function (e) {
         var yOffset = (e.pageY || e.originalEvent.pageY) - $(e.currentTarget).offset().top;

@@ -1,5 +1,6 @@
 ﻿// TODO (lol)
 
+// * TODO: rename name to content and content to desc.
 // X Make the check unicode into a checkbox
 //   X and have it be draggable
 // * Content on rightpanel
@@ -293,6 +294,8 @@ class TodoUiState extends Backbone.Model {
 
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {
+		if (value === this.selected) return;
+
 		// Deselect the old one.
         if (TodoUiState.selectedModel && value) {
 			// Totally refuse to change the selection during an edit.
@@ -516,6 +519,8 @@ class TodoView extends Backbone.View<TodoModel> {
 	mouseoverStartDrag() {
 		if (!this.mainView.model.isDragging)
 			this.uiState.selected = true;
+
+		return false;
 	}
 
 	dragTodoOver(e: JQueryMouseEventObject): boolean {
