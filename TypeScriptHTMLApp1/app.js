@@ -525,6 +525,7 @@ var TodoView = (function (_super) {
         else {
             this.model.parent.view.addChildTodo(selectedModel, this.model.childIndex + 1);
         }
+        selectedModel.view.uiState.selected = true;
         this.uiState.isDraggedOver = false;
         this.mainView.model.isDragging = false;
         return false;
