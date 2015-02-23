@@ -2,6 +2,8 @@
 
 // * Dragging items around
 //   * Can't drag item as child of itself.
+//   * Can't drag topmost parent.
+//   * Drag items as children or same-level.
 //   * Have to be able to stop dragging somehow.
 // * Save to server
 // * Generalized search
@@ -194,6 +196,7 @@ class TodoUiState extends Backbone.Model {
         this.editingContent = false;
 	    this.selected = false;
 	    this.isDraggedOver = false;
+	    this.isDraggedOverAsChild = false;
 
 	    if (!attrs['view']) console.error('No view assigned for TodoUiState');
 
@@ -279,19 +282,31 @@ class TodoUiState extends Backbone.Model {
 
 	static draggedOverModel: TodoUiState;
 
+    get isDraggedOverAsChild(): boolean { return this.get('isDraggedOverAsChild'); }
+    set isDraggedOverAsChild(value: boolean) {
+		var oldValue = this.isDraggedOverAsChild;
+
+	     this.set('isDraggedOverAsChild', value);
+
+	    if (oldValue !== value && this.view) this.view.render();
+    }
+
 	get isDraggedOver(): boolean { return this.get('isDraggedOver');  }
 	set isDraggedOver(value: boolean) {
 		var oldValue = this.isDraggedOver;
 
 		// Turn off the value on the previously-dragged-over element.
-		if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel != this) {
+		if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
 			TodoUiState.draggedOverModel.set('isDraggedOver', false);
+			TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
 			TodoUiState.draggedOverModel.view.render();
 		}
 
 		if (value) TodoUiState.draggedOverModel = this;
 
 		this.set('isDraggedOver', value);
+
+		if (!value) this.isDraggedOverAsChild = false;
 
 		if (this.view && oldValue !== value) this.view.render();
 	}
@@ -465,8 +480,11 @@ class TodoView extends Backbone.View<TodoModel> {
 			this.uiState.selected = true;
 	}
 
-	dragTodoOver(e: JQueryInputEventObject): boolean {
+	dragTodoOver(e: JQueryMouseEventObject): boolean {
+		var xOffset = (e.pageX || (<any> e.originalEvent).pageX) - $(e.currentTarget).offset().left;
+
 		this.uiState.isDraggedOver = true;
+		if (xOffset > 50) this.uiState.isDraggedOverAsChild = true;
 
 		return false;
 	}
@@ -474,6 +492,14 @@ class TodoView extends Backbone.View<TodoModel> {
 	drop(e: JQueryMouseEventObject): boolean {
 		var selectedModel = TodoUiState.selectedModel.model;
 		var parentView = selectedModel.parent.view;
+
+		// TODO: Check if we are a child of the selectedModel at all and quit if so.
+		if (selectedModel === this.model) {
+			this.uiState.isDraggedOver = false;
+			this.mainView.model.isDragging = false;
+
+			return false;
+		}
 
 		parentView.removeTodo(selectedModel.childIndex);
 		this.addChildTodo(selectedModel);

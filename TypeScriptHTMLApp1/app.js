@@ -231,6 +231,7 @@ var TodoUiState = (function (_super) {
         this.editingContent = false;
         this.selected = false;
         this.isDraggedOver = false;
+        this.isDraggedOverAsChild = false;
         if (!attrs['view'])
             console.error('No view assigned for TodoUiState');
         this.view = attrs['view'];
@@ -336,6 +337,19 @@ var TodoUiState = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoUiState.prototype, "isDraggedOverAsChild", {
+        get: function () {
+            return this.get('isDraggedOverAsChild');
+        },
+        set: function (value) {
+            var oldValue = this.isDraggedOverAsChild;
+            this.set('isDraggedOverAsChild', value);
+            if (oldValue !== value && this.view)
+                this.view.render();
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoUiState.prototype, "isDraggedOver", {
         get: function () {
             return this.get('isDraggedOver');
@@ -343,13 +357,16 @@ var TodoUiState = (function (_super) {
         set: function (value) {
             var oldValue = this.isDraggedOver;
             // Turn off the value on the previously-dragged-over element.
-            if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel != this) {
+            if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
                 TodoUiState.draggedOverModel.set('isDraggedOver', false);
+                TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
                 TodoUiState.draggedOverModel.view.render();
             }
             if (value)
                 TodoUiState.draggedOverModel = this;
             this.set('isDraggedOver', value);
+            if (!value)
+                this.isDraggedOverAsChild = false;
             if (this.view && oldValue !== value)
                 this.view.render();
         },
@@ -486,12 +503,21 @@ var TodoView = (function (_super) {
             this.uiState.selected = true;
     };
     TodoView.prototype.dragTodoOver = function (e) {
+        var xOffset = (e.pageX || e.originalEvent.pageX) - $(e.currentTarget).offset().left;
         this.uiState.isDraggedOver = true;
+        if (xOffset > 50)
+            this.uiState.isDraggedOverAsChild = true;
         return false;
     };
     TodoView.prototype.drop = function (e) {
         var selectedModel = TodoUiState.selectedModel.model;
         var parentView = selectedModel.parent.view;
+        // TODO: Check if we are a child of the selectedModel at all and quit if so.
+        if (selectedModel === this.model) {
+            this.uiState.isDraggedOver = false;
+            this.mainView.model.isDragging = false;
+            return false;
+        }
         parentView.removeTodo(selectedModel.childIndex);
         this.addChildTodo(selectedModel);
         this.uiState.isDraggedOver = false;

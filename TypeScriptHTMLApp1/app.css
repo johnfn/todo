@@ -57,13 +57,18 @@ a {
 	width: 90%;
 }
 
-.dragged-over {
+.dragged-over-as-child {
 	background: #f3f3f3;
 }
 
-.dragged-over:after {
+.dragged-over-as-child:after {
 	display: block;
 	content: '';
 	border-bottom: 4px solid gray;
 	margin-left: 20px;
+}
+
+.dragged-over {
+	background: #f3f3f3;
+	border-bottom: 4px solid gray;
 }
