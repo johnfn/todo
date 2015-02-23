@@ -59,5 +59,11 @@ a {
 
 .dragged-over {
 	background: #f3f3f3;
+}
+
+.dragged-over:after {
+	display: block;
+	content: '';
 	border-bottom: 4px solid gray;
+	margin-left: 20px;
 }
