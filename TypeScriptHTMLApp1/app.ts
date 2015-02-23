@@ -1,6 +1,6 @@
 ﻿// TODO (lol)
 
-// * timeago on rightpanel
+// X timeago on rightpanel
 // * Dragging items around
 //   X Can't drag item as child of itself.
 //     X Can't add item as subchild of itself.
@@ -129,6 +129,18 @@ class TodoModel extends Backbone.Model implements ITodo {
 		}
 
 		return result;
+	}
+
+	pathToRoot(): TodoModel[] {
+		var list: TodoModel[] = [];
+		var current = this.parent;
+
+		while (current != null) {
+			list.push(current);
+			current = current.parent;
+		}
+
+		return list;
 	}
 
     /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
@@ -420,8 +432,12 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 	render():TodoDetailView {
 		var createdDateAgo = $.timeago(new Date(this.model.createdDate));
+		var parentNames = _.map(this.model.pathToRoot(), (model) => model.name).reverse().join(' > ');
 
-		this.$el.html(this.template(_.extend(this.model.toJSON(), { createdDate: createdDateAgo })));
+		this.$el.html(this.template(_.extend(this.model.toJSON(), {
+			createdDate: createdDateAgo,
+			breadcrumbs: parentNames
+		})));
 
 		return this;
 	}

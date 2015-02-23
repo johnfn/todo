@@ -85,6 +85,15 @@ var TodoModel = (function (_super) {
         }
         return result;
     };
+    TodoModel.prototype.pathToRoot = function () {
+        var list = [];
+        var current = this.parent;
+        while (current != null) {
+            list.push(current);
+            current = current.parent;
+        }
+        return list;
+    };
     Object.defineProperty(TodoModel.prototype, "childIndex", {
         /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
         get: function () {
@@ -456,7 +465,11 @@ var TodoDetailView = (function (_super) {
     };
     TodoDetailView.prototype.render = function () {
         var createdDateAgo = $.timeago(new Date(this.model.createdDate));
-        this.$el.html(this.template(_.extend(this.model.toJSON(), { createdDate: createdDateAgo })));
+        var parentNames = _.map(this.model.pathToRoot(), function (model) { return model.name; }).reverse().join(' > ');
+        this.$el.html(this.template(_.extend(this.model.toJSON(), {
+            createdDate: createdDateAgo,
+            breadcrumbs: parentNames
+        })));
         return this;
     };
     return TodoDetailView;
