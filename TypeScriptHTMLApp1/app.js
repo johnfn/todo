@@ -523,7 +523,7 @@ var TodoView = (function (_super) {
             this.addChildTodo(selectedModel);
         }
         else {
-            this.model.parent.view.addChildTodo(selectedModel);
+            this.model.parent.view.addChildTodo(selectedModel, this.model.childIndex + 1);
         }
         this.uiState.isDraggedOver = false;
         this.mainView.model.isDragging = false;
@@ -699,11 +699,11 @@ var TodoView = (function (_super) {
         });
     };
     /** Add childModel as a child of this view. */
-    TodoView.prototype.addChildTodo = function (childModel, prepend) {
-        if (prepend === void 0) { prepend = false; }
+    TodoView.prototype.addChildTodo = function (childModel, index) {
+        if (index === void 0) { index = -1; }
         childModel.parent = this.model;
         var newView = new TodoView({ model: childModel, mainView: this.mainView });
-        var index = prepend ? 0 : this.childrenViews.length;
+        index = index !== -1 ? index : this.childrenViews.length;
         this.childrenViews.splice(index, 0, newView);
         // The problem is that half the time when we call this fn, we already
         // have children inserted, but the other half we should be adding

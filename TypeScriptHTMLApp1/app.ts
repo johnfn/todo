@@ -6,6 +6,8 @@
 //   * Can't drag topmost parent.
 //   * Item should still be selected when you drop it.
 //     * I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
+//     * This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made. 
+//       * It doesn't seem like a requirement that TodoModels have to be created without views though.
 //   X Drag items as children or same-level.
 //   * Have to be able to stop dragging somehow.
 // * Save to server
@@ -509,7 +511,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		if (this.uiState.isDraggedOverAsChild) {
 			this.addChildTodo(selectedModel);
 		} else {
-			this.model.parent.view.addChildTodo(selectedModel);
+			this.model.parent.view.addChildTodo(selectedModel, this.model.childIndex + 1);
 		}
 
 		this.uiState.isDraggedOver = false;
@@ -736,11 +738,11 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
 	/** Add childModel as a child of this view. */
-    addChildTodo(childModel: TodoModel, prepend: boolean = false) {
+    addChildTodo(childModel: TodoModel, index: number = -1) {
 		childModel.parent = this.model;
 
         var newView = new TodoView(<any> { model: childModel, mainView: this.mainView });
-        var index = prepend ? 0 : this.childrenViews.length;
+        index = index !== -1 ? index : this.childrenViews.length;
 
         this.childrenViews.splice(index, 0, newView);
 
