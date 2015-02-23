@@ -2,7 +2,7 @@
 
 // * Dragging items around
 //   X Can't drag item as child of itself.
-//     * Can't add item as subchild of itself.
+//     X Can't add item as subchild of itself.
 //   * Can't drag topmost parent.
 //   X Item should still be selected when you drop it.
 //     X I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
@@ -497,10 +497,10 @@ class TodoView extends Backbone.View<TodoModel> {
 	}
 
 	dragTodoOver(e: JQueryMouseEventObject): boolean {
-		var xOffset = (e.pageX || (<any> e.originalEvent).pageX) - $(e.currentTarget).offset().left;
+		var yOffset = (e.pageY || (<any> e.originalEvent).pageY) - $(e.currentTarget).offset().top;
 
 		this.uiState.isDraggedOver = true;
-		this.uiState.isDraggedOverAsChild = xOffset > 150;
+		this.uiState.isDraggedOverAsChild = yOffset > this.$('.todo-name').height() / 2;
 
 		return false;
 	}

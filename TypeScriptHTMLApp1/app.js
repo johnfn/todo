@@ -511,9 +511,9 @@ var TodoView = (function (_super) {
             this.uiState.selected = true;
     };
     TodoView.prototype.dragTodoOver = function (e) {
-        var xOffset = (e.pageX || e.originalEvent.pageX) - $(e.currentTarget).offset().left;
+        var yOffset = (e.pageY || e.originalEvent.pageY) - $(e.currentTarget).offset().top;
         this.uiState.isDraggedOver = true;
-        this.uiState.isDraggedOverAsChild = xOffset > 150;
+        this.uiState.isDraggedOverAsChild = yOffset > this.$('.todo-name').height() / 2;
         return false;
     };
     TodoView.prototype.drop = function (e) {
