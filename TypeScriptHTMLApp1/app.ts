@@ -2,6 +2,7 @@
 
 // * Dragging items around
 //   * Can't drag item as child of itself.
+//   * Have to be able to stop dragging somehow.
 // * Save to server
 // * Generalized search
 // * Individual view.
@@ -432,6 +433,8 @@ class TodoView extends Backbone.View<TodoModel> {
         if (!TodoView.todoViews) TodoView.todoViews = [];
         TodoView.todoViews.push(this);
 
+	    if (!options['mainView']) console.error("no mainView for TodoView");
+
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
         this.childrenViews = [];
@@ -450,6 +453,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
 	startDrag() {
 		// this.uiState.selected = true;
+		this.mainView.model.isDragging = true;
 	}
 
 	// TODO: This is a bit of a (UX) hack. We want to select the item that
@@ -457,7 +461,8 @@ class TodoView extends Backbone.View<TodoModel> {
 	// that would force a render(), which would re-render the selection box and
 	// quit the drag. 
 	mouseoverStartDrag() {
-		this.uiState.selected = true;
+		if (!this.mainView.model.isDragging)
+			this.uiState.selected = true;
 	}
 
 	dragTodoOver(e: JQueryInputEventObject): boolean {
@@ -474,6 +479,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		this.addChildTodo(selectedModel);
 
 		this.uiState.isDraggedOver = false;
+		this.mainView.model.isDragging = false;
 
 		return false;
 	}
@@ -696,7 +702,9 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     addChildTodo(childModel: TodoModel, prepend: boolean = false) {
-        var newView = new TodoView(<any> { model: childModel });
+		childModel.parent = this.model;
+
+        var newView = new TodoView(<any> { model: childModel, mainView: this.mainView });
         var index = prepend ? 0 : this.childrenViews.length;
 
         this.childrenViews.splice(index, 0, newView);
@@ -799,8 +807,15 @@ class TodoView extends Backbone.View<TodoModel> {
 
 // Global todo state. Could keep track of breadcrumbs etc.
 class TodoAppModel extends Backbone.Model {
+	initialize() {
+		this.isDragging = false;
+	}
+
     get selectedTodo(): TodoModel { return this.get('selectedTodo'); }
     set selectedTodo(value: TodoModel) { this.set('selectedTodo', value); }
+
+    get isDragging(): boolean { return this.get('isDragging'); }
+    set isDragging(value: boolean) { this.set('isDragging', value); }
 }
 
 class MainView extends Backbone.View<TodoAppModel> {

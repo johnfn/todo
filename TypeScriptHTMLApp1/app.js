@@ -459,6 +459,8 @@ var TodoView = (function (_super) {
         if (!TodoView.todoViews)
             TodoView.todoViews = [];
         TodoView.todoViews.push(this);
+        if (!options['mainView'])
+            console.error("no mainView for TodoView");
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
         this.childrenViews = [];
@@ -473,13 +475,15 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.startDrag = function () {
         // this.uiState.selected = true;
+        this.mainView.model.isDragging = true;
     };
     // TODO: This is a bit of a (UX) hack. We want to select the item that
     // the user just started dragging, but if we were to do this.uiState.selected = true,
     // that would force a render(), which would re-render the selection box and
     // quit the drag. 
     TodoView.prototype.mouseoverStartDrag = function () {
-        this.uiState.selected = true;
+        if (!this.mainView.model.isDragging)
+            this.uiState.selected = true;
     };
     TodoView.prototype.dragTodoOver = function (e) {
         this.uiState.isDraggedOver = true;
@@ -491,6 +495,7 @@ var TodoView = (function (_super) {
         parentView.removeTodo(selectedModel.childIndex);
         this.addChildTodo(selectedModel);
         this.uiState.isDraggedOver = false;
+        this.mainView.model.isDragging = false;
         return false;
     };
     TodoView.prototype.keydown = function (e) {
@@ -664,7 +669,8 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.addChildTodo = function (childModel, prepend) {
         if (prepend === void 0) { prepend = false; }
-        var newView = new TodoView({ model: childModel });
+        childModel.parent = this.model;
+        var newView = new TodoView({ model: childModel, mainView: this.mainView });
         var index = prepend ? 0 : this.childrenViews.length;
         this.childrenViews.splice(index, 0, newView);
         // The problem is that half the time when we call this fn, we already
@@ -736,12 +742,25 @@ var TodoAppModel = (function (_super) {
     function TodoAppModel() {
         _super.apply(this, arguments);
     }
+    TodoAppModel.prototype.initialize = function () {
+        this.isDragging = false;
+    };
     Object.defineProperty(TodoAppModel.prototype, "selectedTodo", {
         get: function () {
             return this.get('selectedTodo');
         },
         set: function (value) {
             this.set('selectedTodo', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoAppModel.prototype, "isDragging", {
+        get: function () {
+            return this.get('isDragging');
+        },
+        set: function (value) {
+            this.set('isDragging', value);
         },
         enumerable: true,
         configurable: true
