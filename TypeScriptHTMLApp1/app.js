@@ -505,8 +505,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.dragTodoOver = function (e) {
         var xOffset = (e.pageX || e.originalEvent.pageX) - $(e.currentTarget).offset().left;
         this.uiState.isDraggedOver = true;
-        if (xOffset > 50)
-            this.uiState.isDraggedOverAsChild = true;
+        this.uiState.isDraggedOverAsChild = xOffset > 50;
         return false;
     };
     TodoView.prototype.drop = function (e) {

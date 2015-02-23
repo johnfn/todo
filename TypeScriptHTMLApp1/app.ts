@@ -484,7 +484,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		var xOffset = (e.pageX || (<any> e.originalEvent).pageX) - $(e.currentTarget).offset().left;
 
 		this.uiState.isDraggedOver = true;
-		if (xOffset > 50) this.uiState.isDraggedOverAsChild = true;
+		this.uiState.isDraggedOverAsChild = xOffset > 50;
 
 		return false;
 	}
