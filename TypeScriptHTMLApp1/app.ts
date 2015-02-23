@@ -1,9 +1,12 @@
 ﻿// TODO (lol)
 
 // * Dragging items around
-//   * Can't drag item as child of itself.
+//   X Can't drag item as child of itself.
+//     * Can't add item as subchild of itself.
 //   * Can't drag topmost parent.
-//   * Drag items as children or same-level.
+//   * Item should still be selected when you drop it.
+//     * I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
+//   X Drag items as children or same-level.
 //   * Have to be able to stop dragging somehow.
 // * Save to server
 // * Generalized search
@@ -732,6 +735,7 @@ class TodoView extends Backbone.View<TodoModel> {
         });
     }
 
+	/** Add childModel as a child of this view. */
     addChildTodo(childModel: TodoModel, prepend: boolean = false) {
 		childModel.parent = this.model;
 

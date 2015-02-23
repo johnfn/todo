@@ -698,6 +698,7 @@ var TodoView = (function (_super) {
             self.toggleAddChildTodo();
         });
     };
+    /** Add childModel as a child of this view. */
     TodoView.prototype.addChildTodo = function (childModel, prepend) {
         if (prepend === void 0) { prepend = false; }
         childModel.parent = this.model;
