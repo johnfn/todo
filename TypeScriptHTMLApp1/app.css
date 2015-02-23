@@ -59,4 +59,5 @@ a {
 
 .dragged-over {
 	background: #f3f3f3;
+	border-bottom: 4px solid gray;
 }

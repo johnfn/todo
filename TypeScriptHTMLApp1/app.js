@@ -446,7 +446,9 @@ var TodoView = (function (_super) {
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
             'dragstart .todo-move-js': this.startDrag,
+            'mouseover .todo-move-js': this.mouseoverStartDrag,
             'dragover': this.dragTodoOver,
+            'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': function () { return false; }
@@ -472,9 +474,23 @@ var TodoView = (function (_super) {
     TodoView.prototype.startDrag = function () {
         // this.uiState.selected = true;
     };
+    // TODO: This is a bit of a (UX) hack. We want to select the item that
+    // the user just started dragging, but if we were to do this.uiState.selected = true,
+    // that would force a render(), which would re-render the selection box and
+    // quit the drag. 
+    TodoView.prototype.mouseoverStartDrag = function () {
+        this.uiState.selected = true;
+    };
     TodoView.prototype.dragTodoOver = function (e) {
-        console.log('dragover', this.uiState.isDraggedOver);
         this.uiState.isDraggedOver = true;
+        return false;
+    };
+    TodoView.prototype.drop = function (e) {
+        var selectedModel = TodoUiState.selectedModel.model;
+        var parentView = selectedModel.parent.view;
+        parentView.removeTodo(selectedModel.childIndex);
+        this.addChildTodo(selectedModel);
+        this.uiState.isDraggedOver = false;
         return false;
     };
     TodoView.prototype.keydown = function (e) {

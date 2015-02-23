@@ -1,6 +1,7 @@
 ﻿// TODO (lol)
 
 // * Dragging items around
+//   * Can't drag item as child of itself.
 // * Save to server
 // * Generalized search
 // * Individual view.
@@ -250,7 +251,7 @@ class TodoUiState extends Backbone.Model {
 	     this.set('editingContent', value);
     }
 
-    static selectedModel: TodoUiState;
+    public static selectedModel: TodoUiState;
 
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {
@@ -416,7 +417,9 @@ class TodoView extends Backbone.View<TodoModel> {
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
 			'dragstart .todo-move-js': this.startDrag,
+			'mouseover .todo-move-js': this.mouseoverStartDrag,
 			'dragover': this.dragTodoOver,
+			'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': () => false
@@ -449,10 +452,28 @@ class TodoView extends Backbone.View<TodoModel> {
 		// this.uiState.selected = true;
 	}
 
-	dragTodoOver(e: JQueryInputEventObject): boolean {
-		console.log('dragover', this.uiState.isDraggedOver);
+	// TODO: This is a bit of a (UX) hack. We want to select the item that
+	// the user just started dragging, but if we were to do this.uiState.selected = true,
+	// that would force a render(), which would re-render the selection box and
+	// quit the drag. 
+	mouseoverStartDrag() {
+		this.uiState.selected = true;
+	}
 
+	dragTodoOver(e: JQueryInputEventObject): boolean {
 		this.uiState.isDraggedOver = true;
+
+		return false;
+	}
+
+	drop(e: JQueryMouseEventObject): boolean {
+		var selectedModel = TodoUiState.selectedModel.model;
+		var parentView = selectedModel.parent.view;
+
+		parentView.removeTodo(selectedModel.childIndex);
+		this.addChildTodo(selectedModel);
+
+		this.uiState.isDraggedOver = false;
 
 		return false;
 	}
