@@ -1,5 +1,8 @@
 ﻿// TODO (lol)
 
+// * Make the check unicode into a checkbox
+//   * and have it be draggable
+// * Content on rightpanel
 // X timeago on rightpanel
 // * Dragging items around
 //   X Can't drag item as child of itself.
@@ -707,6 +710,8 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private completeTodo() {
         this.model.done = !this.model.done;
+		this.uiState.selected = true;
+
         this.render();
 
         return false;

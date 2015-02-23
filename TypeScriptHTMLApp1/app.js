@@ -676,6 +676,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.completeTodo = function () {
         this.model.done = !this.model.done;
+        this.uiState.selected = true;
         this.render();
         return false;
     };

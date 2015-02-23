@@ -43,11 +43,13 @@
             <div class="todo-name">
                 <span class="edit-name-js 
 					  <% if (done) print('todo-done') %>
-					  <% if (isHeader) print('todo-header') %>"><%= name %></span>
+					  <% if (isHeader) print('todo-header') %>">
+					<input type="checkbox" class="todo-done-js" <% if (done) print('checked') %> />
+					<%= name %>
+				</span>
                 <input class='name-edit' />
 
                 <a href="#" class="todo-add-js"> + </a>
-                <a href="#" class="todo-done-js"> ✓ </a>
                 <a href="#" class="todo-remove-js"> X </a>
                 <a href="#" class="todo-move-js" draggable="true"> M </a>
             </div>
