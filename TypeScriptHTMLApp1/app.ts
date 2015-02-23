@@ -4,12 +4,12 @@
 //   X Can't drag item as child of itself.
 //     * Can't add item as subchild of itself.
 //   * Can't drag topmost parent.
-//   * Item should still be selected when you drop it.
-//     * I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
-//     * This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made. 
-//       * It doesn't seem like a requirement that TodoModels have to be created without views though.
+//   X Item should still be selected when you drop it.
+//     X I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
+//     X This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made. 
+//       X It doesn't seem like a requirement that TodoModels have to be created without views though.
 //   X Drag items as children or same-level.
-//   * Have to be able to stop dragging somehow.
+//   X Have to be able to stop dragging somehow.
 // * Save to server
 // * Generalized search
 // * Individual view.
@@ -117,6 +117,17 @@ class TodoModel extends Backbone.Model implements ITodo {
 	/** Indicate that now would be a good time to save. */
 	goodTimeToSave(): void {
 		this.trigger('good-time-to-save');
+	}
+
+	flatten():TodoModel[] {
+		var result = [this];
+		var children = this.children;
+
+		for (var i = 0; i < children.length; i++) {
+			result = result.concat(children[i].flatten());
+		}
+
+		return result;
 	}
 
     /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
@@ -500,14 +511,16 @@ class TodoView extends Backbone.View<TodoModel> {
 
 		// TODO: Check if the position we're adding at is a 
 		// child of the selectedModel at all and quit if so.
-		if (selectedModel === this.model) {
+		if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
 			this.uiState.isDraggedOver = false;
+			this.uiState.isDraggedOverAsChild = false;
 			this.mainView.model.isDragging = false;
 
 			return false;
 		}
 
 		parentView.removeTodo(selectedModel.childIndex);
+
 		if (this.uiState.isDraggedOverAsChild) {
 			this.addChildTodo(selectedModel);
 		} else {

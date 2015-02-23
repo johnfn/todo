@@ -77,6 +77,14 @@ var TodoModel = (function (_super) {
     TodoModel.prototype.goodTimeToSave = function () {
         this.trigger('good-time-to-save');
     };
+    TodoModel.prototype.flatten = function () {
+        var result = [this];
+        var children = this.children;
+        for (var i = 0; i < children.length; i++) {
+            result = result.concat(children[i].flatten());
+        }
+        return result;
+    };
     Object.defineProperty(TodoModel.prototype, "childIndex", {
         /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
         get: function () {
@@ -513,8 +521,9 @@ var TodoView = (function (_super) {
         var parentView = selectedModel.parent.view;
         // TODO: Check if the position we're adding at is a 
         // child of the selectedModel at all and quit if so.
-        if (selectedModel === this.model) {
+        if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
+            this.uiState.isDraggedOverAsChild = false;
             this.mainView.model.isDragging = false;
             return false;
         }
