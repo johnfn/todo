@@ -505,20 +505,26 @@ var TodoView = (function (_super) {
     TodoView.prototype.dragTodoOver = function (e) {
         var xOffset = (e.pageX || e.originalEvent.pageX) - $(e.currentTarget).offset().left;
         this.uiState.isDraggedOver = true;
-        this.uiState.isDraggedOverAsChild = xOffset > 50;
+        this.uiState.isDraggedOverAsChild = xOffset > 150;
         return false;
     };
     TodoView.prototype.drop = function (e) {
         var selectedModel = TodoUiState.selectedModel.model;
         var parentView = selectedModel.parent.view;
-        // TODO: Check if we are a child of the selectedModel at all and quit if so.
+        // TODO: Check if the position we're adding at is a 
+        // child of the selectedModel at all and quit if so.
         if (selectedModel === this.model) {
             this.uiState.isDraggedOver = false;
             this.mainView.model.isDragging = false;
             return false;
         }
         parentView.removeTodo(selectedModel.childIndex);
-        this.addChildTodo(selectedModel);
+        if (this.uiState.isDraggedOverAsChild) {
+            this.addChildTodo(selectedModel);
+        }
+        else {
+            this.model.parent.view.addChildTodo(selectedModel);
+        }
         this.uiState.isDraggedOver = false;
         this.mainView.model.isDragging = false;
         return false;
