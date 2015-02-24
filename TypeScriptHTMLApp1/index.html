@@ -49,14 +49,23 @@
 				</span>
                 <input class='name-edit' />
 
-                <a href="#" class="todo-add-js"> + </a>
-                <a href="#" class="todo-remove-js"> X </a>
+				<% if (selected) { %>
+					<span class="toolbar">
+						<a href="#" class="todo-add-js"> + </a>
+						<a href="#" class="todo-remove-js"> X </a>
+						<% if (numChildren > 0) { %>
+							<a href="#" class="todo-hide-js"> <%= hidden ? '[+]' : '[-]' %> </a>
+						<% } %>
+					</span>
+				<% } %>
             </div>
 
             <div class="todo-content edit-content-js"> <%= content %> </div>
             <input class='content-edit-js'/>
 
-            <div class="children-js children"> </div>
+			<% if (!hidden) { %>
+				<div class="children-js children"> </div>
+			<% } %>
             <div class="todo-add"> </div>
         </div>
     </script>

@@ -249,6 +249,7 @@ var TodoUiState = (function (_super) {
         this.selected = false;
         this.isDraggedOver = false;
         this.isDraggedOverAsChild = false;
+        this.hidden = false;
         if (!attrs['view'])
             console.error('No view assigned for TodoUiState');
         this.view = attrs['view'];
@@ -279,6 +280,16 @@ var TodoUiState = (function (_super) {
         },
         set: function (value) {
             this.set('addTodoVisible', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoUiState.prototype, "hidden", {
+        get: function () {
+            return this.get('hidden');
+        },
+        set: function (value) {
+            this.set('hidden', value);
         },
         enumerable: true,
         configurable: true
@@ -486,8 +497,10 @@ var TodoView = (function (_super) {
             'click .todo-add-js': this.toggleAddChildTodo,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
+            'click .todo-hide-js': this.clickHideTodo,
             'dragstart .todo-done-js': this.startDrag,
-            'mouseover .todo-done-js': this.mouseoverStartDrag,
+            'mouseover': this.mouseoverStartDrag,
+            // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
             'dragover': this.dragTodoOver,
             'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
@@ -501,7 +514,7 @@ var TodoView = (function (_super) {
             TodoView.todoViews = [];
         TodoView.todoViews.push(this);
         if (!options['mainView'])
-            console.error("no mainView for TodoView");
+            console.error('no mainView for TodoView');
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
         this.childrenViews = [];
@@ -690,6 +703,11 @@ var TodoView = (function (_super) {
         }
         return false;
     };
+    TodoView.prototype.clickHideTodo = function () {
+        this.uiState.hidden = !this.uiState.hidden;
+        this.render();
+        return false;
+    };
     TodoView.prototype.removeTodo = function (index) {
         var deleted = this.childrenViews.splice(index, 1)[0];
         this.model.children.splice(index, 1);
@@ -753,7 +771,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
-        var renderOptions = _.extend({}, this.model.toJSON(), this.uiState.toJSON());
+        var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
         this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');

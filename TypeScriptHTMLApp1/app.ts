@@ -232,6 +232,7 @@ class TodoUiState extends Backbone.Model {
 	    this.selected = false;
 	    this.isDraggedOver = false;
 	    this.isDraggedOverAsChild = false;
+	    this.hidden = false;
 
 	    if (!attrs['view']) console.error('No view assigned for TodoUiState');
 
@@ -253,6 +254,9 @@ class TodoUiState extends Backbone.Model {
 
     get addTodoVisible(): boolean { return this.get('addTodoVisible'); }
     set addTodoVisible(value: boolean) { this.set('addTodoVisible', value); }
+
+    get hidden(): boolean { return this.get('hidden'); }
+    set hidden(value: boolean) { this.set('hidden', value); }
 
     get editingName(): boolean { return this.get('editingName'); }
     set editingName(value: boolean) {
@@ -469,12 +473,14 @@ class TodoView extends Backbone.View<TodoModel> {
     static todoViews: TodoView[];
 
     events() {
-        return {
-            'click .todo-add-js': this.toggleAddChildTodo,
-            'click .todo-done-js': this.completeTodo,
-            'click .todo-remove-js': this.clickRemoveTodo,
-			'dragstart .todo-done-js': this.startDrag,
-			'mouseover .todo-done-js': this.mouseoverStartDrag,
+	    return {
+		    'click .todo-add-js': this.toggleAddChildTodo,
+		    'click .todo-done-js': this.completeTodo,
+		    'click .todo-remove-js': this.clickRemoveTodo,
+		    'click .todo-hide-js': this.clickHideTodo,
+		    'dragstart .todo-done-js': this.startDrag,
+		    'mouseover': this.mouseoverStartDrag,
+		    // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
 			'dragover': this.dragTodoOver,
 			'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
@@ -489,7 +495,7 @@ class TodoView extends Backbone.View<TodoModel> {
         if (!TodoView.todoViews) TodoView.todoViews = [];
         TodoView.todoViews.push(this);
 
-	    if (!options['mainView']) console.error("no mainView for TodoView");
+	    if (!options['mainView']) console.error('no mainView for TodoView');
 
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
@@ -734,6 +740,13 @@ class TodoView extends Backbone.View<TodoModel> {
 	    return false;
     }
 
+	private clickHideTodo() {
+		this.uiState.hidden = !this.uiState.hidden;
+
+		this.render();
+		return false;
+	}
+
 	private removeTodo(index: number) {
 		var deleted = this.childrenViews.splice(index, 1)[0];
 		this.model.children.splice(index, 1);
@@ -818,7 +831,7 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     render(updateSidebar: boolean = true) {
-		var renderOptions = _.extend({}, this.model.toJSON(), this.uiState.toJSON());
+		var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
 
         this.$el.html(this.template(renderOptions));
 
