@@ -56,6 +56,21 @@ class Util {
 	}
 }
 
+class Trigger {
+    private _value = false;
+
+    get value(): boolean {
+        if (this._value) {
+            this._value = false;
+
+            return true;
+        }
+        
+        return false;
+    }
+    set value(value: boolean) { this._value = value; }
+}
+
 class TodoModel extends Backbone.Model implements ITodo {
     /** The TodoModel one view up (or null if there isn't one. */
     parent: TodoModel;
@@ -239,6 +254,10 @@ class TodoUiState extends Backbone.Model {
 	    this.view = attrs['view'];
     }
 
+
+    showUiItems: Trigger = new Trigger();
+    hideUiItems: Trigger = new Trigger();
+
 	get model(): TodoModel { return this.view.model; }
 
     /** Returns true if the user is currently editing anything. */
@@ -306,11 +325,13 @@ class TodoUiState extends Backbone.Model {
 			if (TodoUiState.selectedModel.isEditing) return;
 
             TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
+            TodoUiState.selectedModel.hideUiItems.value = true;
             TodoUiState.selectedModel.view.render(false);
         }
 
         if (value) {
             TodoUiState.selectedModel = this;
+            this.showUiItems.value = true;
 	        this.trigger('selected');
         }
 
@@ -410,17 +431,29 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 }
 
+class TodoDetailUiState extends Backbone.Model {
+	initialize() {
+		this.isEditingContent = false;
+	}
+
+    get isEditingContent(): boolean { return this.get('isEditingContent'); }
+    set isEditingContent(value: boolean) { this.set('isEditingContent', value); }
+}
+
 class TodoDetailView extends Backbone.View<TodoModel> {
 	static instance: TodoDetailView;
 
 	private template:ITemplate;
 
+	private uiState:TodoDetailUiState;
+
     events() {
         return {
-            'click .header-checkbox-js': this.toggleHeader
+            'click .header-checkbox-js': this.toggleHeader,
+			'click .content-js': this.toggleContent,
+			'click .content-input-js': this.toggleContent
         };
     }
-
 
 	initialize() {
 		if (TodoDetailView.instance) {
@@ -428,6 +461,7 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 			return;
 		}
 
+		this.uiState = new TodoDetailUiState();
 		this.template = Util.getTemplate("right-panel");
 		this.setElement($('.right-panel'));
 
@@ -446,12 +480,16 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 		var createdDateAgo = $.timeago(new Date(this.model.createdDate));
 		var parentNames = _.map(this.model.pathToRoot(), (model) => model.name).reverse().join(' > ');
 
-		this.$el.html(this.template(_.extend(this.model.toJSON(), {
+		this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
 			createdDate: createdDateAgo,
 			breadcrumbs: parentNames
 		})));
 
 		return this;
+	}
+
+	toggleContent(e: JQueryMouseEventObject) {
+		this.uiState.isEditingContent = !this.uiState.isEditingContent;
 	}
 }
 
@@ -866,6 +904,12 @@ class TodoView extends Backbone.View<TodoModel> {
 		    TodoDetailView.instance.model = this.model;
 		    TodoDetailView.instance.render();
 	    }
+
+        if (this.uiState.showUiItems.value) {
+            this.$('.toolbar').hide().fadeIn(150);
+        }
+
+        if (this.uiState.hideUiItems.value) this.$('.toolbar').show().fadeOut();
 
 	    return this;
     }

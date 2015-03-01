@@ -20,6 +20,26 @@ var Util = (function () {
     };
     return Util;
 })();
+var Trigger = (function () {
+    function Trigger() {
+        this._value = false;
+    }
+    Object.defineProperty(Trigger.prototype, "value", {
+        get: function () {
+            if (this._value) {
+                this._value = false;
+                return true;
+            }
+            return false;
+        },
+        set: function (value) {
+            this._value = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return Trigger;
+})();
 var TodoModel = (function (_super) {
     __extends(TodoModel, _super);
     function TodoModel() {
@@ -243,6 +263,8 @@ var TodoUiState = (function (_super) {
     __extends(TodoUiState, _super);
     function TodoUiState(attrs) {
         _super.call(this, attrs);
+        this.showUiItems = new Trigger();
+        this.hideUiItems = new Trigger();
         this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
@@ -353,10 +375,12 @@ var TodoUiState = (function (_super) {
                 if (TodoUiState.selectedModel.isEditing)
                     return;
                 TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
+                TodoUiState.selectedModel.hideUiItems.value = true;
                 TodoUiState.selectedModel.view.render(false);
             }
             if (value) {
                 TodoUiState.selectedModel = this;
+                this.showUiItems.value = true;
                 this.trigger('selected');
             }
             this.set('selected', value);
@@ -451,6 +475,26 @@ var NewTodoView = (function (_super) {
     };
     return NewTodoView;
 })(Backbone.View);
+var TodoDetailUiState = (function (_super) {
+    __extends(TodoDetailUiState, _super);
+    function TodoDetailUiState() {
+        _super.apply(this, arguments);
+    }
+    TodoDetailUiState.prototype.initialize = function () {
+        this.isEditingContent = false;
+    };
+    Object.defineProperty(TodoDetailUiState.prototype, "isEditingContent", {
+        get: function () {
+            return this.get('isEditingContent');
+        },
+        set: function (value) {
+            this.set('isEditingContent', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return TodoDetailUiState;
+})(Backbone.Model);
 var TodoDetailView = (function (_super) {
     __extends(TodoDetailView, _super);
     function TodoDetailView() {
@@ -458,7 +502,9 @@ var TodoDetailView = (function (_super) {
     }
     TodoDetailView.prototype.events = function () {
         return {
-            'click .header-checkbox-js': this.toggleHeader
+            'click .header-checkbox-js': this.toggleHeader,
+            'click .content-js': this.toggleContent,
+            'click .content-input-js': this.toggleContent
         };
     };
     TodoDetailView.prototype.initialize = function () {
@@ -466,6 +512,7 @@ var TodoDetailView = (function (_super) {
             console.error('Multiple instantiation of TodoDetailView');
             return;
         }
+        this.uiState = new TodoDetailUiState();
         this.template = Util.getTemplate("right-panel");
         this.setElement($('.right-panel'));
         TodoDetailView.instance = this;
@@ -479,11 +526,14 @@ var TodoDetailView = (function (_super) {
     TodoDetailView.prototype.render = function () {
         var createdDateAgo = $.timeago(new Date(this.model.createdDate));
         var parentNames = _.map(this.model.pathToRoot(), function (model) { return model.name; }).reverse().join(' > ');
-        this.$el.html(this.template(_.extend(this.model.toJSON(), {
+        this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
             createdDate: createdDateAgo,
             breadcrumbs: parentNames
         })));
         return this;
+    };
+    TodoDetailView.prototype.toggleContent = function (e) {
+        this.uiState.isEditingContent = !this.uiState.isEditingContent;
     };
     return TodoDetailView;
 })(Backbone.View);
@@ -794,6 +844,11 @@ var TodoView = (function (_super) {
             TodoDetailView.instance.model = this.model;
             TodoDetailView.instance.render();
         }
+        if (this.uiState.showUiItems.value) {
+            this.$('.toolbar').hide().fadeIn(150);
+        }
+        if (this.uiState.hideUiItems.value)
+            this.$('.toolbar').show().fadeOut();
         return this;
     };
     /** Show the name text xor the name input. */

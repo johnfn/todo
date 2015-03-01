@@ -104,7 +104,15 @@
 			<small class="right-panel-time"> (added <%= createdDate %>) </small>
 		</div>
 
-		<div> <%= content %> </div>
+		<% if (isEditingContent) { %>
+			<div class="content-js"> <%= content %> </div>
+		<% } else { %>
+			<div class="content-input-js">
+				<textarea>
+					<%= content %>
+				</textarea>
+			</div>
+		<% } %>
 		<div>
 			<input type="checkbox" class="header-checkbox-js" value="Car" <% if (isHeader) print('checked') %>/>Header
 		</div>
