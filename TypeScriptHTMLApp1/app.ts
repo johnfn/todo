@@ -209,7 +209,9 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     /** Returns the next child in this list of children, or null if this is the last. */
     get nextChild(): TodoModel {
-        console.log('nextchild');
+        if (this.parent == null) {
+            return null;
+        }
 
         if (this.childIndex + 1 >= this.parent.numChildren) {
             return null;
