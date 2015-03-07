@@ -1,4 +1,28 @@
-﻿body {
+﻿.title {
+    color: #fff;
+    font-family: 'Open Sans', sans-serif;
+
+    background-color: rgb(86, 160, 98);
+    text-shadow: 1px 1px #397145;
+
+    margin-bottom: 10px;
+    font-weight: 500;
+    -moz-box-shadow: 3px -3px 5px 6px #ccc;
+    -webkit-box-shadow: 3px -3px 5px 6px #ccc;
+    box-shadow: 3px -3px 5px 6px #ccc;
+}
+
+.title-text {
+    font-size: 2.3em;
+    padding-left: 20px;
+}
+
+.title-below {
+    background-color: #397145;
+    height: 1px;
+}
+
+body {
     font-family: 'Segoe UI', sans-serif;
 }
 
@@ -11,7 +35,9 @@
 }
 
 .todo {
-    border-left: 1px solid #f3f3f3;
+    border-left: 2px solid #f0f0f0;
+    padding-left: 3px;
+    margin-top: 3px;
 }
 
 .todo-content {

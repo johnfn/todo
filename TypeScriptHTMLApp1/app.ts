@@ -175,7 +175,6 @@ class TodoModel extends Backbone.Model implements ITodo {
         }
 
         console.error('childIndex is in weird state');
-        debugger;
 
         return -1;
     }
