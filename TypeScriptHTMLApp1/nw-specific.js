@@ -36,6 +36,7 @@ var option = {
   key : "Ctrl+Period",
   active : function() {
     win.restore();
+    win.focus();
   },
   failed : function(msg) {
     console.log(msg);
