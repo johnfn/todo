@@ -10,9 +10,10 @@ var KeyboardShortcuts = (function (_super) {
         _super.apply(this, arguments);
     }
     KeyboardShortcuts.prototype.initialize = function () {
-        this.normalShortcuts = Util.getTemplate("normal-shortcuts");
-        this.editingShortcuts = Util.getTemplate("editing-shortcuts");
-        this.setElement($(".shortcuts-js"));
+        this.normalShortcuts = Util.getTemplate('normal-shortcuts');
+        this.editingShortcuts = Util.getTemplate('editing-shortcuts');
+        debugger;
+        this.setElement($('.shortcuts-js'));
     };
     KeyboardShortcuts.prototype.setModel = function (model) {
         this.model = model;

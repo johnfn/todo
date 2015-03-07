@@ -3,10 +3,12 @@
     editingShortcuts: ITemplate;
 
     initialize() {
-        this.normalShortcuts = Util.getTemplate("normal-shortcuts");
-        this.editingShortcuts = Util.getTemplate("editing-shortcuts");
+        this.normalShortcuts = Util.getTemplate('normal-shortcuts');
+        this.editingShortcuts = Util.getTemplate('editing-shortcuts');
 
-        this.setElement($(".shortcuts-js"));
+        debugger;
+
+        this.setElement($('.shortcuts-js'));
     }
 
     setModel(model: TodoUiState) {

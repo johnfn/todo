@@ -905,8 +905,8 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$('.name').focus();
         }
 
-        // window['keyboardShortcuts'].setModel(this.uiState);
-        // window['keyboardShortcuts'].render();
+        window['keyboardShortcuts'].setModel(this.uiState);
+        window['keyboardShortcuts'].render();
 
 	    if (updateSidebar && this.uiState.selected) {
 		    TodoDetailView.instance.model = this.model;
