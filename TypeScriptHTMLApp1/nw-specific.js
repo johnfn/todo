@@ -4,6 +4,9 @@ var gui = require('nw.gui'); //or global.window.nwDispatcher.requireNwGui() (see
 var win = gui.Window.get();
 var tray;
 
+win.menu = new gui.Menu({ type: 'menubar' });
+win.menu.createMacBuiltin("grants-todos");
+
 // Get the minimize event
 win.on('minimize', function() {
   // Hide window
@@ -25,13 +28,14 @@ win.on('restore', function() {
     tray.remove();
     tray = null;
   }
+
+  win.focus()
 });
 
 var option = {
   key : "Ctrl+Period",
   active : function() {
     win.restore();
-console.log("...");
   },
   failed : function(msg) {
     console.log(msg);
@@ -41,4 +45,4 @@ console.log("...");
 var shortcut = new gui.Shortcut(option);
 gui.App.registerGlobalHotKey(shortcut);
 
-win.setAlwaysOnTop(true);
+win.focus();
