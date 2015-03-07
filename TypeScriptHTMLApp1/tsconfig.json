@@ -1,0 +1,25 @@
+{
+    "version": "1.4.1",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./Scripts/typings/backbone/backbone.d.ts",
+        "./Scripts/typings/bootstrap/bootstrap.d.ts",
+        "./Scripts/typings/jquery.timeago/jquery.timeago.d.ts",
+        "./Scripts/typings/jquery/jquery.d.ts",
+        "./Scripts/typings/underscore/underscore.d.ts",
+        "./app.ts",
+        "./keyboard-shortcuts.ts",
+        "./storage.ts"
+    ]
+}

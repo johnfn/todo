@@ -13,7 +13,7 @@
 //   * Can't drag topmost parent.
 //   X Item should still be selected when you drop it.
 //     X I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
-//     X This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made. 
+//     X This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made.
 //       X It doesn't seem like a requirement that TodoModels have to be created without views though.
 //   X Drag items as children or same-level.
 //   X Have to be able to stop dragging somehow.
@@ -521,7 +521,7 @@ class TodoView extends Backbone.View<TodoModel> {
 	// TODO: This is a bit of a (UX) hack. We want to select the item that
 	// the user just started dragging, but if we were to do this.uiState.selected = true,
 	// that would force a render(), which would re-render the selection box and
-	// quit the drag. 
+	// quit the drag.
 	mouseoverStartDrag() {
 		if (!this.mainView.model.isDragging)
 			this.uiState.selected = true;
@@ -542,7 +542,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		var selectedModel = TodoUiState.selectedModel.model;
 		var parentView = selectedModel.parent.view;
 
-		// TODO: Check if the position we're adding at is a 
+		// TODO: Check if the position we're adding at is a
 		// child of the selectedModel at all and quit if so.
 		if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
 			this.uiState.isDraggedOver = false;
@@ -811,7 +811,7 @@ class TodoView extends Backbone.View<TodoModel> {
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) === -1) {
             this.model.children.splice(index, 0, childModel);
         }
-		 
+
 		this.model.goodTimeToSave();
 
 	    this.render();

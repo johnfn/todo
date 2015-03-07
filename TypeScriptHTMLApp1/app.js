@@ -1,4 +1,3 @@
-// TODO (lol)
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -36,14 +35,12 @@ var TodoModel = (function (_super) {
         this.uid = Math.random() + ' ' + Math.random();
         this.createdDate = (new Date()).toString();
         this.modifiedDate = (new Date()).toString();
-        // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'good-time-to-save', function () {
             if (_this.parent) {
                 _this.parent.trigger('good-time-to-save');
             }
         });
     };
-    /** recursively create this todo and all sub-todos from the provided data. */
     TodoModel.prototype.initWithData = function (data, parent) {
         this.name = data.name;
         this.content = data.content;
@@ -67,13 +64,11 @@ var TodoModel = (function (_super) {
         }
         return this;
     };
-    /** Recursively get the ITodo data of this Todo. */
     TodoModel.prototype.getData = function () {
         var result = this.toJSON();
         result['children'] = _.map(this.children, function (model) { return model.getData(); });
         return result;
     };
-    /** Indicate that now would be a good time to save. */
     TodoModel.prototype.goodTimeToSave = function () {
         this.trigger('good-time-to-save');
     };
@@ -95,7 +90,6 @@ var TodoModel = (function (_super) {
         return list;
     };
     Object.defineProperty(TodoModel.prototype, "childIndex", {
-        /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
         get: function () {
             if (this.parent == null)
                 return -1;
@@ -206,7 +200,6 @@ var TodoModel = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "nextChild", {
-        /** Returns the next child in this list of children, or null if this is the last. */
         get: function () {
             console.log('nextchild');
             if (this.childIndex + 1 >= this.parent.numChildren) {
@@ -225,7 +218,6 @@ var TodoModel = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "previousChild", {
-        /** Returns the previous child in this list of children, or null if this is the first. */
         get: function () {
             if (this.childIndex - 1 < 0) {
                 return null;
@@ -262,7 +254,6 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "isEditing", {
-        /** Returns true if the user is currently editing anything. */
         get: function () {
             return this.addTodoVisible || this.editingName || this.editingContent;
         },
@@ -347,12 +338,10 @@ var TodoUiState = (function (_super) {
         set: function (value) {
             if (value === this.selected)
                 return;
-            // Deselect the old one.
             if (TodoUiState.selectedModel && value) {
-                // Totally refuse to change the selection during an edit.
                 if (TodoUiState.selectedModel.isEditing)
                     return;
-                TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
+                TodoUiState.selectedModel.set('selected', false);
                 TodoUiState.selectedModel.view.render(false);
             }
             if (value) {
@@ -386,7 +375,6 @@ var TodoUiState = (function (_super) {
         },
         set: function (value) {
             var oldValue = this.isDraggedOver;
-            // Turn off the value on the previously-dragged-over element.
             if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
                 TodoUiState.draggedOverModel.set('isDraggedOver', false);
                 TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
@@ -500,7 +488,6 @@ var TodoView = (function (_super) {
             'click .todo-hide-js': this.clickHideTodo,
             'dragstart .todo-done-js': this.startDrag,
             'mouseover': this.mouseoverStartDrag,
-            // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
             'dragover': this.dragTodoOver,
             'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
@@ -528,13 +515,8 @@ var TodoView = (function (_super) {
         this.listenTo(this, 'remove-todo', this.removeTodo);
     };
     TodoView.prototype.startDrag = function () {
-        // this.uiState.selected = true;
         this.mainView.model.isDragging = true;
     };
-    // TODO: This is a bit of a (UX) hack. We want to select the item that
-    // the user just started dragging, but if we were to do this.uiState.selected = true,
-    // that would force a render(), which would re-render the selection box and
-    // quit the drag. 
     TodoView.prototype.mouseoverStartDrag = function () {
         if (!this.mainView.model.isDragging)
             this.uiState.selected = true;
@@ -549,8 +531,6 @@ var TodoView = (function (_super) {
     TodoView.prototype.drop = function (e) {
         var selectedModel = TodoUiState.selectedModel.model;
         var parentView = selectedModel.parent.view;
-        // TODO: Check if the position we're adding at is a 
-        // child of the selectedModel at all and quit if so.
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
@@ -574,13 +554,11 @@ var TodoView = (function (_super) {
             return true;
         var enter = e.which === 13 && !e.shiftKey;
         var shiftEnter = e.which === 13 && e.shiftKey;
-        // Navigation
         if (e.which === 38 || e.which === 40 || e.which === 37 || e.which === 39) {
             if (!this.uiState.isEditing) {
                 return this.navigateBetweenTodos(e.which);
             }
         }
-        // Shift + Enter to toggle between name and content editing
         if (shiftEnter && this.uiState.editingName) {
             this.uiState.editingName = false;
             this.uiState.editingContent = true;
@@ -593,38 +571,32 @@ var TodoView = (function (_super) {
             this.render();
             return false;
         }
-        // Shift + Enter to start to add child
         if (shiftEnter) {
             this.toggleAddChildTodo();
             return false;
         }
-        // Esc to stop editing
         if (e.which === 27 && this.uiState.isEditing) {
             this.uiState.stopAllEditing();
             this.render();
             return false;
         }
-        // Enter to finish editing name
         if (enter && this.uiState.editingName) {
             this.model.name = this.$('.name-edit').val();
             this.uiState.editingName = false;
             this.render();
             return false;
         }
-        // Enter to finish editing content
         if (enter && this.uiState.editingContent) {
             this.model.content = this.$('.content-edit-js').val();
             this.uiState.editingContent = false;
             this.render();
             return false;
         }
-        // Enter to finish adding child
         if (enter && this.uiState.addTodoVisible) {
             this.editView.addTodo(null);
             this.render();
             return false;
         }
-        // Enter to edit name
         if (enter && !this.uiState.editingName && !this.uiState.addTodoVisible) {
             this.uiState.editingName = true;
             this.render();
@@ -632,8 +604,6 @@ var TodoView = (function (_super) {
         }
         return true;
     };
-    /** Given a keypress, move appropriately between todos.
-        Return true to stop key event propagation. */
     TodoView.prototype.navigateBetweenTodos = function (which) {
         var newSelection;
         if (which === 40 || which === 39) {
@@ -643,20 +613,6 @@ var TodoView = (function (_super) {
             else {
                 newSelection = this.model.nextChild;
                 if (newSelection == null) {
-                    // We could potentially be falling off a big cliff of todos. e.g
-                    // we could be here:
-                    //
-                    // [ ] Todo blah blah
-                    //  *  [ ] Some inner todo
-                    //  *  [ ] bleh
-                    //      *  [ ] super inner todo
-                    //      *  [ ] oh no
-                    //          *  [ ] so inner! <------- HERE
-                    // [ ] Other stuff
-                    //
-                    // So we need to repeatedly ascend to the parent to see if
-                    // it has a nextChild -- all the way until there are no more
-                    // parents to check.
                     var currentParent = this.model.parent;
                     while (currentParent != null) {
                         if (currentParent.nextChild != null) {
@@ -682,7 +638,6 @@ var TodoView = (function (_super) {
         if (which === 37) {
             newSelection = this.model.parent;
         }
-        // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
             newSelection.view.uiState.selected = true;
             this.render();
@@ -744,17 +699,12 @@ var TodoView = (function (_super) {
             self.toggleAddChildTodo();
         });
     };
-    /** Add childModel as a child of this view. */
     TodoView.prototype.addChildTodo = function (childModel, index) {
         if (index === void 0) { index = -1; }
         childModel.parent = this.model;
         var newView = new TodoView({ model: childModel, mainView: this.mainView });
         index = index !== -1 ? index : this.childrenViews.length;
         this.childrenViews.splice(index, 0, newView);
-        // The problem is that half the time when we call this fn, we already
-        // have children inserted, but the other half we should be adding
-        // new children to the array.
-        // TODO: Should think about this more later.
         if (_.pluck(this.model.children, 'uid').indexOf(childModel.uid) === -1) {
             this.model.children.splice(index, 0, childModel);
         }
@@ -775,12 +725,10 @@ var TodoView = (function (_super) {
         this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
-        // Update state per uiState
         $addTodo.toggle(this.uiState.addTodoVisible);
         this.renderTodoName();
         this.renderTodoContent();
-        this.delegateEvents(); // We might lose our own events. D:
-        // render children
+        this.delegateEvents();
         _.each(this.childrenViews, function (child) {
             child.render(false).$el.appendTo($childrenContainer);
         });
@@ -788,15 +736,12 @@ var TodoView = (function (_super) {
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
-        // window['keyboardShortcuts'].setModel(this.uiState);
-        // window['keyboardShortcuts'].render();
         if (updateSidebar && this.uiState.selected) {
             TodoDetailView.instance.model = this.model;
             TodoDetailView.instance.render();
         }
         return this;
     };
-    /** Show the name text xor the name input. */
     TodoView.prototype.renderTodoName = function () {
         this.$('.edit-name-js').toggle(!this.uiState.editingName);
         var $nameInput = this.$('.name-edit').toggle(this.uiState.editingName).val(this.model.name);
@@ -804,7 +749,6 @@ var TodoView = (function (_super) {
             $nameInput.select();
         }
     };
-    /** Show the content text xor the content input. */
     TodoView.prototype.renderTodoContent = function () {
         this.$('.edit-content-js').toggle(!this.uiState.editingContent);
         var $contentInput = this.$('.content-edit-js').toggle(this.uiState.editingContent).val(this.model.content);
@@ -814,7 +758,6 @@ var TodoView = (function (_super) {
     };
     return TodoView;
 })(Backbone.View);
-// Global todo state. Could keep track of breadcrumbs etc.
 var TodoAppModel = (function (_super) {
     __extends(TodoAppModel, _super);
     function TodoAppModel() {
@@ -861,7 +804,6 @@ var MainView = (function (_super) {
         this.savedData = new SavedData();
         this.initializeTodoTree(this.savedData.load());
         this.listenTo(this.savedData, 'load', function () {
-            // Do something intelligent.
             self.initializeTodoTree(_this.savedData.load());
             self.render();
         });
@@ -907,8 +849,7 @@ $(function () {
         }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e))
-                break; // stop propagation
+                break;
         }
     });
 });
-//# sourceMappingURL=app.js.map
