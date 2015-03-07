@@ -105,13 +105,13 @@
 		</div>
 
 		<% if (isEditingContent) { %>
-			<div class="content-js"> <%= content %> </div>
-		<% } else { %>
 			<div class="content-input-js">
-				<textarea>
+				<textarea class="content-edit-js">
 					<%= content %>
 				</textarea>
 			</div>
+		<% } else { %>
+			<div class="content-js"> <%= content %> </div>
 		<% } %>
 		<div>
 			<input type="checkbox" class="header-checkbox-js" value="Car" <% if (isHeader) print('checked') %>/>Header

@@ -513,7 +513,7 @@ var TodoDetailView = (function (_super) {
             return;
         }
         this.uiState = new TodoDetailUiState();
-        this.template = Util.getTemplate("right-panel");
+        this.template = Util.getTemplate('right-panel');
         this.setElement($('.right-panel'));
         TodoDetailView.instance = this;
     };
@@ -530,9 +530,15 @@ var TodoDetailView = (function (_super) {
             createdDate: createdDateAgo,
             breadcrumbs: parentNames
         })));
+        if (this.uiState.isEditingContent) {
+            this.$('.content-edit-js').focus().select();
+        }
         return this;
     };
     TodoDetailView.prototype.toggleContent = function (e) {
+        if (this.uiState.isEditingContent) {
+            this.model.content = this.$('.content-edit-js').val();
+        }
         this.uiState.isEditingContent = !this.uiState.isEditingContent;
     };
     return TodoDetailView;

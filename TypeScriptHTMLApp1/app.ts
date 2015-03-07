@@ -462,7 +462,7 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 		}
 
 		this.uiState = new TodoDetailUiState();
-		this.template = Util.getTemplate("right-panel");
+		this.template = Util.getTemplate('right-panel');
 		this.setElement($('.right-panel'));
 
 		TodoDetailView.instance = this;
@@ -485,11 +485,19 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 			breadcrumbs: parentNames
 		})));
 
+        if (this.uiState.isEditingContent) {
+            this.$('.content-edit-js').focus().select();
+        }
+
 		return this;
 	}
 
 	toggleContent(e: JQueryMouseEventObject) {
-		this.uiState.isEditingContent = !this.uiState.isEditingContent;
+	    if (this.uiState.isEditingContent) {
+	        this.model.content = this.$('.content-edit-js').val();
+	    }
+
+	    this.uiState.isEditingContent = !this.uiState.isEditingContent;
 	}
 }
 
