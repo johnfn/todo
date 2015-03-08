@@ -1,4 +1,9 @@
-﻿.title {
+﻿html {
+    position: relative;
+    min-height: 100%;
+}
+
+.title {
     color: #fff;
     font-family: 'Open Sans', sans-serif;
 
@@ -31,7 +36,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
+    margin-bottom: 30px;
 }
 
 .name {
@@ -154,6 +159,7 @@ a {
 }
 
 .footer {
+    display: block;
     position: absolute;
     bottom: 0;
     width: 100%;
