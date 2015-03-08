@@ -1052,13 +1052,15 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     render():FooterView {
-        debugger;
+        var allTodos = this.model.flatten();
 
-        var archiveable = _.filter(this.model.flatten(), (m) => !m.archived && m.done);
+        var archiveable = _.filter(allTodos, m => !m.archived && m.done);
+        var starred = _.filter(allTodos, m => m.starred);
 
         this.$el.html(this.template({
             hasThingsToArchive: archiveable.length > 0,
-            numThingsToArchive: archiveable.length
+            numThingsToArchive: archiveable.length,
+            starred: starred[0] // implicitly giving undefined if there is no starred item.
         }));
 
         return this;

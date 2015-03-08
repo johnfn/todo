@@ -156,6 +156,12 @@
             <button type="submit" class="btn btn-link archive-all" <% if (!hasThingsToArchive) print('disabled') %>>
                 Archive all done <% if (hasThingsToArchive) print('(' + numThingsToArchive + ')') %>
             </button>
+
+            <% if (typeof starred !== 'undefined') { %>
+                <span> 
+                    <i class="fa fa-star"></i> <%= starred.name %>
+                </span>
+            <% } %>
         </div>
     </script>
 </head>

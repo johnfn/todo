@@ -972,11 +972,13 @@ var FooterView = (function (_super) {
         });
     };
     FooterView.prototype.render = function () {
-        debugger;
-        var archiveable = _.filter(this.model.flatten(), function (m) { return !m.archived && m.done; });
+        var allTodos = this.model.flatten();
+        var archiveable = _.filter(allTodos, function (m) { return !m.archived && m.done; });
+        var starred = _.filter(allTodos, function (m) { return m.starred; });
         this.$el.html(this.template({
             hasThingsToArchive: archiveable.length > 0,
-            numThingsToArchive: archiveable.length
+            numThingsToArchive: archiveable.length,
+            starred: starred[0] // implicitly giving undefined if there is no starred item.
         }));
         return this;
     };
