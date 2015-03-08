@@ -96,6 +96,7 @@ var TodoModel = (function (_super) {
     TodoModel.prototype.goodTimeToSave = function () {
         this.trigger('good-time-to-save');
     };
+    /** Return a list of all todos nested under this todo. */
     TodoModel.prototype.flatten = function () {
         var result = [this];
         var children = this.children;
@@ -162,6 +163,10 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('archived', value);
+            // Also set all children to their parent's archived status. We 
+            // bypass the getter because otherwise we'd have a crazy number
+            // of recursive calls for deeply nested trees.
+            _.each(this.flatten(), function (m) { return m.set('archived', value); });
         },
         enumerable: true,
         configurable: true
@@ -231,7 +236,7 @@ var TodoModel = (function (_super) {
     });
     Object.defineProperty(TodoModel.prototype, "children", {
         get: function () {
-            return this._children;
+            return this._children || [];
         },
         enumerable: true,
         configurable: true

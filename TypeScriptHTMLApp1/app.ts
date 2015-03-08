@@ -142,6 +142,7 @@ class TodoModel extends Backbone.Model implements ITodo {
 		this.trigger('good-time-to-save');
 	}
 
+    /** Return a list of all todos nested under this todo. */
 	flatten():TodoModel[] {
 		var result = [this];
 		var children = this.children;
@@ -189,7 +190,15 @@ class TodoModel extends Backbone.Model implements ITodo {
     set topmost(value: boolean) { this.set('topmost', value); }
 
     get archived(): boolean { return this.get('archived'); }
-    set archived(value: boolean) { this.set('archived', value); }
+    set archived(value: boolean) {
+        this.set('archived', value);
+
+        // Also set all children to their parent's archived status. We 
+        // bypass the getter because otherwise we'd have a crazy number
+        // of recursive calls for deeply nested trees.
+
+        _.each(this.flatten(), m => m.set('archived', value));
+    }
 
     get createdDate(): string { return this.get('createdDate'); }
     set createdDate(value: string) { this.set('createdDate', value); }
@@ -209,7 +218,7 @@ class TodoModel extends Backbone.Model implements ITodo {
     get done(): boolean { return this.get('done'); }
     set done(value: boolean) { this.set('done', value); this.goodTimeToSave(); }
 
-    get children(): TodoModel[] { return this._children; }
+    get children(): TodoModel[] { return this._children || []; }
 
     get numChildren(): number { return this._children.length; }
 
