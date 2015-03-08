@@ -92,6 +92,10 @@ a {
     text-decoration: line-through;
 }
 
+.todo-name-content .fa-star {
+    color: rgb(194, 75, 75);
+}
+
 .todo-header {
 	font-size: 1.5em;
 }

@@ -592,6 +592,8 @@ class TodoView extends Backbone.View<TodoModel> {
         this.model.topmost = !this.model.topmost;
         this.render();
 
+        this.model.goodTimeToSave();
+
         return false;
     }
 

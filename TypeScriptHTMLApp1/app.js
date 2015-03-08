@@ -625,6 +625,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.toggleSetTopmost = function () {
         this.model.topmost = !this.model.topmost;
         this.render();
+        this.model.goodTimeToSave();
         return false;
     };
     TodoView.prototype.startDrag = function () {
