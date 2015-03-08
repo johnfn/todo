@@ -4,6 +4,7 @@
   "show_in_taskbar": "true",
   "window": {
     "toolbar": false,
-    "frame": true
+    "frame": true,
+    "width": 800
   }
 }
