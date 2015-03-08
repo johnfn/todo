@@ -1,6 +1,6 @@
 {
   "name": "grants-todos",
-  "main": "index-nw.html",
+  "main": "index.html",
   "show_in_taskbar": "true",
   "window": {
     "toolbar": false,
