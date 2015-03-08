@@ -79,9 +79,11 @@
 				<% if (selected) { %>
 					<span class="toolbar">
 						<a href="#" class="todo-add-js"> + </a>
-						<a href="#" class="todo-set-starred-js"> 
-                            <i class="fa fa-star<%= starred ? '' : '-o' %>"></i>
-                        </a>
+                        <% if (!isHeader) { %>
+                            <a href="#" class="todo-set-starred-js"> 
+                                <i class="fa fa-star<%= starred ? '' : '-o' %>"></i>
+                            </a>
+                        <% } %>
 						<a href="#" class="todo-remove-js"> - </a>
 						<% if (numChildren > 0) { %>
 							<a href="#" class="todo-hide-js"> <%= hidden ? '[+]' : '[-]' %> </a>
