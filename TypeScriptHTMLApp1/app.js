@@ -913,6 +913,20 @@ var TodoArchiveModel = (function (_super) {
     }
     return TodoArchiveModel;
 })(Backbone.Model);
+var TodoArchiveItemView = (function (_super) {
+    __extends(TodoArchiveItemView, _super);
+    function TodoArchiveItemView() {
+        _super.apply(this, arguments);
+    }
+    TodoArchiveItemView.prototype.initialize = function () {
+        this.template = Util.getTemplate('todo-archive-item');
+    };
+    TodoArchiveItemView.prototype.render = function () {
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+    };
+    return TodoArchiveItemView;
+})(Backbone.View);
 var TodoArchiveView = (function (_super) {
     __extends(TodoArchiveView, _super);
     function TodoArchiveView() {
@@ -921,13 +935,22 @@ var TodoArchiveView = (function (_super) {
     TodoArchiveView.prototype.initialize = function () {
         this.setElement($('#archive-js'));
         this.template = Util.getTemplate('todo-archive');
-        this.render();
     };
     TodoArchiveView.prototype.render = function () {
+        var self = this;
+        var archivedModels = _.filter(this.baseTodoModel.flatten(), function (m) { return m.archived; });
         this.$el.html(this.template());
+        _.each(archivedModels, function (m) {
+            var v = new TodoArchiveItemView({
+                model: m,
+                el: $('<div>').appendTo(self.$('.todo-archive-list'))
+            });
+            v.render();
+        });
         return this;
     };
     TodoArchiveView.prototype.loadData = function (todoModel) {
+        this.baseTodoModel = todoModel;
         this.listenTo(todoModel, "good-time-to-save", this.render);
     };
     return TodoArchiveView;
@@ -1016,6 +1039,7 @@ $(function () {
     mainView.render();
     var archiveView = new TodoArchiveView();
     archiveView.loadData(mainView.baseTodoModel);
+    archiveView.render();
     var autosaveView = new SavedDataView({
         collection: mainView.savedData
     });

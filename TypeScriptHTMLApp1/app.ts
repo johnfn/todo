@@ -986,23 +986,49 @@ class TodoArchiveModel extends Backbone.Model {
     
 }
 
+class TodoArchiveItemView extends Backbone.View<TodoModel> {
+    template: ITemplate;
+
+    initialize() {
+        this.template = Util.getTemplate('todo-archive-item');
+    }
+
+    render():TodoArchiveItemView {
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+    }
+}
+
 class TodoArchiveView extends Backbone.View<TodoArchiveModel> {
     template: ITemplate;
+    baseTodoModel: TodoModel;
 
     initialize() {
         this.setElement($('#archive-js'));
         this.template = Util.getTemplate('todo-archive');
-
-        this.render();
     }
 
     render():TodoArchiveView {
+        var self = this;
+        var archivedModels = _.filter(this.baseTodoModel.flatten(), m => m.archived);
+
         this.$el.html(this.template());
+
+        _.each(archivedModels, m => {
+            var v = new TodoArchiveItemView(<any> {
+                model: m,
+                el: $('<div>').appendTo(self.$('.todo-archive-list'))
+            });
+
+            v.render();
+        });
 
         return this;
     }
 
     loadData(todoModel: TodoModel) {
+        this.baseTodoModel = todoModel;
+
         this.listenTo(todoModel, "good-time-to-save", this.render);
     }
 }
@@ -1091,6 +1117,7 @@ $(() => {
 
     var archiveView = new TodoArchiveView();
     archiveView.loadData(mainView.baseTodoModel);
+    archiveView.render();
 
 	var autosaveView = new SavedDataView(<any> {
 		collection: mainView.savedData
