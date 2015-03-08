@@ -2,8 +2,7 @@
     color: #fff;
     font-family: 'Open Sans', sans-serif;
 
-    background-color: rgb(86, 160, 98);
-    text-shadow: 1px 1px #397145;
+    background-color: rgb(114, 161, 194);
 
     margin-bottom: 10px;
     font-weight: 500;
@@ -12,14 +11,23 @@
     box-shadow: 3px -3px 5px 6px #ccc;
 }
 
-.title-text {
-    font-size: 2.3em;
+.title-content {
     padding-left: 20px;
+    font-size: 1.5em;
+}
+
+.title-content i {
+    text-shadow: 1px 1px #255D64;
+}
+
+.title-text {
+    padding-left: 10px;
+    letter-spacing: -1px;
 }
 
 .title-below {
-    background-color: #397145;
-    height: 1px;
+    background-color: #6E96B8;
+    height: 3px;
 }
 
 body {
