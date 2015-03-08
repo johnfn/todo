@@ -153,6 +153,7 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('starred', value);
+            this.goodTimeToSave();
         },
         enumerable: true,
         configurable: true
@@ -162,11 +163,14 @@ var TodoModel = (function (_super) {
             return this.get('archived');
         },
         set: function (value) {
+            if (this.archived === value)
+                return;
             this.set('archived', value);
             // Also set all children to their parent's archived status. We 
             // bypass the getter because otherwise we'd have a crazy number
             // of recursive calls for deeply nested trees.
             _.each(this.flatten(), function (m) { return m.set('archived', value); });
+            this.goodTimeToSave();
         },
         enumerable: true,
         configurable: true
@@ -548,7 +552,6 @@ var TodoDetailView = (function (_super) {
     };
     TodoDetailView.prototype.unarchiveTodo = function () {
         this.model.archived = false;
-        this.model.goodTimeToSave();
         this.render();
     };
     Object.defineProperty(TodoDetailView.prototype, "model", {
@@ -637,7 +640,6 @@ var TodoView = (function (_super) {
     TodoView.prototype.toggleSetStarred = function () {
         this.model.starred = !this.model.starred;
         this.render();
-        this.model.goodTimeToSave();
         return false;
     };
     TodoView.prototype.startDrag = function () {
@@ -817,8 +819,6 @@ var TodoView = (function (_super) {
             return false;
         }
         this.model.archived = true;
-        debugger;
-        this.model.goodTimeToSave();
         this.model.parent.view.render();
         // TODO: Reincorporate this code once I do full on deletion.
         // this.model.parent.view.trigger('remove-todo', this.model.childIndex);
@@ -953,14 +953,29 @@ var FooterView = (function (_super) {
     function FooterView() {
         _super.apply(this, arguments);
     }
+    FooterView.prototype.events = function () {
+        return {
+            'click .archive-all': this.archiveAllDone
+        };
+    };
     FooterView.prototype.initialize = function () {
         this.template = Util.getTemplate('footer');
         this.setElement($('.footer'));
         this.render();
     };
+    FooterView.prototype.archiveAllDone = function () {
+        _.each(this.model.flatten(), function (m) {
+            if (m.done) {
+                m.archived = true;
+            }
+        });
+    };
     FooterView.prototype.render = function () {
         this.$el.html(this.template());
         return this;
+    };
+    FooterView.prototype.loadData = function (baseTodoModel) {
+        this.model = baseTodoModel;
     };
     return FooterView;
 })(Backbone.View);
@@ -1098,6 +1113,7 @@ $(function () {
     archiveView.loadData(mainView.baseTodoModel);
     archiveView.render();
     var footerView = new FooterView();
+    footerView.loadData(mainView.baseTodoModel);
     var autosaveView = new SavedDataView({
         collection: mainView.savedData
     });

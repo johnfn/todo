@@ -187,10 +187,15 @@ class TodoModel extends Backbone.Model implements ITodo {
     set isHeader(value: boolean) { this.set('isHeader', value); }
 
     get starred(): boolean { return this.get('starred'); }
-    set starred(value: boolean) { this.set('starred', value); }
+    set starred(value: boolean) {
+        this.set('starred', value);
+        this.goodTimeToSave();
+    }
 
     get archived(): boolean { return this.get('archived'); }
     set archived(value: boolean) {
+        if (this.archived === value) return;
+
         this.set('archived', value);
 
         // Also set all children to their parent's archived status. We 
@@ -198,6 +203,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         // of recursive calls for deeply nested trees.
 
         _.each(this.flatten(), m => m.set('archived', value));
+        this.goodTimeToSave();
     }
 
     get createdDate(): string { return this.get('createdDate'); }
@@ -497,7 +503,6 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
     unarchiveTodo() {
         this.model.archived = false;
-        this.model.goodTimeToSave();
 
         this.render();
     }
@@ -610,8 +615,6 @@ class TodoView extends Backbone.View<TodoModel> {
     toggleSetStarred() {
         this.model.starred = !this.model.starred;
         this.render();
-
-        this.model.goodTimeToSave();
 
         return false;
     }
@@ -843,10 +846,6 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         this.model.archived = true;
-        debugger;
-
-		this.model.goodTimeToSave();
-
         this.model.parent.view.render();
 
         // TODO: Reincorporate this code once I do full on deletion.
@@ -1029,6 +1028,12 @@ class TodoView extends Backbone.View<TodoModel> {
 class FooterView extends Backbone.View<TodoModel> {
     template: ITemplate;
 
+    events() {
+        return {
+            'click .archive-all': this.archiveAllDone
+        };
+    }
+
     initialize() {
         this.template = Util.getTemplate('footer');
 
@@ -1036,10 +1041,22 @@ class FooterView extends Backbone.View<TodoModel> {
         this.render();
     }
 
+    archiveAllDone() {
+        _.each(this.model.flatten(), (m) => {
+            if (m.done) {
+                m.archived = true;
+            }
+        });
+    }
+
     render():FooterView {
         this.$el.html(this.template());
 
         return this;
+    }
+
+    loadData(baseTodoModel: TodoModel) {
+        this.model = baseTodoModel;
     }
 }
 
@@ -1184,6 +1201,7 @@ $(() => {
     archiveView.render();
 
     var footerView = new FooterView();
+    footerView.loadData(mainView.baseTodoModel);
 
 	var autosaveView = new SavedDataView(<any> {
 		collection: mainView.savedData
