@@ -57,6 +57,7 @@ var TodoModel = (function (_super) {
         this.createdDate = (new Date()).toString();
         this.modifiedDate = (new Date()).toString();
         this.archived = false;
+        this.topmost = false;
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'good-time-to-save', function () {
             if (_this.parent) {
@@ -141,6 +142,16 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('isHeader', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "topmost", {
+        get: function () {
+            return this.get('topmost');
+        },
+        set: function (value) {
+            this.set('topmost', value);
         },
         enumerable: true,
         configurable: true
@@ -562,6 +573,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.events = function () {
         return {
             'click .todo-add-js': this.toggleAddChildTodo,
+            'click .todo-set-topmost-js': this.toggleSetTopmost,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
             'click .todo-hide-js': this.clickHideTodo,
@@ -597,6 +609,11 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.editName = function () {
         this.model.name = $('.name-edit').val();
+        return false;
+    };
+    TodoView.prototype.toggleSetTopmost = function () {
+        this.model.topmost = !this.model.topmost;
+        this.render();
         return false;
     };
     TodoView.prototype.startDrag = function () {

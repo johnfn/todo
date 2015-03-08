@@ -60,7 +60,11 @@
                 <span class="edit-name-js 
 					  <% if (done) print('todo-done') %>
 					  <% if (isHeader) print('todo-header') %>">
-					<input type="checkbox" class="todo-done-js" <% if (done) print('checked') %> draggable="true" />
+
+                    <% if (!isHeader) { %>
+                        <input type="checkbox" class="todo-done-js" <% if (done) print('checked') %> draggable="true" />
+                    <% } %>
+
                     <% if (editingName) { %>
                         <input class='name-edit' />
                     <% } else { %>
@@ -71,6 +75,9 @@
 				<% if (selected) { %>
 					<span class="toolbar">
 						<a href="#" class="todo-add-js"> + </a>
+						<a href="#" class="todo-set-topmost-js"> 
+                            <i class="fa fa-star<%= topmost ? '' : '-o' %>"></i>
+                        </a>
 						<a href="#" class="todo-remove-js"> - </a>
 						<% if (numChildren > 0) { %>
 							<a href="#" class="todo-hide-js"> <%= hidden ? '[+]' : '[-]' %> </a>
@@ -113,7 +120,9 @@
 	</script>
 
 	<script type="text/template" id="right-panel">
-		<%= breadcrumbs %> 
+        <% if (!archived) { %> 
+            <%= breadcrumbs %> 
+        <% } %>
 		<div> 
 			<b> <%= name %> </b>
 			<small class="right-panel-time"> (added <%= createdDate %>) </small>
@@ -126,9 +135,16 @@
 		<% } else { %>
 			<div class="content-js"> <%= content %> </div>
 		<% } %>
-		<div>
-			<input type="checkbox" class="header-checkbox-js" value="Car" <% if (isHeader) print('checked') %>/>Header
-		</div>
+
+        <% if (!archived) { %>
+            <div>
+                <input type="checkbox" class="header-checkbox-js" <% if (isHeader) print('checked') %>/>Header
+            </div>
+        <% } %>
+
+        <div>
+            <input type="checkbox" class="archived-checkbox-js"  <% if (archived) print('checked') %>/>Archived
+        </div>
 	</script>
 </head>
 <body>

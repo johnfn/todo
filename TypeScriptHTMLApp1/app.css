@@ -74,19 +74,19 @@ a {
     border-radius: 3px;
     box-shadow: 1px 1px 6px rgba(105, 105, 105, 0.27);
     margin-left: 10px;
+    float: right;
 }
 
 .toolbar a {
-    color: #555;
+    color: #999;
     text-decoration: none;
 }
 
-.toolbar a:hover {
-    color: #555;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.3em;
-}
+    .toolbar a:hover {
+        color: #000;
+        text-decoration: none;
+    }
+
 
 .todo-done {
     text-decoration: line-through;

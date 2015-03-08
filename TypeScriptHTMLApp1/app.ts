@@ -32,6 +32,7 @@ interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
     archived: boolean;
+    topmost: boolean;
 	isHeader: boolean;
     content: string;
 	createdDate: string;
@@ -92,6 +93,7 @@ class TodoModel extends Backbone.Model implements ITodo {
 	    this.createdDate = (new Date()).toString();
 	    this.modifiedDate = (new Date()).toString();
         this.archived = false;
+        this.topmost = false;
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'good-time-to-save', () => {
@@ -182,6 +184,9 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
+
+    get topmost(): boolean { return this.get('topmost'); }
+    set topmost(value: boolean) { this.set('topmost', value); }
 
     get archived(): boolean { return this.get('archived'); }
     set archived(value: boolean) { this.set('archived', value); }
@@ -529,6 +534,7 @@ class TodoView extends Backbone.View<TodoModel> {
     events() {
 	    return {
 		    'click .todo-add-js': this.toggleAddChildTodo,
+		    'click .todo-set-topmost-js': this.toggleSetTopmost,
 		    'click .todo-done-js': this.completeTodo,
 		    'click .todo-remove-js': this.clickRemoveTodo,
 		    'click .todo-hide-js': this.clickHideTodo,
@@ -570,6 +576,13 @@ class TodoView extends Backbone.View<TodoModel> {
 
     editName() {
         this.model.name = $('.name-edit').val();
+
+        return false;
+    }
+
+    toggleSetTopmost() {
+        this.model.topmost = !this.model.topmost;
+        this.render();
 
         return false;
     }
