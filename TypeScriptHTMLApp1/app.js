@@ -557,6 +557,7 @@ var TodoView = (function (_super) {
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
             'click .todo-hide-js': this.clickHideTodo,
+            'keyup .name-edit': this.editName,
             'dragstart .todo-done-js': this.startDrag,
             'mouseover': this.mouseoverStartDrag,
             // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
@@ -585,6 +586,10 @@ var TodoView = (function (_super) {
         }
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
         this.listenTo(this, 'remove-todo', this.removeTodo);
+    };
+    TodoView.prototype.editName = function () {
+        this.model.name = $('.name-edit').val();
+        return false;
     };
     TodoView.prototype.startDrag = function () {
         // this.uiState.selected = true;
@@ -830,6 +835,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
+        console.log('rendur');
         var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
         this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');

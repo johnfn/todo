@@ -530,6 +530,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		    'click .todo-done-js': this.completeTodo,
 		    'click .todo-remove-js': this.clickRemoveTodo,
 		    'click .todo-hide-js': this.clickHideTodo,
+            'keyup .name-edit': this.editName,
 		    'dragstart .todo-done-js': this.startDrag,
 		    'mouseover': this.mouseoverStartDrag,
 		    // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
@@ -563,6 +564,12 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
 	    this.listenTo(this, 'remove-todo', this.removeTodo);
+    }
+
+    editName() {
+        this.model.name = $('.name-edit').val();
+
+        return false;
     }
 
 	startDrag() {
@@ -883,6 +890,8 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     render(updateSidebar: boolean = true) {
+        console.log('rendur');
+
 		var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
 
         this.$el.html(this.template(renderOptions));
