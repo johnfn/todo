@@ -286,7 +286,7 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "isEditing", {
-        /** Returns true if the user is currently editing anything. */
+        /** Returns true if the user is currently editing anything. See also: editingName, editingContent. */
         get: function () {
             return this.addTodoVisible || this.editingName || this.editingContent;
         },
@@ -870,8 +870,7 @@ var TodoView = (function (_super) {
     };
     /** Show the name text xor the name input. */
     TodoView.prototype.renderTodoName = function () {
-        this.$('.edit-name-js').toggle(!this.uiState.editingName);
-        var $nameInput = this.$('.name-edit').toggle(this.uiState.editingName).val(this.model.name);
+        var $nameInput = this.$('.name-edit').val(this.model.name);
         if (this.uiState.editingName) {
             $nameInput.select();
         }

@@ -51,9 +51,12 @@
 					  <% if (done) print('todo-done') %>
 					  <% if (isHeader) print('todo-header') %>">
 					<input type="checkbox" class="todo-done-js" <% if (done) print('checked') %> draggable="true" />
-					<%= name %>
+                    <% if (editingName) { %>
+                        <input class='name-edit' />
+                    <% } else { %>
+                        <%= name %>
+                    <% } %>
 				</span>
-                <input class='name-edit' />
 
 				<% if (selected) { %>
 					<span class="toolbar">

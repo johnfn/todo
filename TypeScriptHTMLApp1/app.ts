@@ -263,7 +263,7 @@ class TodoUiState extends Backbone.Model {
 
 	get model(): TodoModel { return this.view.model; }
 
-    /** Returns true if the user is currently editing anything. */
+    /** Returns true if the user is currently editing anything. See also: editingName, editingContent. */
     get isEditing(): boolean {
         return this.addTodoVisible || this.editingName || this.editingContent;
     }
@@ -939,11 +939,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
     /** Show the name text xor the name input. */
     private renderTodoName() {
-        this.$('.edit-name-js')
-            .toggle(!this.uiState.editingName);
-
         var $nameInput = this.$('.name-edit')
-            .toggle(this.uiState.editingName)
             .val(this.model.name);
 
         if (this.uiState.editingName) {
