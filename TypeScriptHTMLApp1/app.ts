@@ -465,12 +465,15 @@ class TodoDetailView extends Backbone.View<TodoModel> {
     events() {
         return {
             'click .header-checkbox-js': this.toggleHeader,
+            'click .archived-checkbox-js': this.unarchiveTodo,
 			'click .content-js': this.toggleContent,
 			'click .content-input-js': this.toggleContent
         };
     }
 
 	initialize() {
+        _.bindAll(this, 'render', 'unarchiveTodo');
+
 		if (TodoDetailView.instance) {
 			console.error('Multiple instantiation of TodoDetailView');
 			return;
@@ -482,6 +485,13 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 		TodoDetailView.instance = this;
 	}
+
+    unarchiveTodo() {
+        this.model.archived = false;
+        this.model.goodTimeToSave();
+
+        this.render();
+    }
 
     get model(): TodoModel { return this._model; }
     set model(value: TodoModel) {
@@ -1122,8 +1132,6 @@ class MainView extends Backbone.View<TodoAppModel> {
 	}
 
     keydown(e: JQueryKeyEventObject): boolean {
-        console.log(e.which);
-
         return true;
     }
 

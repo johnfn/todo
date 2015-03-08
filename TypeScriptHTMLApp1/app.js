@@ -525,11 +525,13 @@ var TodoDetailView = (function (_super) {
     TodoDetailView.prototype.events = function () {
         return {
             'click .header-checkbox-js': this.toggleHeader,
+            'click .archived-checkbox-js': this.unarchiveTodo,
             'click .content-js': this.toggleContent,
             'click .content-input-js': this.toggleContent
         };
     };
     TodoDetailView.prototype.initialize = function () {
+        _.bindAll(this, 'render', 'unarchiveTodo');
         if (TodoDetailView.instance) {
             console.error('Multiple instantiation of TodoDetailView');
             return;
@@ -538,6 +540,11 @@ var TodoDetailView = (function (_super) {
         this.template = Util.getTemplate('right-panel');
         this.setElement($('.right-panel'));
         TodoDetailView.instance = this;
+    };
+    TodoDetailView.prototype.unarchiveTodo = function () {
+        this.model.archived = false;
+        this.model.goodTimeToSave();
+        this.render();
     };
     Object.defineProperty(TodoDetailView.prototype, "model", {
         get: function () {
@@ -1054,7 +1061,6 @@ var MainView = (function (_super) {
         this.baseTodoModel.uiState.selected = true;
     };
     MainView.prototype.keydown = function (e) {
-        console.log(e.which);
         return true;
     };
     MainView.prototype.render = function () {
