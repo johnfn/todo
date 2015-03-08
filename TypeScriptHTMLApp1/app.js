@@ -918,8 +918,17 @@ var TodoArchiveItemView = (function (_super) {
     function TodoArchiveItemView() {
         _super.apply(this, arguments);
     }
+    TodoArchiveItemView.prototype.events = function () {
+        return {
+            'mouseover': this.updateDetailView
+        };
+    };
     TodoArchiveItemView.prototype.initialize = function () {
         this.template = Util.getTemplate('todo-archive-item');
+    };
+    TodoArchiveItemView.prototype.updateDetailView = function () {
+        TodoDetailView.instance.model = this.model;
+        TodoDetailView.instance.render();
     };
     TodoArchiveItemView.prototype.render = function () {
         this.$el.html(this.template(this.model.toJSON()));

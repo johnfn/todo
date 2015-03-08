@@ -989,12 +989,24 @@ class TodoArchiveModel extends Backbone.Model {
 class TodoArchiveItemView extends Backbone.View<TodoModel> {
     template: ITemplate;
 
+    events() {
+        return {
+            'mouseover': this.updateDetailView
+        }
+    }
+
     initialize() {
         this.template = Util.getTemplate('todo-archive-item');
     }
 
+    updateDetailView() {
+        TodoDetailView.instance.model = this.model;
+        TodoDetailView.instance.render();
+    }
+
     render():TodoArchiveItemView {
         this.$el.html(this.template(this.model.toJSON()));
+
         return this;
     }
 }
