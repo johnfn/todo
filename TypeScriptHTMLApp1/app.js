@@ -948,6 +948,54 @@ var TodoView = (function (_super) {
     };
     return TodoView;
 })(Backbone.View);
+var FooterUiState = (function (_super) {
+    __extends(FooterUiState, _super);
+    function FooterUiState(attrs) {
+        _super.call(this, attrs);
+        this.baseTodoModel = attrs['model'];
+        this.listenTo(this.baseTodoModel, 'global-change', this.updateState);
+        this.updateState();
+    }
+    FooterUiState.prototype.updateState = function () {
+        var allTodos = this.baseTodoModel.flatten();
+        var archiveable = _.filter(allTodos, function (m) { return !m.archived && m.done; });
+        var starred = _.filter(allTodos, function (m) { return m.starred; });
+        this.hasThingsToArchive = archiveable.length > 0;
+        this.numThingsToArchive = archiveable.length;
+        this.firstStarred = starred[0];
+    };
+    Object.defineProperty(FooterUiState.prototype, "hasThingsToArchive", {
+        get: function () {
+            return this.get('hasThingsToArchive');
+        },
+        set: function (value) {
+            this.set('hasThingsToArchive', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FooterUiState.prototype, "numThingsToArchive", {
+        get: function () {
+            return this.get('numThingsToArchive');
+        },
+        set: function (value) {
+            this.set('numThingsToArchive', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FooterUiState.prototype, "firstStarred", {
+        get: function () {
+            return this.get('firstStarred');
+        },
+        set: function (value) {
+            this.set('firstStarred', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return FooterUiState;
+})(Backbone.Model);
 var FooterView = (function (_super) {
     __extends(FooterView, _super);
     function FooterView() {
@@ -955,14 +1003,21 @@ var FooterView = (function (_super) {
     }
     FooterView.prototype.events = function () {
         return {
-            'click .archive-all': this.archiveAllDone
+            'click .archive-all': this.archiveAllDone,
+            'click .starred-item': this.gotoStarredItem
         };
     };
     FooterView.prototype.initialize = function () {
         this.template = Util.getTemplate('footer');
+        this.uiState = new FooterUiState({ model: this.model });
         this.setElement($('.footer'));
         this.render();
         this.listenTo(this.model, 'global-change', this.render);
+    };
+    FooterView.prototype.gotoStarredItem = function () {
+        $('html, body').animate({
+            scrollTop: $("#elementtoScrollToID").offset().top
+        }, 2000);
     };
     FooterView.prototype.archiveAllDone = function () {
         _.each(this.model.flatten(), function (m) {
@@ -972,14 +1027,7 @@ var FooterView = (function (_super) {
         });
     };
     FooterView.prototype.render = function () {
-        var allTodos = this.model.flatten();
-        var archiveable = _.filter(allTodos, function (m) { return !m.archived && m.done; });
-        var starred = _.filter(allTodos, function (m) { return m.starred; });
-        this.$el.html(this.template({
-            hasThingsToArchive: archiveable.length > 0,
-            numThingsToArchive: archiveable.length,
-            starred: starred[0] // implicitly giving undefined if there is no starred item.
-        }));
+        this.$el.html(this.template(this.uiState.toJSON()));
         return this;
     };
     return FooterView;

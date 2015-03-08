@@ -1025,22 +1025,64 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 }
 
+class FooterUiState extends Backbone.Model {
+    baseTodoModel: TodoModel;
+
+    constructor(attrs?: any) {
+        super(attrs);
+
+        this.baseTodoModel = attrs['model'];
+
+        this.listenTo(this.baseTodoModel, 'global-change', this.updateState);
+        this.updateState();
+    }
+
+    updateState() {
+        var allTodos = this.baseTodoModel.flatten();
+
+        var archiveable = _.filter(allTodos, m => !m.archived && m.done);
+        var starred = _.filter(allTodos, m => m.starred);
+
+        this.hasThingsToArchive = archiveable.length > 0;
+        this.numThingsToArchive = archiveable.length;
+        this.firstStarred = starred[0];
+    }
+
+    get hasThingsToArchive(): boolean { return this.get('hasThingsToArchive'); }
+    set hasThingsToArchive(value: boolean) { this.set('hasThingsToArchive', value); }
+
+    get numThingsToArchive(): number { return this.get('numThingsToArchive'); }
+    set numThingsToArchive(value: number) { this.set('numThingsToArchive', value); }
+
+    get firstStarred(): TodoModel { return this.get('firstStarred'); }
+    set firstStarred(value: TodoModel) { this.set('firstStarred', value); }
+}
+
 class FooterView extends Backbone.View<TodoModel> {
     template: ITemplate;
+    uiState: FooterUiState;
 
     events() {
         return {
-            'click .archive-all': this.archiveAllDone
+            'click .archive-all': this.archiveAllDone,
+            'click .starred-item': this.gotoStarredItem
         };
     }
 
     initialize() {
         this.template = Util.getTemplate('footer');
 
+        this.uiState = new FooterUiState({ model: this.model });
         this.setElement($('.footer'));
         this.render();
 
         this.listenTo(this.model, 'global-change', this.render);
+    }
+
+    gotoStarredItem() {
+        $('html, body').animate({
+            scrollTop: $("#elementtoScrollToID").offset().top
+        }, 2000);
     }
 
     archiveAllDone() {
@@ -1052,16 +1094,7 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     render():FooterView {
-        var allTodos = this.model.flatten();
-
-        var archiveable = _.filter(allTodos, m => !m.archived && m.done);
-        var starred = _.filter(allTodos, m => m.starred);
-
-        this.$el.html(this.template({
-            hasThingsToArchive: archiveable.length > 0,
-            numThingsToArchive: archiveable.length,
-            starred: starred[0] // implicitly giving undefined if there is no starred item.
-        }));
+        this.$el.html(this.template(this.uiState.toJSON()));
 
         return this;
     }
