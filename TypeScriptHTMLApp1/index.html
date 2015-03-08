@@ -130,12 +130,28 @@
         <div class="title-below"></div>
     </div>
 
-	<div class="container whole-todo-container">
-		<div class="col-sm-8" id="main-content">
-		</div>
-		<div class="col-sm-4 right-panel">
-		</div>
-	</div>
+    <div class="container whole-todo-container">
+        <div class="col-sm-8">
+            <div role="tabpanel">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#todos" aria-controls="todos" role="tab" data-toggle="tab">todos</a></li>
+                    <li role="presentation"><a href="#archive" aria-controls="archive" role="tab" data-toggle="tab">archive</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="todos">
+                        <div id="main-content"></div>
+                    </div>
+
+                    <div role="tabpanel" class="tab-pane" id="archive">
+                        Dis b da archive, bruh.
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 right-panel">
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="container">
