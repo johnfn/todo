@@ -96,7 +96,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 	watch(todoModel: TodoModel) {
 		this.baseTodoModel = todoModel;
 
-		this.listenTo(this.baseTodoModel, 'good-time-to-save', this.save);
+		this.listenTo(this.baseTodoModel, 'global-change', this.save);
 	}
 
 	/** Save, and potentially roll the buffer forwards. */

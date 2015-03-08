@@ -59,9 +59,9 @@ var TodoModel = (function (_super) {
         this.archived = false;
         this.starred = false;
         // Pass this event up the hierarchy, so we can use it in SavedData.
-        this.listenTo(this, 'good-time-to-save', function () {
+        this.listenTo(this, 'global-change', function () {
             if (_this.parent) {
-                _this.parent.trigger('good-time-to-save');
+                _this.parent.trigger('global-change');
             }
         });
     };
@@ -94,7 +94,7 @@ var TodoModel = (function (_super) {
     };
     /** Indicate that now would be a good time to save. */
     TodoModel.prototype.goodTimeToSave = function () {
-        this.trigger('good-time-to-save');
+        this.trigger('global-change');
     };
     /** Return a list of all todos nested under this todo. */
     TodoModel.prototype.flatten = function () {
@@ -974,9 +974,6 @@ var FooterView = (function (_super) {
         this.$el.html(this.template());
         return this;
     };
-    FooterView.prototype.loadData = function (baseTodoModel) {
-        this.model = baseTodoModel;
-    };
     return FooterView;
 })(Backbone.View);
 var TodoArchiveItemView = (function (_super) {
@@ -1006,9 +1003,11 @@ var TodoArchiveView = (function (_super) {
     function TodoArchiveView() {
         _super.apply(this, arguments);
     }
-    TodoArchiveView.prototype.initialize = function () {
+    TodoArchiveView.prototype.initialize = function (attrs) {
         this.setElement($('#archive-js'));
         this.template = Util.getTemplate('todo-archive');
+        this.listenTo(this.model, 'global-change', this.render);
+        this.render();
     };
     TodoArchiveView.prototype.render = function () {
         var self = this;
@@ -1022,10 +1021,6 @@ var TodoArchiveView = (function (_super) {
             v.render();
         });
         return this;
-    };
-    TodoArchiveView.prototype.loadData = function (todoModel) {
-        this.model = todoModel;
-        this.listenTo(todoModel, "good-time-to-save", this.render);
     };
     return TodoArchiveView;
 })(Backbone.View);
@@ -1109,11 +1104,8 @@ $(function () {
     var detailView = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();
-    var archiveView = new TodoArchiveView();
-    archiveView.loadData(mainView.baseTodoModel);
-    archiveView.render();
-    var footerView = new FooterView();
-    footerView.loadData(mainView.baseTodoModel);
+    var archiveView = new TodoArchiveView({ model: mainView.baseTodoModel });
+    var footerView = new FooterView({ model: mainView.baseTodoModel });
     var autosaveView = new SavedDataView({
         collection: mainView.savedData
     });

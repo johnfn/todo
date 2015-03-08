@@ -96,9 +96,9 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.starred = false;
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
-	    this.listenTo(this, 'good-time-to-save', () => {
+	    this.listenTo(this, 'global-change', () => {
 		    if (this.parent) {
-			    this.parent.trigger('good-time-to-save');
+			    this.parent.trigger('global-change');
 		    }
 	    });
     }
@@ -139,7 +139,7 @@ class TodoModel extends Backbone.Model implements ITodo {
 
 	/** Indicate that now would be a good time to save. */
 	goodTimeToSave(): void {
-		this.trigger('good-time-to-save');
+		this.trigger('global-change');
 	}
 
     /** Return a list of all todos nested under this todo. */
@@ -1054,10 +1054,6 @@ class FooterView extends Backbone.View<TodoModel> {
 
         return this;
     }
-
-    loadData(baseTodoModel: TodoModel) {
-        this.model = baseTodoModel;
-    }
 }
 
 class TodoArchiveItemView extends Backbone.View<TodoModel> {
@@ -1087,9 +1083,13 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
 class TodoArchiveView extends Backbone.View<TodoModel> {
     template: ITemplate;
 
-    initialize() {
+    initialize(attrs:Backbone.ViewOptions<TodoModel>) {
         this.setElement($('#archive-js'));
         this.template = Util.getTemplate('todo-archive');
+
+        this.listenTo(this.model, 'global-change', this.render);
+
+        this.render();
     }
 
     render():TodoArchiveView {
@@ -1108,12 +1108,6 @@ class TodoArchiveView extends Backbone.View<TodoModel> {
         });
 
         return this;
-    }
-
-    loadData(todoModel: TodoModel) {
-        this.model = todoModel;
-
-        this.listenTo(todoModel, "good-time-to-save", this.render);
     }
 }
 
@@ -1196,12 +1190,8 @@ $(() => {
     var mainView = new MainView();
     mainView.render();
 
-    var archiveView = new TodoArchiveView();
-    archiveView.loadData(mainView.baseTodoModel);
-    archiveView.render();
-
-    var footerView = new FooterView();
-    footerView.loadData(mainView.baseTodoModel);
+    var archiveView = new TodoArchiveView(<any> { model: mainView.baseTodoModel });
+    var footerView = new FooterView(<any> { model: mainView.baseTodoModel });
 
 	var autosaveView = new SavedDataView(<any> {
 		collection: mainView.savedData
