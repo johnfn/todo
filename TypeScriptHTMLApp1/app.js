@@ -953,6 +953,15 @@ var FooterView = (function (_super) {
     function FooterView() {
         _super.apply(this, arguments);
     }
+    FooterView.prototype.initialize = function () {
+        this.template = Util.getTemplate('footer');
+        this.setElement($('.footer'));
+        this.render();
+    };
+    FooterView.prototype.render = function () {
+        this.$el.html(this.template());
+        return this;
+    };
     return FooterView;
 })(Backbone.View);
 var TodoArchiveItemView = (function (_super) {
@@ -1088,6 +1097,7 @@ $(function () {
     var archiveView = new TodoArchiveView();
     archiveView.loadData(mainView.baseTodoModel);
     archiveView.render();
+    var footerView = new FooterView();
     var autosaveView = new SavedDataView({
         collection: mainView.savedData
     });

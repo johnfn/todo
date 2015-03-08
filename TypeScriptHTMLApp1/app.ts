@@ -1027,7 +1027,20 @@ class TodoView extends Backbone.View<TodoModel> {
 }
 
 class FooterView extends Backbone.View<TodoModel> {
-    
+    template: ITemplate;
+
+    initialize() {
+        this.template = Util.getTemplate('footer');
+
+        this.setElement($('.footer'));
+        this.render();
+    }
+
+    render():FooterView {
+        this.$el.html(this.template());
+
+        return this;
+    }
 }
 
 class TodoArchiveItemView extends Backbone.View<TodoModel> {
@@ -1169,6 +1182,8 @@ $(() => {
     var archiveView = new TodoArchiveView();
     archiveView.loadData(mainView.baseTodoModel);
     archiveView.render();
+
+    var footerView = new FooterView();
 
 	var autosaveView = new SavedDataView(<any> {
 		collection: mainView.savedData
