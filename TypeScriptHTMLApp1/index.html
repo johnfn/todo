@@ -69,9 +69,7 @@
             <div class="todo-content edit-content-js"> <%= content %> </div>
             <input class='content-edit-js'/>
 
-			<% if (!hidden) { %>
-				<div class="children-js children"> </div>
-			<% } %>
+            <div class="children-js children <%= hidden ? 'hide' : '' %>"> </div>
             <div class="todo-add"> </div>
         </div>
     </script>

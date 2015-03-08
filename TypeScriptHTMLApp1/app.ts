@@ -256,8 +256,10 @@ class TodoUiState extends Backbone.Model {
     }
 
 
-    showUiItems: Trigger = new Trigger();
-    hideUiItems: Trigger = new Trigger();
+    showUiToolbarTrigger = new Trigger();
+    hideUiToolbarTrigger = new Trigger();
+
+    hiddenTrigger = new Trigger();
 
 	get model(): TodoModel { return this.view.model; }
 
@@ -276,7 +278,10 @@ class TodoUiState extends Backbone.Model {
     set addTodoVisible(value: boolean) { this.set('addTodoVisible', value); }
 
     get hidden(): boolean { return this.get('hidden'); }
-    set hidden(value: boolean) { this.set('hidden', value); }
+    set hidden(value: boolean) {
+        this.set('hidden', value);
+        this.hiddenTrigger.value = value;
+    }
 
     get editingName(): boolean { return this.get('editingName'); }
     set editingName(value: boolean) {
@@ -326,13 +331,13 @@ class TodoUiState extends Backbone.Model {
 			if (TodoUiState.selectedModel.isEditing) return;
 
             TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
-            TodoUiState.selectedModel.hideUiItems.value = true;
+            TodoUiState.selectedModel.hideUiToolbarTrigger.value = true;
             TodoUiState.selectedModel.view.render(false);
         }
 
         if (value) {
             TodoUiState.selectedModel = this;
-            this.showUiItems.value = true;
+            this.showUiToolbarTrigger.value = true;
 	        this.trigger('selected');
         }
 
@@ -914,11 +919,20 @@ class TodoView extends Backbone.View<TodoModel> {
 		    TodoDetailView.instance.render();
 	    }
 
-        if (this.uiState.showUiItems.value) {
+        if (this.uiState.showUiToolbarTrigger.value) {
             this.$('.toolbar').hide().fadeIn(150);
         }
 
-        if (this.uiState.hideUiItems.value) this.$('.toolbar').show().fadeOut();
+        if (this.uiState.hideUiToolbarTrigger.value) this.$('.toolbar').show().fadeOut();
+
+        // The idea here is that if the user just triggered a 'hide children',
+        // then show a nice animation rather than instantly forcing a hide. But
+        // if someone called a render() on us during or after the hide was triggered,
+        // this code won't run, the hide class will continue to exist and the node
+        // will instantly be invisible.
+        if (this.uiState.hiddenTrigger.value) {
+            this.$('.children-js').removeClass('hide').fadeOut(150);
+        }
 
 	    return this;
     }

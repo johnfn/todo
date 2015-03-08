@@ -134,3 +134,7 @@ a {
 .whole-todo-container {
     margin-bottom: 300px;
 }
+
+.hide {
+    display: none;
+}
