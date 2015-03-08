@@ -805,6 +805,8 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.completeTodo = function () {
         this.model.done = !this.model.done;
+        if (this.model.done)
+            this.model.topmost = false;
         this.uiState.selected = true;
         this.render();
         return false;
