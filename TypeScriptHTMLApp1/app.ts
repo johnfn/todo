@@ -31,6 +31,7 @@
 interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
+    archived: boolean;
 	isHeader: boolean;
     content: string;
 	createdDate: string;
@@ -90,6 +91,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.uid = Math.random() + ' ' + Math.random();
 	    this.createdDate = (new Date()).toString();
 	    this.modifiedDate = (new Date()).toString();
+        this.archived = false;
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'good-time-to-save', () => {
@@ -101,19 +103,16 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     /** recursively create this todo and all sub-todos from the provided data. */
     initWithData(data: ITodo, parent: TodoModel): TodoModel {
-        this.name = data.name;
-        this.content = data.content;
-        this.done = data.done;
-        this.parent = parent;
-		this.createdDate = data.createdDate;
-		this.modifiedDate = data.modifiedDate;
-	    this.isHeader = data.isHeader;
+        for (var prop in data) {
+            if (!data.hasOwnProperty(prop)) continue;
+            if (prop === 'children') continue;
 
-        if (data.depth) {
-            this.depth = data.depth;
-        } else {
-            this.depth = 0;
+            this[prop] = data[prop];
         }
+
+        this.parent = parent;
+
+        if (!this.has('depth')) this.depth = 0;
 
         for (var i = 0; i < data.children.length; i++) {
             var child = data.children[i];
@@ -183,6 +182,9 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
+
+    get archived(): boolean { return this.get('archived'); }
+    set archived(value: boolean) { this.set('archived', value); }
 
     get createdDate(): string { return this.get('createdDate'); }
     set createdDate(value: string) { this.set('createdDate', value); }
@@ -790,11 +792,20 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     private clickRemoveTodo() {
-	    if (this.model.parent) {
-		    this.model.parent.view.uiState.selected = true;
+        // Can't archive topmost todo.
+        if (!this.model.parent) {
+            return false;
+        }
 
-		    this.model.parent.view.trigger('remove-todo', this.model.childIndex);
-	    }
+        this.model.archived = true;
+        debugger;
+
+		this.model.goodTimeToSave();
+
+        this.model.parent.view.render();
+
+        // TODO: Reincorporate this code once I do full on deletion.
+        // this.model.parent.view.trigger('remove-todo', this.model.childIndex);
 
 	    return false;
     }
@@ -909,7 +920,11 @@ class TodoView extends Backbone.View<TodoModel> {
         // render children
 
         _.each(this.childrenViews,(child: TodoView) => {
-            child.render(false).$el.appendTo($childrenContainer);
+            console.log(child.model.archived);
+
+            if (!child.model.archived) {
+                child.render(false).$el.appendTo($childrenContainer);
+            }
         });
 
         this.editView.render().$el.appendTo($addTodo);

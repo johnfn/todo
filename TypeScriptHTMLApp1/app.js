@@ -56,6 +56,7 @@ var TodoModel = (function (_super) {
         this.uid = Math.random() + ' ' + Math.random();
         this.createdDate = (new Date()).toString();
         this.modifiedDate = (new Date()).toString();
+        this.archived = false;
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'good-time-to-save', function () {
             if (_this.parent) {
@@ -65,19 +66,16 @@ var TodoModel = (function (_super) {
     };
     /** recursively create this todo and all sub-todos from the provided data. */
     TodoModel.prototype.initWithData = function (data, parent) {
-        this.name = data.name;
-        this.content = data.content;
-        this.done = data.done;
+        for (var prop in data) {
+            if (!data.hasOwnProperty(prop))
+                continue;
+            if (prop === 'children')
+                continue;
+            this[prop] = data[prop];
+        }
         this.parent = parent;
-        this.createdDate = data.createdDate;
-        this.modifiedDate = data.modifiedDate;
-        this.isHeader = data.isHeader;
-        if (data.depth) {
-            this.depth = data.depth;
-        }
-        else {
+        if (!this.has('depth'))
             this.depth = 0;
-        }
         for (var i = 0; i < data.children.length; i++) {
             var child = data.children[i];
             child.depth = this.depth + 1;
@@ -143,6 +141,16 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('isHeader', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "archived", {
+        get: function () {
+            return this.get('archived');
+        },
+        set: function (value) {
+            this.set('archived', value);
         },
         enumerable: true,
         configurable: true
@@ -761,10 +769,16 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.clickRemoveTodo = function () {
-        if (this.model.parent) {
-            this.model.parent.view.uiState.selected = true;
-            this.model.parent.view.trigger('remove-todo', this.model.childIndex);
+        // Can't archive topmost todo.
+        if (!this.model.parent) {
+            return false;
         }
+        this.model.archived = true;
+        debugger;
+        this.model.goodTimeToSave();
+        this.model.parent.view.render();
+        // TODO: Reincorporate this code once I do full on deletion.
+        // this.model.parent.view.trigger('remove-todo', this.model.childIndex);
         return false;
     };
     TodoView.prototype.clickHideTodo = function () {
@@ -846,7 +860,10 @@ var TodoView = (function (_super) {
         this.delegateEvents(); // We might lose our own events. D:
         // render children
         _.each(this.childrenViews, function (child) {
-            child.render(false).$el.appendTo($childrenContainer);
+            console.log(child.model.archived);
+            if (!child.model.archived) {
+                child.render(false).$el.appendTo($childrenContainer);
+            }
         });
         this.editView.render().$el.appendTo($addTodo);
         if (this.uiState.addTodoVisible) {
