@@ -460,6 +460,8 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 	private uiState:TodoDetailUiState;
 
+    private _model:TodoModel;
+
     events() {
         return {
             'click .header-checkbox-js': this.toggleHeader,
@@ -480,6 +482,12 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 		TodoDetailView.instance = this;
 	}
+
+    get model(): TodoModel { return this._model; }
+    set model(value: TodoModel) {
+        this._model = value;
+        this.render();
+    }
 
 	toggleHeader(e:JQueryMouseEventObject) {
 		this.model.isHeader = $(e.currentTarget).is(':checked');
@@ -949,7 +957,6 @@ class TodoView extends Backbone.View<TodoModel> {
 
 	    if (updateSidebar && this.uiState.selected) {
 		    TodoDetailView.instance.model = this.model;
-		    TodoDetailView.instance.render();
 	    }
 
         if (this.uiState.showUiToolbarTrigger.value) {
@@ -1014,7 +1021,6 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
 
     updateDetailView() {
         TodoDetailView.instance.model = this.model;
-        TodoDetailView.instance.render();
     }
 
     render():TodoArchiveItemView {
@@ -1102,7 +1108,6 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
 
 		TodoDetailView.instance.model = this.baseTodoModel;
-		TodoDetailView.instance.render();
 
 	    this.savedData.watch(this.baseTodoModel);
 

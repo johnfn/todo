@@ -539,6 +539,17 @@ var TodoDetailView = (function (_super) {
         this.setElement($('.right-panel'));
         TodoDetailView.instance = this;
     };
+    Object.defineProperty(TodoDetailView.prototype, "model", {
+        get: function () {
+            return this._model;
+        },
+        set: function (value) {
+            this._model = value;
+            this.render();
+        },
+        enumerable: true,
+        configurable: true
+    });
     TodoDetailView.prototype.toggleHeader = function (e) {
         this.model.isHeader = $(e.currentTarget).is(':checked');
         this.model.view.render();
@@ -889,7 +900,6 @@ var TodoView = (function (_super) {
         window['keyboardShortcuts'].render();
         if (updateSidebar && this.uiState.selected) {
             TodoDetailView.instance.model = this.model;
-            TodoDetailView.instance.render();
         }
         if (this.uiState.showUiToolbarTrigger.value) {
             this.$('.toolbar').hide().fadeIn(150);
@@ -945,7 +955,6 @@ var TodoArchiveItemView = (function (_super) {
     };
     TodoArchiveItemView.prototype.updateDetailView = function () {
         TodoDetailView.instance.model = this.model;
-        TodoDetailView.instance.render();
     };
     TodoArchiveItemView.prototype.render = function () {
         this.$el.html(this.template(this.model.toJSON()));
@@ -1036,7 +1045,6 @@ var MainView = (function (_super) {
     MainView.prototype.initializeTodoTree = function (data) {
         this.baseTodoModel = new TodoModel().initWithData(data, null);
         TodoDetailView.instance.model = this.baseTodoModel;
-        TodoDetailView.instance.render();
         this.savedData.watch(this.baseTodoModel);
         this.baseTodoView = new TodoView({
             model: this.baseTodoModel,
