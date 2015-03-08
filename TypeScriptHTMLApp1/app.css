@@ -37,6 +37,7 @@
 
 body {
     margin-bottom: 30px;
+    color: #595959;
 }
 
 .name {
@@ -49,9 +50,8 @@ body {
 
 .todo {
     font-family: 'Open Sans', sans-serif;
-    border-left: 2px solid #f0f0f0;
+    border-left: 1px solid #ddd;
     padding-left: 3px;
-    margin-top: 3px;
 }
 
 .todo-content {
@@ -65,7 +65,7 @@ a {
 
 .toolbar {
     padding: 1px;
-    border: 1px solid #2C622A;
+    border: 1px solid #8D8D8D;
     background-color: white;
     padding-left: 5px;
     padding-right: 5px;
@@ -97,7 +97,8 @@ a {
 }
 
 .selected {
-    border-left: 2px solid black;
+    border-left: 1px solid #777;
+    color: #222;
 }
 
 .invisible {
