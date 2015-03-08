@@ -153,7 +153,9 @@
 
     <script type="text/template" id="footer">
         <div class="container">
-            <button type="submit" class="btn btn-link archive-all">Archive all done</button>
+            <button type="submit" class="btn btn-link archive-all" <% if (!hasThingsToArchive) print('disabled') %>>
+                Archive all done <% if (hasThingsToArchive) print('(' + numThingsToArchive + ')') %>
+            </button>
         </div>
     </script>
 </head>

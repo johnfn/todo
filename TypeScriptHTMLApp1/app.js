@@ -962,6 +962,7 @@ var FooterView = (function (_super) {
         this.template = Util.getTemplate('footer');
         this.setElement($('.footer'));
         this.render();
+        this.listenTo(this.model, 'global-change', this.render);
     };
     FooterView.prototype.archiveAllDone = function () {
         _.each(this.model.flatten(), function (m) {
@@ -971,7 +972,12 @@ var FooterView = (function (_super) {
         });
     };
     FooterView.prototype.render = function () {
-        this.$el.html(this.template());
+        debugger;
+        var archiveable = _.filter(this.model.flatten(), function (m) { return !m.archived && m.done; });
+        this.$el.html(this.template({
+            hasThingsToArchive: archiveable.length > 0,
+            numThingsToArchive: archiveable.length
+        }));
         return this;
     };
     return FooterView;

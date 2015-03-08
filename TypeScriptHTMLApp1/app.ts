@@ -1039,6 +1039,8 @@ class FooterView extends Backbone.View<TodoModel> {
 
         this.setElement($('.footer'));
         this.render();
+
+        this.listenTo(this.model, 'global-change', this.render);
     }
 
     archiveAllDone() {
@@ -1050,7 +1052,14 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     render():FooterView {
-        this.$el.html(this.template());
+        debugger;
+
+        var archiveable = _.filter(this.model.flatten(), (m) => !m.archived && m.done);
+
+        this.$el.html(this.template({
+            hasThingsToArchive: archiveable.length > 0,
+            numThingsToArchive: archiveable.length
+        }));
 
         return this;
     }
