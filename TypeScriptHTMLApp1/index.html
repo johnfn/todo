@@ -68,7 +68,7 @@
                     <% if (editingName) { %>
                         <input class='name-edit' />
                     <% } else { %>
-                        <% if (topmost) { %>
+                        <% if (starred) { %>
                             <i class="fa fa-star"></i>
                         <% } %>
 
@@ -79,8 +79,8 @@
 				<% if (selected) { %>
 					<span class="toolbar">
 						<a href="#" class="todo-add-js"> + </a>
-						<a href="#" class="todo-set-topmost-js"> 
-                            <i class="fa fa-star<%= topmost ? '' : '-o' %>"></i>
+						<a href="#" class="todo-set-starred-js"> 
+                            <i class="fa fa-star<%= starred ? '' : '-o' %>"></i>
                         </a>
 						<a href="#" class="todo-remove-js"> - </a>
 						<% if (numChildren > 0) { %>

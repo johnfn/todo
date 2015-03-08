@@ -32,7 +32,7 @@ interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
     archived: boolean;
-    topmost: boolean;
+    starred: boolean;
 	isHeader: boolean;
     content: string;
 	createdDate: string;
@@ -93,7 +93,7 @@ class TodoModel extends Backbone.Model implements ITodo {
 	    this.createdDate = (new Date()).toString();
 	    this.modifiedDate = (new Date()).toString();
         this.archived = false;
-        this.topmost = false;
+        this.starred = false;
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'good-time-to-save', () => {
@@ -186,8 +186,8 @@ class TodoModel extends Backbone.Model implements ITodo {
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
 
-    get topmost(): boolean { return this.get('topmost'); }
-    set topmost(value: boolean) { this.set('topmost', value); }
+    get starred(): boolean { return this.get('starred'); }
+    set starred(value: boolean) { this.set('starred', value); }
 
     get archived(): boolean { return this.get('archived'); }
     set archived(value: boolean) {
@@ -561,7 +561,7 @@ class TodoView extends Backbone.View<TodoModel> {
     events() {
 	    return {
 		    'click .todo-add-js': this.toggleAddChildTodo,
-		    'click .todo-set-topmost-js': this.toggleSetTopmost,
+		    'click .todo-set-starred-js': this.toggleSetStarred,
 		    'click .todo-done-js': this.completeTodo,
 		    'click .todo-remove-js': this.clickRemoveTodo,
 		    'click .todo-hide-js': this.clickHideTodo,
@@ -607,8 +607,8 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
-    toggleSetTopmost() {
-        this.model.topmost = !this.model.topmost;
+    toggleSetStarred() {
+        this.model.starred = !this.model.starred;
         this.render();
 
         this.model.goodTimeToSave();
@@ -827,7 +827,7 @@ class TodoView extends Backbone.View<TodoModel> {
     private completeTodo() {
         this.model.done = !this.model.done;
 
-        if (this.model.done) this.model.topmost = false;
+        if (this.model.done) this.model.starred = false;
 
 		this.uiState.selected = true;
 

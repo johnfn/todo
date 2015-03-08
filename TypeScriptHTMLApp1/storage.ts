@@ -155,7 +155,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 			done: false,
             archived: false,
 			isHeader: true,
-            topmost: false,
+            starred: false,
 			children:
 			[{
 				createdDate: Util.fairlyLegibleDateTime(),
@@ -165,7 +165,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 				done: false,
                 archived: false,
 				isHeader: false,
-                topmost: false,
+                starred: false,
 				children: []
 			}, {
 				createdDate: Util.fairlyLegibleDateTime(),
@@ -175,7 +175,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 				done: false,
                 archived: false,
 				isHeader: false,
-                topmost: false,
+                starred: false,
 				children: []
 			}]
 		};

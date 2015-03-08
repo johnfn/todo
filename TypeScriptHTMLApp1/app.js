@@ -57,7 +57,7 @@ var TodoModel = (function (_super) {
         this.createdDate = (new Date()).toString();
         this.modifiedDate = (new Date()).toString();
         this.archived = false;
-        this.topmost = false;
+        this.starred = false;
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'good-time-to-save', function () {
             if (_this.parent) {
@@ -147,12 +147,12 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TodoModel.prototype, "topmost", {
+    Object.defineProperty(TodoModel.prototype, "starred", {
         get: function () {
-            return this.get('topmost');
+            return this.get('starred');
         },
         set: function (value) {
-            this.set('topmost', value);
+            this.set('starred', value);
         },
         enumerable: true,
         configurable: true
@@ -596,7 +596,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.events = function () {
         return {
             'click .todo-add-js': this.toggleAddChildTodo,
-            'click .todo-set-topmost-js': this.toggleSetTopmost,
+            'click .todo-set-starred-js': this.toggleSetStarred,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
             'click .todo-hide-js': this.clickHideTodo,
@@ -634,8 +634,8 @@ var TodoView = (function (_super) {
         this.model.name = $('.name-edit').val();
         return false;
     };
-    TodoView.prototype.toggleSetTopmost = function () {
-        this.model.topmost = !this.model.topmost;
+    TodoView.prototype.toggleSetStarred = function () {
+        this.model.starred = !this.model.starred;
         this.render();
         this.model.goodTimeToSave();
         return false;
@@ -806,7 +806,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.completeTodo = function () {
         this.model.done = !this.model.done;
         if (this.model.done)
-            this.model.topmost = false;
+            this.model.starred = false;
         this.uiState.selected = true;
         this.render();
         return false;

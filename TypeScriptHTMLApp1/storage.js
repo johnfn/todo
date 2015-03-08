@@ -187,7 +187,7 @@ var SavedData = (function (_super) {
             done: false,
             archived: false,
             isHeader: true,
-            topmost: false,
+            starred: false,
             children: [{
                 createdDate: Util.fairlyLegibleDateTime(),
                 modifiedDate: Util.fairlyLegibleDateTime(),
@@ -196,7 +196,7 @@ var SavedData = (function (_super) {
                 done: false,
                 archived: false,
                 isHeader: false,
-                topmost: false,
+                starred: false,
                 children: []
             }, {
                 createdDate: Util.fairlyLegibleDateTime(),
@@ -206,7 +206,7 @@ var SavedData = (function (_super) {
                 done: false,
                 archived: false,
                 isHeader: false,
-                topmost: false,
+                starred: false,
                 children: []
             }]
         };
