@@ -130,3 +130,7 @@ a {
 	font-size: .8em;
 	font-style: italic;
 }
+
+.whole-todo-container {
+    margin-bottom: 300px;
+}
