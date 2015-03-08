@@ -913,7 +913,7 @@ var TodoView = (function (_super) {
         }
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
-        if (updateSidebar && this.uiState.selected) {
+        if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
             TodoDetailView.instance.model = this.model;
         }
         if (this.uiState.showUiToolbarTrigger.value) {

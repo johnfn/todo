@@ -979,7 +979,7 @@ class TodoView extends Backbone.View<TodoModel> {
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
 
-	    if (updateSidebar && this.uiState.selected) {
+	    if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
 		    TodoDetailView.instance.model = this.model;
 	    }
 
