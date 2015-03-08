@@ -860,7 +860,6 @@ var TodoView = (function (_super) {
         this.delegateEvents(); // We might lose our own events. D:
         // render children
         _.each(this.childrenViews, function (child) {
-            console.log(child.model.archived);
             if (!child.model.archived) {
                 child.render(false).$el.appendTo($childrenContainer);
             }
@@ -906,6 +905,32 @@ var TodoView = (function (_super) {
         }
     };
     return TodoView;
+})(Backbone.View);
+var TodoArchiveModel = (function (_super) {
+    __extends(TodoArchiveModel, _super);
+    function TodoArchiveModel() {
+        _super.apply(this, arguments);
+    }
+    return TodoArchiveModel;
+})(Backbone.Model);
+var TodoArchiveView = (function (_super) {
+    __extends(TodoArchiveView, _super);
+    function TodoArchiveView() {
+        _super.apply(this, arguments);
+    }
+    TodoArchiveView.prototype.initialize = function () {
+        this.setElement($('#archive-js'));
+        this.template = Util.getTemplate('todo-archive');
+        this.render();
+    };
+    TodoArchiveView.prototype.render = function () {
+        this.$el.html(this.template());
+        return this;
+    };
+    TodoArchiveView.prototype.loadData = function (todoModel) {
+        this.listenTo(todoModel, "good-time-to-save", this.render);
+    };
+    return TodoArchiveView;
 })(Backbone.View);
 // Global todo state. Could keep track of breadcrumbs etc.
 var TodoAppModel = (function (_super) {
@@ -986,9 +1011,11 @@ var MainView = (function (_super) {
 })(Backbone.View);
 $(function () {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
-    var view = new TodoDetailView();
+    var detailView = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();
+    var archiveView = new TodoArchiveView();
+    archiveView.loadData(mainView.baseTodoModel);
     var autosaveView = new SavedDataView({
         collection: mainView.savedData
     });

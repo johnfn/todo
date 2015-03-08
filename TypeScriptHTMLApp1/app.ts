@@ -920,8 +920,6 @@ class TodoView extends Backbone.View<TodoModel> {
         // render children
 
         _.each(this.childrenViews,(child: TodoView) => {
-            console.log(child.model.archived);
-
             if (!child.model.archived) {
                 child.render(false).$el.appendTo($childrenContainer);
             }
@@ -981,6 +979,31 @@ class TodoView extends Backbone.View<TodoModel> {
         if (this.uiState.editingContent) {
             $contentInput.select();
         }
+    }
+}
+
+class TodoArchiveModel extends Backbone.Model {
+    
+}
+
+class TodoArchiveView extends Backbone.View<TodoArchiveModel> {
+    template: ITemplate;
+
+    initialize() {
+        this.setElement($('#archive-js'));
+        this.template = Util.getTemplate('todo-archive');
+
+        this.render();
+    }
+
+    render():TodoArchiveView {
+        this.$el.html(this.template());
+
+        return this;
+    }
+
+    loadData(todoModel: TodoModel) {
+        this.listenTo(todoModel, "good-time-to-save", this.render);
     }
 }
 
@@ -1061,9 +1084,13 @@ class MainView extends Backbone.View<TodoAppModel> {
 $(() => {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
 
-	var view = new TodoDetailView();
+	var detailView = new TodoDetailView();
+
     var mainView = new MainView();
     mainView.render();
+
+    var archiveView = new TodoArchiveView();
+    archiveView.loadData(mainView.baseTodoModel);
 
 	var autosaveView = new SavedDataView(<any> {
 		collection: mainView.savedData
