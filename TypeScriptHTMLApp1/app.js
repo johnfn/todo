@@ -962,7 +962,7 @@ var FooterUiState = (function (_super) {
         var starred = _.filter(allTodos, function (m) { return m.starred; });
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;
-        this.firstStarred = starred[0];
+        this.firstStarredTodo = starred[0];
     };
     Object.defineProperty(FooterUiState.prototype, "hasThingsToArchive", {
         get: function () {
@@ -984,12 +984,12 @@ var FooterUiState = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(FooterUiState.prototype, "firstStarred", {
+    Object.defineProperty(FooterUiState.prototype, "firstStarredTodo", {
         get: function () {
-            return this.get('firstStarred');
+            return this.get('firstStarredTodo');
         },
         set: function (value) {
-            this.set('firstStarred', value);
+            this.set('firstStarredTodo', value);
         },
         enumerable: true,
         configurable: true
@@ -1015,6 +1015,7 @@ var FooterView = (function (_super) {
         this.listenTo(this.model, 'global-change', this.render);
     };
     FooterView.prototype.gotoStarredItem = function () {
+        var item = this.uiState.firstStarredTodo;
         $('html, body').animate({
             scrollTop: $("#elementtoScrollToID").offset().top
         }, 2000);

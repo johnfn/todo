@@ -1045,7 +1045,7 @@ class FooterUiState extends Backbone.Model {
 
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;
-        this.firstStarred = starred[0];
+        this.firstStarredTodo = starred[0];
     }
 
     get hasThingsToArchive(): boolean { return this.get('hasThingsToArchive'); }
@@ -1054,8 +1054,8 @@ class FooterUiState extends Backbone.Model {
     get numThingsToArchive(): number { return this.get('numThingsToArchive'); }
     set numThingsToArchive(value: number) { this.set('numThingsToArchive', value); }
 
-    get firstStarred(): TodoModel { return this.get('firstStarred'); }
-    set firstStarred(value: TodoModel) { this.set('firstStarred', value); }
+    get firstStarredTodo(): TodoModel { return this.get('firstStarredTodo'); }
+    set firstStarredTodo(value: TodoModel) { this.set('firstStarredTodo', value); }
 }
 
 class FooterView extends Backbone.View<TodoModel> {
@@ -1080,6 +1080,8 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     gotoStarredItem() {
+        var item = this.uiState.firstStarredTodo;
+
         $('html, body').animate({
             scrollTop: $("#elementtoScrollToID").offset().top
         }, 2000);
