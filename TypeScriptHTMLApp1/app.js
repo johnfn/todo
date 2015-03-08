@@ -948,13 +948,13 @@ var TodoView = (function (_super) {
     };
     return TodoView;
 })(Backbone.View);
-var TodoArchiveModel = (function (_super) {
-    __extends(TodoArchiveModel, _super);
-    function TodoArchiveModel() {
+var FooterView = (function (_super) {
+    __extends(FooterView, _super);
+    function FooterView() {
         _super.apply(this, arguments);
     }
-    return TodoArchiveModel;
-})(Backbone.Model);
+    return FooterView;
+})(Backbone.View);
 var TodoArchiveItemView = (function (_super) {
     __extends(TodoArchiveItemView, _super);
     function TodoArchiveItemView() {
@@ -988,7 +988,7 @@ var TodoArchiveView = (function (_super) {
     };
     TodoArchiveView.prototype.render = function () {
         var self = this;
-        var archivedModels = _.filter(this.baseTodoModel.flatten(), function (m) { return m.archived; });
+        var archivedModels = _.filter(this.model.flatten(), function (m) { return m.archived; });
         this.$el.html(this.template());
         _.each(archivedModels, function (m) {
             var v = new TodoArchiveItemView({
@@ -1000,7 +1000,7 @@ var TodoArchiveView = (function (_super) {
         return this;
     };
     TodoArchiveView.prototype.loadData = function (todoModel) {
-        this.baseTodoModel = todoModel;
+        this.model = todoModel;
         this.listenTo(todoModel, "good-time-to-save", this.render);
     };
     return TodoArchiveView;

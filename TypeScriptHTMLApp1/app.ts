@@ -1026,7 +1026,7 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 }
 
-class TodoArchiveModel extends Backbone.Model {
+class FooterView extends Backbone.View<TodoModel> {
     
 }
 
@@ -1054,9 +1054,8 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
     }
 }
 
-class TodoArchiveView extends Backbone.View<TodoArchiveModel> {
+class TodoArchiveView extends Backbone.View<TodoModel> {
     template: ITemplate;
-    baseTodoModel: TodoModel;
 
     initialize() {
         this.setElement($('#archive-js'));
@@ -1065,7 +1064,7 @@ class TodoArchiveView extends Backbone.View<TodoArchiveModel> {
 
     render():TodoArchiveView {
         var self = this;
-        var archivedModels = _.filter(this.baseTodoModel.flatten(), m => m.archived);
+        var archivedModels = _.filter(this.model.flatten(), m => m.archived);
 
         this.$el.html(this.template());
 
@@ -1082,7 +1081,7 @@ class TodoArchiveView extends Backbone.View<TodoArchiveModel> {
     }
 
     loadData(todoModel: TodoModel) {
-        this.baseTodoModel = todoModel;
+        this.model = todoModel;
 
         this.listenTo(todoModel, "good-time-to-save", this.render);
     }
