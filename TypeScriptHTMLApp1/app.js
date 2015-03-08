@@ -835,7 +835,6 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
-        console.log('rendur');
         var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
         this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');

@@ -890,8 +890,6 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     render(updateSidebar: boolean = true) {
-        console.log('rendur');
-
 		var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
 
         this.$el.html(this.template(renderOptions));
