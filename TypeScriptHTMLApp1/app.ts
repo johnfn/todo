@@ -1045,6 +1045,7 @@ class FooterUiState extends Backbone.Model {
 
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;
+
         this.firstStarredTodo = starred[0];
     }
 
@@ -1083,8 +1084,8 @@ class FooterView extends Backbone.View<TodoModel> {
         var item = this.uiState.firstStarredTodo;
 
         $('html, body').animate({
-            scrollTop: $("#elementtoScrollToID").offset().top
-        }, 2000);
+            scrollTop: $(item.view.el).offset().top
+        }, 150);
     }
 
     archiveAllDone() {

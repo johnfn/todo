@@ -1017,8 +1017,8 @@ var FooterView = (function (_super) {
     FooterView.prototype.gotoStarredItem = function () {
         var item = this.uiState.firstStarredTodo;
         $('html, body').animate({
-            scrollTop: $("#elementtoScrollToID").offset().top
-        }, 2000);
+            scrollTop: $(item.view.el).offset().top
+        }, 150);
     };
     FooterView.prototype.archiveAllDone = function () {
         _.each(this.model.flatten(), function (m) {
