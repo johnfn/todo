@@ -1114,14 +1114,20 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
 
     initialize() {
         this.template = Util.getTemplate('todo-archive-item');
+
+        this.listenTo(this.model.uiState, 'change', this.render);
     }
 
     updateDetailView() {
+        this.model.uiState.selected = true;
+
         TodoDetailView.instance.model = this.model;
     }
 
     render():TodoArchiveItemView {
-        this.$el.html(this.template(this.model.toJSON()));
+		var renderOptions = _.extend({ }, this.model.toJSON(), this.model.uiState.toJSON());
+
+        this.$el.html(this.template(renderOptions));
 
         return this;
     }

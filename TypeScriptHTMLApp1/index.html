@@ -42,7 +42,15 @@
     </script>
 
     <script type="text/template" id="todo-archive-item">
-         <li> <%= name %> </li>
+        <li> 
+            <%= name %> 
+            
+            <% if (selected) { %>
+                <span class="toolbar">
+                    <a href="#" class="todo-remove-js"> x </a>
+                </span>
+            <% } %>
+        </li>
     </script>
 
     <script type="text/template" id="todo-archive">
