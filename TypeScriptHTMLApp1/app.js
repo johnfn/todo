@@ -169,14 +169,18 @@ var TodoModel = (function (_super) {
         set: function (value) {
             if (this.archived === value)
                 return;
+            var now = Util.fairlyLegibleDateTime();
             this.set('archived', value);
             if (value) {
-                this.archivalDate = Util.fairlyLegibleDateTime();
+                this.archivalDate = now;
             }
             // Also set all children to their parent's archived status. We 
             // bypass the getter because otherwise we'd have a crazy number
             // of recursive calls for deeply nested trees.
-            _.each(this.flatten(), function (m) { return m.set('archived', value); });
+            _.each(this.flatten(), function (m) {
+                m.set('archived', value);
+                m.archivalDate = now;
+            });
             this.goodTimeToSave();
         },
         enumerable: true,
