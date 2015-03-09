@@ -1047,18 +1047,21 @@ var FooterView = (function (_super) {
             'click .starred-item': this.gotoStarredItem
         };
     };
-    FooterView.prototype.initialize = function () {
+    FooterView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('footer');
+        this.archivalTemplate = Util.getTemplate('archival-footer');
+        this.tabModel = attrs['tabModel'];
         this.uiState = new FooterUiState({ model: this.model });
         this.setElement($('.footer'));
-        this.render();
         this.listenTo(this.model, 'global-change', this.render);
+        this.render();
     };
     FooterView.prototype.gotoStarredItem = function () {
         var item = this.uiState.firstStarredTodo;
         $('html, body').animate({
             scrollTop: $(item.view.el).offset().top
         }, 150);
+        return false;
     };
     FooterView.prototype.archiveAllDone = function () {
         _.each(this.model.flatten(), function (m) {
@@ -1208,6 +1211,9 @@ var TabBarState = (function (_super) {
     function TabBarState() {
         _super.apply(this, arguments);
     }
+    TabBarState.prototype.initialize = function () {
+        this.currentTab = 'todos';
+    };
     Object.defineProperty(TabBarState.prototype, "currentTab", {
         get: function () {
             return this.get('currentTab');
@@ -1227,7 +1233,7 @@ var TabBarView = (function (_super) {
     }
     TabBarView.prototype.events = function () {
         return {
-            'click .todo-tab-js': this.changeTab
+            'click li': this.changeTab
         };
     };
     TabBarView.prototype.initialize = function (attrs) {
@@ -1237,7 +1243,9 @@ var TabBarView = (function (_super) {
         this.render();
     };
     TabBarView.prototype.changeTab = function (e) {
-        console.log('click');
+        // TODO: Don't store data in view.
+        var tabName = $(e.currentTarget).find('a').data('tab');
+        this.model.currentTab = tabName;
     };
     TabBarView.prototype.render = function () {
         this.$el.html(this.template());
@@ -1252,7 +1260,10 @@ $(function () {
     var mainView = new MainView();
     mainView.render();
     var archiveView = new TodoArchiveView({ model: mainView.baseTodoModel });
-    var footerView = new FooterView({ model: mainView.baseTodoModel });
+    var footerView = new FooterView({
+        model: mainView.baseTodoModel,
+        tabModel: tabbarView.model
+    });
     var autosaveView = new SavedDataView({
         collection: mainView.savedData
     });

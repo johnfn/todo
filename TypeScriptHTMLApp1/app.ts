@@ -1099,7 +1099,9 @@ class FooterUiState extends Backbone.Model {
 
 class FooterView extends Backbone.View<TodoModel> {
     template: ITemplate;
+    archivalTemplate: ITemplate;
     uiState: FooterUiState;
+    tabModel: TabBarState;
 
     events() {
         return {
@@ -1108,14 +1110,16 @@ class FooterView extends Backbone.View<TodoModel> {
         };
     }
 
-    initialize() {
+    initialize(attrs:any) {
         this.template = Util.getTemplate('footer');
+        this.archivalTemplate = Util.getTemplate('archival-footer');
+        this.tabModel = attrs['tabModel'];
 
         this.uiState = new FooterUiState({ model: this.model });
         this.setElement($('.footer'));
-        this.render();
 
         this.listenTo(this.model, 'global-change', this.render);
+        this.render();
     }
 
     gotoStarredItem() {
@@ -1124,6 +1128,8 @@ class FooterView extends Backbone.View<TodoModel> {
         $('html, body').animate({
             scrollTop: $(item.view.el).offset().top
         }, 150);
+
+        return false;
     }
 
     archiveAllDone() {
@@ -1279,8 +1285,12 @@ class MainView extends Backbone.View<TodoAppModel> {
 }
 
 class TabBarState extends Backbone.Model {
-    get currentTab(): boolean { return this.get('currentTab'); }
-    set currentTab(value: boolean) { this.set('currentTab', value); }
+    initialize() {
+        this.currentTab = 'todos';
+    }
+
+    get currentTab(): string { return this.get('currentTab'); }
+    set currentTab(value: string) { this.set('currentTab', value); }
 }
 
 class TabBarView extends Backbone.View<TabBarState> {
@@ -1288,7 +1298,7 @@ class TabBarView extends Backbone.View<TabBarState> {
 
     events() {
         return {
-            'click .todo-tab-js': this.changeTab
+            'click li': this.changeTab
         };
     }
 
@@ -1302,7 +1312,10 @@ class TabBarView extends Backbone.View<TabBarState> {
     }
 
     changeTab(e: JQueryMouseEventObject) {
-        console.log('click');
+        // TODO: Don't store data in view.
+        var tabName = $(e.currentTarget).find('a').data('tab');
+
+        this.model.currentTab = tabName;
     }
 
     render(): TabBarView {
@@ -1323,7 +1336,10 @@ $(() => {
     mainView.render();
 
     var archiveView = new TodoArchiveView(<any> { model: mainView.baseTodoModel });
-    var footerView = new FooterView(<any> { model: mainView.baseTodoModel });
+    var footerView = new FooterView(<any> {
+        model: mainView.baseTodoModel,
+        tabModel: tabbarView.model
+    });
 
 	var autosaveView = new SavedDataView(<any> {
 		collection: mainView.savedData
