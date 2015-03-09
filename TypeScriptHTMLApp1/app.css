@@ -172,3 +172,15 @@ a {
 .todo-archive-list {
     list-style-type: none;
 }
+
+.hidden-ellipses {
+    border: 1px solid #8D8D8D;
+    border-radius: 3px;
+    padding-right: 2px;
+    padding-left: 2px;
+    margin-left: 5px;
+}
+
+.hidden-ellipses:hover {
+    border: 2px solid #8D8D8D;
+}

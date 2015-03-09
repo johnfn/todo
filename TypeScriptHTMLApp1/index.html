@@ -57,7 +57,7 @@
         </div>
     </script>
 
-    <script type="text/template" id="todo">
+<script type="text/template" id="todo">
         <div class="todo 
 			 <% if (selected) print ('selected') %>
 			 <% if (isDraggedOver && !isDraggedOverAsChild) print ('dragged-over') %>
@@ -81,6 +81,10 @@
                         <%= name %>
                     <% } %>
 				</span>
+
+                <% if (hidden) { %> 
+                    <a href="#" class="todo-hide-js hidden-ellipses">...</a>
+                <% } %>
 
 				<% if (selected) { %>
 					<span class="toolbar">
