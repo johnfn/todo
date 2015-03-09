@@ -1203,8 +1203,51 @@ var MainView = (function (_super) {
     };
     return MainView;
 })(Backbone.View);
+var TabBarState = (function (_super) {
+    __extends(TabBarState, _super);
+    function TabBarState() {
+        _super.apply(this, arguments);
+    }
+    Object.defineProperty(TabBarState.prototype, "currentTab", {
+        get: function () {
+            return this.get('currentTab');
+        },
+        set: function (value) {
+            this.set('currentTab', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return TabBarState;
+})(Backbone.Model);
+var TabBarView = (function (_super) {
+    __extends(TabBarView, _super);
+    function TabBarView() {
+        _super.apply(this, arguments);
+    }
+    TabBarView.prototype.events = function () {
+        return {
+            'click .todo-tab-js': this.changeTab
+        };
+    };
+    TabBarView.prototype.initialize = function (attrs) {
+        this.template = Util.getTemplate('tab-bar');
+        this.model = new TabBarState();
+        this.setElement($('.whole-todo-container'));
+        this.render();
+    };
+    TabBarView.prototype.changeTab = function (e) {
+        console.log('click');
+    };
+    TabBarView.prototype.render = function () {
+        this.$el.html(this.template());
+        return this;
+    };
+    return TabBarView;
+})(Backbone.View);
 $(function () {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
+    var tabbarView = new TabBarView();
     var detailView = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();

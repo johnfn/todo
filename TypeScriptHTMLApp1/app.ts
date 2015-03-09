@@ -1278,8 +1278,44 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 }
 
+class TabBarState extends Backbone.Model {
+    get currentTab(): boolean { return this.get('currentTab'); }
+    set currentTab(value: boolean) { this.set('currentTab', value); }
+}
+
+class TabBarView extends Backbone.View<TabBarState> {
+    template: ITemplate;
+
+    events() {
+        return {
+            'click .todo-tab-js': this.changeTab
+        };
+    }
+
+    initialize(attrs?: any) {
+        this.template = Util.getTemplate('tab-bar');
+        this.model = new TabBarState();
+
+        this.setElement($('.whole-todo-container'));
+
+        this.render();
+    }
+
+    changeTab(e: JQueryMouseEventObject) {
+        console.log('click');
+    }
+
+    render(): TabBarView {
+        this.$el.html(this.template());
+
+        return this;
+    }
+}
+
 $(() => {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
+
+    var tabbarView = new TabBarView();
 
 	var detailView = new TodoDetailView();
 

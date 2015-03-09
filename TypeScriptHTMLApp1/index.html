@@ -172,22 +172,13 @@
             <% } %>
         </div>
     </script>
-</head>
-<body>
-    <div class="title">
-        <div class="title-content">
-            <i class="fa fa-cogs"></i>
-            <span class="title-text">todo</span>
-        </div>
-        <div class="title-below"></div>
-    </div>
 
-    <div class="container whole-todo-container">
+    <script type="text/template" id="tab-bar">
         <div class="col-sm-8">
             <div role="tabpanel">
                 <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#todos" aria-controls="todos" role="tab" data-toggle="tab">todos</a></li>
-                    <li role="presentation"><a href="#archive" aria-controls="archive" role="tab" data-toggle="tab">archive</a></li>
+                    <li role="presentation" class="active todo-tab-js"><a href="#todos" aria-controls="todos" role="tab" data-toggle="tab">todos</a></li>
+                    <li role="presentation" class="archive-tab-js"><a href="#archive" aria-controls="archive" role="tab" data-toggle="tab">archive</a></li>
                 </ul>
 
                 <div class="tab-content">
@@ -203,6 +194,19 @@
         </div>
         <div class="col-sm-4 right-panel">
         </div>
+    </script>
+</head>
+<body>
+    <div class="title">
+        <div class="title-content">
+            <i class="fa fa-cogs"></i>
+            <span class="title-text">todo</span>
+        </div>
+        <div class="title-below"></div>
+    </div>
+
+    <div class="container whole-todo-container">
+
     </div>
 
     <footer class="footer">
