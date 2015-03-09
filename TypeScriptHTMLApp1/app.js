@@ -56,6 +56,7 @@ var TodoModel = (function (_super) {
         this.uid = Math.random() + ' ' + Math.random();
         this.createdDate = (new Date()).toString();
         this.modifiedDate = (new Date()).toString();
+        this.archivalDate = "";
         this.archived = false;
         this.starred = false;
         // Pass this event up the hierarchy, so we can use it in SavedData.
@@ -166,6 +167,9 @@ var TodoModel = (function (_super) {
             if (this.archived === value)
                 return;
             this.set('archived', value);
+            if (value) {
+                this.archivalDate = (new Date()).toString();
+            }
             // Also set all children to their parent's archived status. We 
             // bypass the getter because otherwise we'd have a crazy number
             // of recursive calls for deeply nested trees.
@@ -201,6 +205,16 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('depth', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "archivalDate", {
+        get: function () {
+            return this.get('archivalDate');
+        },
+        set: function (value) {
+            this.set('archivalDate', value);
         },
         enumerable: true,
         configurable: true

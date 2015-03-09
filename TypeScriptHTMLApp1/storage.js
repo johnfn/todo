@@ -183,6 +183,7 @@ var SavedData = (function (_super) {
             name: 'This is a starter todo list.',
             createdDate: Util.fairlyLegibleDateTime(),
             modifiedDate: Util.fairlyLegibleDateTime(),
+            archivalDate: '',
             content: '',
             done: false,
             archived: false,
@@ -191,6 +192,7 @@ var SavedData = (function (_super) {
             children: [{
                 createdDate: Util.fairlyLegibleDateTime(),
                 modifiedDate: Util.fairlyLegibleDateTime(),
+                archivalDate: '',
                 name: 'Put some stuff here',
                 content: '',
                 done: false,
@@ -201,6 +203,7 @@ var SavedData = (function (_super) {
             }, {
                 createdDate: Util.fairlyLegibleDateTime(),
                 modifiedDate: Util.fairlyLegibleDateTime(),
+                archivalDate: '',
                 name: 'More stuff here.',
                 content: '',
                 done: false,

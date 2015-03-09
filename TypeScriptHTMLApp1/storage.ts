@@ -151,6 +151,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 			name: 'This is a starter todo list.',
 			createdDate: Util.fairlyLegibleDateTime(),
 			modifiedDate: Util.fairlyLegibleDateTime(),
+            archivalDate: '',
 			content: '',
 			done: false,
             archived: false,
@@ -160,6 +161,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 			[{
 				createdDate: Util.fairlyLegibleDateTime(),
 				modifiedDate: Util.fairlyLegibleDateTime(),
+                archivalDate: '',
 				name: 'Put some stuff here',
 				content: '',
 				done: false,
@@ -170,6 +172,7 @@ class SavedData extends Backbone.Collection<SavedSnapshot> {
 			}, {
 				createdDate: Util.fairlyLegibleDateTime(),
 				modifiedDate: Util.fairlyLegibleDateTime(),
+                archivalDate: '',
 				name: 'More stuff here.',
 				content: '',
 				done: false,

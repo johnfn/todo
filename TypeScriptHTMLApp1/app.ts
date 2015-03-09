@@ -32,6 +32,7 @@ interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
     archived: boolean;
+    archivalDate: string;
     starred: boolean;
 	isHeader: boolean;
     content: string;
@@ -92,6 +93,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.uid = Math.random() + ' ' + Math.random();
 	    this.createdDate = (new Date()).toString();
 	    this.modifiedDate = (new Date()).toString();
+        this.archivalDate = "";
         this.archived = false;
         this.starred = false;
 
@@ -198,6 +200,10 @@ class TodoModel extends Backbone.Model implements ITodo {
 
         this.set('archived', value);
 
+        if (value) {
+            this.archivalDate = (new Date()).toString();
+        }
+
         // Also set all children to their parent's archived status. We 
         // bypass the getter because otherwise we'd have a crazy number
         // of recursive calls for deeply nested trees.
@@ -214,6 +220,9 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     get depth(): number { return this.get('depth'); }
     set depth(value: number) { this.set('depth', value); }
+
+    get archivalDate(): string { return this.get('archivalDate'); }
+    set archivalDate(value: string) { this.set('archivalDate', value); }
 
     get name(): string { return this.get('name'); }
     set name(value: string) { this.set('name', value); this.goodTimeToSave(); }
