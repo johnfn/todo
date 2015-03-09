@@ -42,21 +42,19 @@
     </script>
 
     <script type="text/template" id="todo-archive-item">
-        <li> 
-            <%= name %>  - <span class="time"><%= archivalDate %></span>
-            
-            <% if (selected) { %>
-                <span class="toolbar">
-                    <a href="#" class="todo-remove-js"> x </a>
-                </span>
-            <% } %>
-        </li>
+        <%= name %>  - <span class="time"><%= archivalDate %></span>
+        
+        <% if (selected) { %>
+            <span class="toolbar">
+                <a href="#" class="todo-remove-js"> x </a>
+            </span>
+        <% } %>
     </script>
 
     <script type="text/template" id="todo-archive">
-        <ul class="todo-archive-list">
+        <div class="todo-archive-list">
 
-        </ul>
+        </div>
     </script>
 
     <script type="text/template" id="todo">
