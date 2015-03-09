@@ -179,8 +179,16 @@ var TodoModel = (function (_super) {
             // of recursive calls for deeply nested trees.
             _.each(this.flatten(), function (m) {
                 m.set('archived', value);
-                m.archivalDate = now;
+                if (value)
+                    m.archivalDate = now;
             });
+            // If we're unarchiving the child (or grandchild etc.) of an unarchived item, 
+            // we need to go up the tree unarchiving parents. 
+            var currentParent = this.parent;
+            while (currentParent != null && currentParent.archived) {
+                currentParent.set('archived', false);
+                currentParent = currentParent.parent;
+            }
             this.goodTimeToSave();
         },
         enumerable: true,
