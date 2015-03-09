@@ -148,6 +148,13 @@ class TodoModel extends Backbone.Model implements ITodo {
 		this.trigger('global-change');
 	}
 
+    /** Destroys this todo entirely. Unfortunately it currently has to go through
+        the view. TODO: Investigate if we can just delete ourselves and re-render
+        the parent somehow */
+    destroy(): void {
+        this.parent.view.trigger('remove-todo', this.childIndex);
+    }
+
     /** Return a list of all todos nested under this todo. */
 	flatten():TodoModel[] {
 		var result = [this];
@@ -1119,7 +1126,8 @@ class FooterView extends Backbone.View<TodoModel> {
     events() {
         return {
             'click .archive-all': this.archiveAllDone,
-            'click .starred-item': this.gotoStarredItem
+            'click .starred-item': this.gotoStarredItem,
+            'click .delete-all': this.deleteAll
         };
     }
 
@@ -1134,6 +1142,18 @@ class FooterView extends Backbone.View<TodoModel> {
         this.listenTo(this.model, 'global-change', this.render);
         this.listenTo(this.tabModel, 'change', this.render);
         this.render();
+    }
+
+    deleteAll() {
+        var archived = _.filter(this.model.flatten(), m => m.archived);
+
+        // If we've currently selected a todo that's about to be deleted, then
+        // select a different one.
+        if (archived.indexOf(TodoDetailView.instance.model) !== -1) {
+            TodoDetailView.instance.model = this.model;
+        }
+
+        _.each(archived, m => m.destroy());
     }
 
     gotoStarredItem() {
@@ -1305,7 +1325,7 @@ class MainView extends Backbone.View<TodoAppModel> {
 }
 
 class TabBarState extends Backbone.Model {
-    static TabSelectionTodo = 'todo';
+    static TabSelectionTodo = 'todos';
     static TabSelectionArchive = 'archive';
 
     initialize() {

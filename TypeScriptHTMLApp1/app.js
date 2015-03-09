@@ -100,6 +100,12 @@ var TodoModel = (function (_super) {
     TodoModel.prototype.goodTimeToSave = function () {
         this.trigger('global-change');
     };
+    /** Destroys this todo entirely. Unfortunately it currently has to go through
+        the view. TODO: Investigate if we can just delete ourselves and re-render
+        the parent somehow */
+    TodoModel.prototype.destroy = function () {
+        this.parent.view.trigger('remove-todo', this.childIndex);
+    };
     /** Return a list of all todos nested under this todo. */
     TodoModel.prototype.flatten = function () {
         var result = [this];
@@ -1069,7 +1075,8 @@ var FooterView = (function (_super) {
     FooterView.prototype.events = function () {
         return {
             'click .archive-all': this.archiveAllDone,
-            'click .starred-item': this.gotoStarredItem
+            'click .starred-item': this.gotoStarredItem,
+            'click .delete-all': this.deleteAll
         };
     };
     FooterView.prototype.initialize = function (attrs) {
@@ -1081,6 +1088,15 @@ var FooterView = (function (_super) {
         this.listenTo(this.model, 'global-change', this.render);
         this.listenTo(this.tabModel, 'change', this.render);
         this.render();
+    };
+    FooterView.prototype.deleteAll = function () {
+        var archived = _.filter(this.model.flatten(), function (m) { return m.archived; });
+        // If we've currently selected a todo that's about to be deleted, then
+        // select a different one.
+        if (archived.indexOf(TodoDetailView.instance.model) !== -1) {
+            TodoDetailView.instance.model = this.model;
+        }
+        _.each(archived, function (m) { return m.destroy(); });
     };
     FooterView.prototype.gotoStarredItem = function () {
         var item = this.uiState.firstStarredTodo;
@@ -1256,7 +1272,7 @@ var TabBarState = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    TabBarState.TabSelectionTodo = 'todo';
+    TabBarState.TabSelectionTodo = 'todos';
     TabBarState.TabSelectionArchive = 'archive';
     return TabBarState;
 })(Backbone.Model);
