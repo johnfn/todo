@@ -163,6 +163,8 @@ var TodoModel = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "archived", {
+        /** Archive or unarchive this todo, and apply that archival status to
+            all children of this todo. */
         get: function () {
             return this.get('archived');
         },
@@ -174,8 +176,8 @@ var TodoModel = (function (_super) {
             if (value) {
                 this.archivalDate = now;
             }
-            // Also set all children to their parent's archived status. We 
-            // bypass the getter because otherwise we'd have a crazy number
+            // Set all children to their parent's archived status. We 
+            // bypass the setter because otherwise we'd have a crazy number
             // of recursive calls for deeply nested trees.
             _.each(this.flatten(), function (m) {
                 m.set('archived', value);
@@ -183,7 +185,8 @@ var TodoModel = (function (_super) {
                     m.archivalDate = now;
             });
             // If we're unarchiving the child (or grandchild etc.) of an unarchived item, 
-            // we need to go up the tree unarchiving parents. 
+            // we need to go up the tree unarchiving parents. We bypass the setter because
+            // we don't want recursive unarchival in this case.
             var currentParent = this.parent;
             while (currentParent != null && currentParent.archived) {
                 currentParent.set('archived', false);
@@ -277,6 +280,14 @@ var TodoModel = (function (_super) {
     Object.defineProperty(TodoModel.prototype, "numChildren", {
         get: function () {
             return this._children.length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "numActiveChildren", {
+        /** Number of active (non-archived) children. */
+        get: function () {
+            return _.filter(this._children, function (m) { return !m.archived; }).length;
         },
         enumerable: true,
         configurable: true
@@ -921,7 +932,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
-        var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
+        var renderOptions = _.extend({ numActiveChildren: this.model.numActiveChildren }, this.model.toJSON(), this.uiState.toJSON());
         this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');

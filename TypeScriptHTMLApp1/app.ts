@@ -198,6 +198,8 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.goodTimeToSave();
     }
 
+    /** Archive or unarchive this todo, and apply that archival status to
+        all children of this todo. */
     get archived(): boolean { return this.get('archived'); }
     set archived(value: boolean) {
         if (this.archived === value) return;
@@ -209,8 +211,8 @@ class TodoModel extends Backbone.Model implements ITodo {
             this.archivalDate = now;
         }
 
-        // Also set all children to their parent's archived status. We 
-        // bypass the getter because otherwise we'd have a crazy number
+        // Set all children to their parent's archived status. We 
+        // bypass the setter because otherwise we'd have a crazy number
         // of recursive calls for deeply nested trees.
 
         _.each(this.flatten(), m => {
@@ -219,7 +221,8 @@ class TodoModel extends Backbone.Model implements ITodo {
         });
 
         // If we're unarchiving the child (or grandchild etc.) of an unarchived item, 
-        // we need to go up the tree unarchiving parents. 
+        // we need to go up the tree unarchiving parents. We bypass the setter because
+        // we don't want recursive unarchival in this case.
 
         var currentParent = this.parent;
         while (currentParent != null && currentParent.archived) {
@@ -255,6 +258,11 @@ class TodoModel extends Backbone.Model implements ITodo {
     get children(): TodoModel[] { return this._children || []; }
 
     get numChildren(): number { return this._children.length; }
+
+    /** Number of active (non-archived) children. */
+    get numActiveChildren(): number {
+        return _.filter(this._children, m => !m.archived).length;
+    }
 
     /** Returns the next child in this list of children, or null if this is the last. */
     get nextChild(): TodoModel {
@@ -973,7 +981,9 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     render(updateSidebar: boolean = true) {
-		var renderOptions = _.extend({ numChildren: this.model.numChildren }, this.model.toJSON(), this.uiState.toJSON());
+        var renderOptions = _.extend({ numActiveChildren: this.model.numActiveChildren }
+            , this.model.toJSON()
+            , this.uiState.toJSON());
 
         this.$el.html(this.template(renderOptions));
 
