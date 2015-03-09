@@ -43,7 +43,7 @@
 
     <script type="text/template" id="todo-archive-item">
         <li> 
-            <%= name %>  - <%= archivalDate %>
+            <%= name %>  - <span class="time"><%= archivalDate %></span>
             
             <% if (selected) { %>
                 <span class="toolbar">
@@ -139,7 +139,7 @@
         <% } %>
 		<div> 
 			<b> <%= name %> </b>
-			<small class="right-panel-time"> (added <%= createdDate %>) </small>
+			<small class="time"> (added <%= createdDate %>) </small>
 		</div>
 
 		<% if (isEditingContent) { %>
