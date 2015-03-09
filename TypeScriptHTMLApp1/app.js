@@ -1004,8 +1004,6 @@ var FooterUiState = (function (_super) {
     }
     FooterUiState.prototype.updateState = function () {
         var allTodos = this.baseTodoModel.flatten();
-        // TODO: Does this stuff really have to be calculated on EVERY model change?
-        // Can't I just do it lazily?
         var archiveable = _.filter(allTodos, function (m) { return !m.archived && m.done; });
         var deleteable = _.filter(allTodos, function (m) { return m.archived; });
         var starred = _.filter(allTodos, function (m) { return m.starred; });

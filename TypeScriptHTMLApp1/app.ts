@@ -1085,12 +1085,9 @@ class FooterUiState extends Backbone.Model {
     updateState() {
         var allTodos = this.baseTodoModel.flatten();
 
-        // TODO: Does this stuff really have to be calculated on EVERY model change?
-        // Can't I just do it lazily?
-
         var archiveable = _.filter(allTodos, m => !m.archived && m.done);
-        var deleteable = _.filter(allTodos, m => m.archived);
-        var starred = _.filter(allTodos, m => m.starred);
+        var deleteable  = _.filter(allTodos, m => m.archived);
+        var starred     = _.filter(allTodos, m => m.starred);
 
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;

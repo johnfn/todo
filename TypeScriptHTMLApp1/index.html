@@ -102,7 +102,9 @@
 				<% } %>
             </div>
 
-            <div class="todo-content edit-content-js"> <%= content %> </div>
+            <% if (content.length > 0) { %>
+                <div class="todo-content edit-content-js"> <%= content %> </div>
+            <% } %>
             <input class='content-edit-js'/>
 
             <div class="children-js children <%= hidden ? 'hide' : '' %>"> </div>
