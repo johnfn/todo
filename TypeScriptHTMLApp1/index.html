@@ -175,15 +175,9 @@
 
     <script type="text/template" id="archival-footer">
         <div class="container">
-            <button type="submit" class="btn btn-link archive-all" <% if (!hasThingsToArchive) print('disabled') %>>
-                Archive all done <% if (hasThingsToArchive) print('(' + numThingsToArchive + ')') %>
+            <button type="submit" class="btn btn-link archive-all" <% if (!hasThingsToDelete) print('disabled') %>>
+                Delete all <% if (hasThingsToDelete) print('(' + numThingsToDelete + ')') %>
             </button>
-
-            <% if (typeof firstStarredTodo !== 'undefined') { %>
-                <a class="starred-item" href="#"> 
-                    <i class="fa fa-star"></i> <%= firstStarredTodo.name %>
-                </a>
-            <% } %>
         </div>
     </script>
 

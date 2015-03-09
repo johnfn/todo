@@ -1078,11 +1078,18 @@ class FooterUiState extends Backbone.Model {
     updateState() {
         var allTodos = this.baseTodoModel.flatten();
 
+        // TODO: Does this stuff really have to be calculated on EVERY model change?
+        // Can't I just do it lazily?
+
         var archiveable = _.filter(allTodos, m => !m.archived && m.done);
+        var deleteable = _.filter(allTodos, m => m.archived);
         var starred = _.filter(allTodos, m => m.starred);
 
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;
+
+        this.hasThingsToDelete = deleteable.length > 0;
+        this.numThingsToDelete = deleteable.length;
 
         this.firstStarredTodo = starred[0];
     }
@@ -1092,6 +1099,12 @@ class FooterUiState extends Backbone.Model {
 
     get numThingsToArchive(): number { return this.get('numThingsToArchive'); }
     set numThingsToArchive(value: number) { this.set('numThingsToArchive', value); }
+
+    get hasThingsToDelete(): boolean { return this.get('hasThingsToDelete'); }
+    set hasThingsToDelete(value: boolean) { this.set('hasThingsToDelete', value); }
+
+    get numThingsToDelete(): number { return this.get('numThingsToDelete'); }
+    set numThingsToDelete(value: number) { this.set('numThingsToDelete', value); }
 
     get firstStarredTodo(): TodoModel { return this.get('firstStarredTodo'); }
     set firstStarredTodo(value: TodoModel) { this.set('firstStarredTodo', value); }
@@ -1119,6 +1132,7 @@ class FooterView extends Backbone.View<TodoModel> {
         this.setElement($('.footer'));
 
         this.listenTo(this.model, 'global-change', this.render);
+        this.listenTo(this.tabModel, 'change', this.render);
         this.render();
     }
 
@@ -1141,7 +1155,13 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     render():FooterView {
-        this.$el.html(this.template(this.uiState.toJSON()));
+        console.log(this.tabModel.currentTab);
+
+        if (this.tabModel.currentTab === TabBarState.TabSelectionTodo) {
+            this.$el.html(this.template(this.uiState.toJSON()));
+        } else if (this.tabModel.currentTab === TabBarState.TabSelectionArchive) {
+            this.$el.html(this.archivalTemplate(this.uiState.toJSON()));
+        }
 
         return this;
     }
@@ -1285,6 +1305,9 @@ class MainView extends Backbone.View<TodoAppModel> {
 }
 
 class TabBarState extends Backbone.Model {
+    static TabSelectionTodo = 'todo';
+    static TabSelectionArchive = 'archive';
+
     initialize() {
         this.currentTab = 'todos';
     }

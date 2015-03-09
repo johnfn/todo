@@ -998,10 +998,15 @@ var FooterUiState = (function (_super) {
     }
     FooterUiState.prototype.updateState = function () {
         var allTodos = this.baseTodoModel.flatten();
+        // TODO: Does this stuff really have to be calculated on EVERY model change?
+        // Can't I just do it lazily?
         var archiveable = _.filter(allTodos, function (m) { return !m.archived && m.done; });
+        var deleteable = _.filter(allTodos, function (m) { return m.archived; });
         var starred = _.filter(allTodos, function (m) { return m.starred; });
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;
+        this.hasThingsToDelete = deleteable.length > 0;
+        this.numThingsToDelete = deleteable.length;
         this.firstStarredTodo = starred[0];
     };
     Object.defineProperty(FooterUiState.prototype, "hasThingsToArchive", {
@@ -1020,6 +1025,26 @@ var FooterUiState = (function (_super) {
         },
         set: function (value) {
             this.set('numThingsToArchive', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FooterUiState.prototype, "hasThingsToDelete", {
+        get: function () {
+            return this.get('hasThingsToDelete');
+        },
+        set: function (value) {
+            this.set('hasThingsToDelete', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(FooterUiState.prototype, "numThingsToDelete", {
+        get: function () {
+            return this.get('numThingsToDelete');
+        },
+        set: function (value) {
+            this.set('numThingsToDelete', value);
         },
         enumerable: true,
         configurable: true
@@ -1054,6 +1079,7 @@ var FooterView = (function (_super) {
         this.uiState = new FooterUiState({ model: this.model });
         this.setElement($('.footer'));
         this.listenTo(this.model, 'global-change', this.render);
+        this.listenTo(this.tabModel, 'change', this.render);
         this.render();
     };
     FooterView.prototype.gotoStarredItem = function () {
@@ -1071,7 +1097,13 @@ var FooterView = (function (_super) {
         });
     };
     FooterView.prototype.render = function () {
-        this.$el.html(this.template(this.uiState.toJSON()));
+        console.log(this.tabModel.currentTab);
+        if (this.tabModel.currentTab === TabBarState.TabSelectionTodo) {
+            this.$el.html(this.template(this.uiState.toJSON()));
+        }
+        else if (this.tabModel.currentTab === TabBarState.TabSelectionArchive) {
+            this.$el.html(this.archivalTemplate(this.uiState.toJSON()));
+        }
         return this;
     };
     return FooterView;
@@ -1224,6 +1256,8 @@ var TabBarState = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    TabBarState.TabSelectionTodo = 'todo';
+    TabBarState.TabSelectionArchive = 'archive';
     return TabBarState;
 })(Backbone.Model);
 var TabBarView = (function (_super) {
