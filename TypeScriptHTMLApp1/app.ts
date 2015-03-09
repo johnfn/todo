@@ -1108,7 +1108,8 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
 
     events() {
         return {
-            'mouseover': this.updateDetailView
+            'mouseover': this.updateDetailView,
+            'click .todo-remove-js': this.removeTodoForever
         }
     }
 
@@ -1116,6 +1117,10 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
         this.template = Util.getTemplate('todo-archive-item');
 
         this.listenTo(this.model.uiState, 'change', this.render);
+    }
+
+    removeTodoForever() {
+        this.model.parent.view.trigger('remove-todo', this.model.childIndex);
     }
 
     updateDetailView() {

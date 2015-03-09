@@ -1040,12 +1040,16 @@ var TodoArchiveItemView = (function (_super) {
     }
     TodoArchiveItemView.prototype.events = function () {
         return {
-            'mouseover': this.updateDetailView
+            'mouseover': this.updateDetailView,
+            'click .todo-remove-js': this.removeTodoForever
         };
     };
     TodoArchiveItemView.prototype.initialize = function () {
         this.template = Util.getTemplate('todo-archive-item');
         this.listenTo(this.model.uiState, 'change', this.render);
+    };
+    TodoArchiveItemView.prototype.removeTodoForever = function () {
+        this.model.parent.view.trigger('remove-todo', this.model.childIndex);
     };
     TodoArchiveItemView.prototype.updateDetailView = function () {
         this.model.uiState.selected = true;
