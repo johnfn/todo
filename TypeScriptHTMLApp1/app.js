@@ -15,8 +15,11 @@ var Util = (function () {
     Util.id = function (a) {
         return a;
     };
+    Util.makeDateTimeReadable = function (date) {
+        return date.slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+    };
     Util.fairlyLegibleDateTime = function () {
-        return (new Date()).toString().slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+        return Util.makeDateTimeReadable(new Date().toString());
     };
     return Util;
 })();
@@ -56,7 +59,7 @@ var TodoModel = (function (_super) {
         this.uid = Math.random() + ' ' + Math.random();
         this.createdDate = (new Date()).toString();
         this.modifiedDate = (new Date()).toString();
-        this.archivalDate = "";
+        this.archivalDate = '';
         this.archived = false;
         this.starred = false;
         // Pass this event up the hierarchy, so we can use it in SavedData.
@@ -168,7 +171,7 @@ var TodoModel = (function (_super) {
                 return;
             this.set('archived', value);
             if (value) {
-                this.archivalDate = (new Date()).toString();
+                this.archivalDate = Util.fairlyLegibleDateTime();
             }
             // Also set all children to their parent's archived status. We 
             // bypass the getter because otherwise we'd have a crazy number

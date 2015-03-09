@@ -54,8 +54,12 @@ class Util {
 		return a;
 	}
 
+    static makeDateTimeReadable(date: string): string {
+		return date.slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+    }
+
 	static fairlyLegibleDateTime(): string {
-		return (new Date()).toString().slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+	    return Util.makeDateTimeReadable(new Date().toString());
 	}
 }
 
@@ -93,7 +97,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.uid = Math.random() + ' ' + Math.random();
 	    this.createdDate = (new Date()).toString();
 	    this.modifiedDate = (new Date()).toString();
-        this.archivalDate = "";
+        this.archivalDate = '';
         this.archived = false;
         this.starred = false;
 
@@ -201,7 +205,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.set('archived', value);
 
         if (value) {
-            this.archivalDate = (new Date()).toString();
+            this.archivalDate = Util.fairlyLegibleDateTime();
         }
 
         // Also set all children to their parent's archived status. We 
