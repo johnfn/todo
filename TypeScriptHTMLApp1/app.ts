@@ -271,6 +271,11 @@ class TodoModel extends Backbone.Model implements ITodo {
         return _.filter(this._children, m => !m.archived).length;
     }
 
+    /** Number of active (non-archived) children, grand-children, and etc. */
+    get numActiveTotalChildren(): number {
+        return _.filter(this.flatten(), m => !m.archived).length;
+    }
+
     /** Returns the next child in this list of children, or null if this is the last. */
     get nextChild(): TodoModel {
         if (this.parent == null) {
@@ -988,9 +993,11 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     render(updateSidebar: boolean = true) {
-        var renderOptions = _.extend({ numActiveChildren: this.model.numActiveChildren }
-            , this.model.toJSON()
-            , this.uiState.toJSON());
+        var renderOptions = _.extend({
+            numActiveChildren: this.model.numActiveChildren,
+            numActiveTotalChildren: this.model.numActiveTotalChildren
+        } , this.model.toJSON()
+          , this.uiState.toJSON());
 
         this.$el.html(this.template(renderOptions));
 

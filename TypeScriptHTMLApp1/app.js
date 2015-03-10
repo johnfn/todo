@@ -298,6 +298,14 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoModel.prototype, "numActiveTotalChildren", {
+        /** Number of active (non-archived) children, grand-children, and etc. */
+        get: function () {
+            return _.filter(this.flatten(), function (m) { return !m.archived; }).length;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoModel.prototype, "nextChild", {
         /** Returns the next child in this list of children, or null if this is the last. */
         get: function () {
@@ -938,7 +946,10 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
-        var renderOptions = _.extend({ numActiveChildren: this.model.numActiveChildren }, this.model.toJSON(), this.uiState.toJSON());
+        var renderOptions = _.extend({
+            numActiveChildren: this.model.numActiveChildren,
+            numActiveTotalChildren: this.model.numActiveTotalChildren
+        }, this.model.toJSON(), this.uiState.toJSON());
         this.$el.html(this.template(renderOptions));
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');

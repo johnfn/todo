@@ -177,8 +177,8 @@ a {
 .hidden-ellipses {
     border: 1px solid #8D8D8D;
     border-radius: 3px;
-    padding-right: 2px;
-    padding-left: 2px;
+    padding-right: 4px;
+    padding-left: 4px;
     margin-left: 5px;
 }
 
