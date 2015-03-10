@@ -1252,6 +1252,13 @@ var TodoAppModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoAppModel.prototype, "currentTodoStack", {
+        get: function () {
+            return this.currentTodoModel.pathToRoot().reverse();
+        },
+        enumerable: true,
+        configurable: true
+    });
     return TodoAppModel;
 })(Backbone.Model);
 var TopBarView = (function (_super) {
@@ -1259,13 +1266,27 @@ var TopBarView = (function (_super) {
     function TopBarView() {
         _super.apply(this, arguments);
     }
+    TopBarView.prototype.events = function () {
+        return {
+            'click .parent-todo': this.changeZoom
+        };
+    };
     TopBarView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.topbar-container'));
+        this.listenTo(this.model, 'change', this.render);
         this.render();
     };
+    TopBarView.prototype.changeZoom = function (e) {
+        var index = parseInt($(e.currentTarget).data('index'));
+        this.model.currentTodoView = this.model.currentTodoStack[index].view;
+        return false;
+    };
     TopBarView.prototype.render = function () {
-        this.$el.html(this.template(this.model.toJSON()));
+        var templateOpts = _.extend({}, this.model.toJSON(), {
+            parents: this.model.currentTodoStack
+        });
+        this.$el.html(this.template(templateOpts));
         return this;
     };
     return TopBarView;
@@ -1289,6 +1310,7 @@ var MainView = (function (_super) {
             self.initializeTodoTree(_this.savedData.load());
             self.render();
         });
+        this.listenTo(this.model, 'change:currentTodoView', this.render);
     };
     MainView.prototype.initializeTodoTree = function (data) {
         var baseTodoModel = new TodoModel().initWithData(data, null);
@@ -1305,7 +1327,7 @@ var MainView = (function (_super) {
         return true;
     };
     MainView.prototype.render = function () {
-        this.$el.html(this.template);
+        this.$el.html(this.template());
         this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
         return this;
     };
@@ -1316,7 +1338,6 @@ var MainView = (function (_super) {
     };
     MainView.prototype.zoomTo = function (todoView) {
         this.model.currentTodoView = todoView;
-        this.render();
     };
     return MainView;
 })(Backbone.View);

@@ -189,7 +189,11 @@
             <div class="title-below"></div>
         </div>
         
-        Worked!
+        <% for (var i = 0; i < parents.length; i++) { %>
+            <a href="#" class="parent-todo" data-index="<%= i %>">
+                <%= parents[i].name %>
+            </a>
+        <% } %>
     </script>
 
     <script type="text/template" id="archival-footer">

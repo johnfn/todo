@@ -324,7 +324,6 @@ class TodoUiState extends Backbone.Model {
 	    this.view = attrs['view'];
     }
 
-
     showUiToolbarTrigger = new Trigger();
     hideUiToolbarTrigger = new Trigger();
 
@@ -1282,20 +1281,43 @@ class TodoAppModel extends Backbone.Model {
     get baseTodoModel(): TodoModel { return this.baseTodoView.model;  }
 
     get currentTodoModel(): TodoModel { return this.currentTodoView.model;  }
+
+    get currentTodoStack(): TodoModel[] {
+        return this.currentTodoModel.pathToRoot().reverse();
+    }
 }
 
 class TopBarView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
 
+    events() {
+        return {
+            'click .parent-todo': this.changeZoom
+        };
+    }
+
     initialize(attrs?: any) {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.topbar-container'));
 
+        this.listenTo(this.model, 'change', this.render);
         this.render();
     }
 
+    changeZoom(e:JQueryMouseEventObject): boolean {
+        var index = parseInt($(e.currentTarget).data('index'));
+
+        this.model.currentTodoView = this.model.currentTodoStack[index].view;
+
+        return false;
+    }
+
     render():TopBarView {
-        this.$el.html(this.template(this.model.toJSON()));
+        var templateOpts = _.extend({}, this.model.toJSON(), {
+            parents: this.model.currentTodoStack
+        });
+
+        this.$el.html(this.template(templateOpts));
 
         return this;
     }
@@ -1323,6 +1345,8 @@ class MainView extends Backbone.View<TodoAppModel> {
 		    self.initializeTodoTree(this.savedData.load());
 		    self.render();
 	    });
+
+        this.listenTo(this.model, 'change:currentTodoView', this.render);
     }
 
 	private initializeTodoTree(data: ITodo) {
@@ -1346,7 +1370,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     render(): Backbone.View<TodoAppModel> {
-        this.$el.html(this.template);
+        this.$el.html(this.template());
         this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
 
         return this;
@@ -1360,8 +1384,6 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     zoomTo(todoView: TodoView) {
         this.model.currentTodoView = todoView;
-
-        this.render();
     }
 }
 
@@ -1431,7 +1453,7 @@ $(() => {
 		collection: mainView.savedData
 	});
 
-    $('body').on('keydown',(e: JQueryKeyEventObject) => {
+    $('body').on('keydown', (e: JQueryKeyEventObject) => {
 		if (e.which === 83 && e.ctrlKey) {
 			e.preventDefault();
 			autosaveView.render();
