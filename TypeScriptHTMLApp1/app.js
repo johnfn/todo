@@ -656,6 +656,7 @@ var TodoView = (function (_super) {
             'click .todo-set-starred-js': this.toggleSetStarred,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
+            'click .todo-zoom-js': this.clickZoomTodo,
             'click .todo-hide-js': this.clickHideTodo,
             'keyup .name-edit': this.editName,
             'dragstart .todo-done-js': this.startDrag,
@@ -865,6 +866,10 @@ var TodoView = (function (_super) {
             this.model.starred = false;
         this.uiState.selected = true;
         this.render();
+        return false;
+    };
+    TodoView.prototype.clickZoomTodo = function () {
+        this.mainView.zoomTo(this);
         return false;
     };
     TodoView.prototype.clickRemoveTodo = function () {
@@ -1232,33 +1237,37 @@ var MainView = (function (_super) {
         this.savedData = new SavedData();
         this.initializeTodoTree(this.savedData.load());
         this.listenTo(this.savedData, 'load', function () {
-            // Do something intelligent.
             self.initializeTodoTree(_this.savedData.load());
             self.render();
         });
     };
     MainView.prototype.initializeTodoTree = function (data) {
-        this.baseTodoModel = new TodoModel().initWithData(data, null);
-        TodoDetailView.instance.model = this.baseTodoModel;
-        this.savedData.watch(this.baseTodoModel);
+        var baseTodoModel = new TodoModel().initWithData(data, null);
+        TodoDetailView.instance.model = baseTodoModel;
+        this.savedData.watch(baseTodoModel);
         this.baseTodoView = new TodoView({
-            model: this.baseTodoModel,
+            model: baseTodoModel,
             mainView: this
         });
-        this.baseTodoModel.uiState.selected = true;
+        baseTodoModel.uiState.selected = true;
+        this.currentTodoView = this.baseTodoView;
     };
     MainView.prototype.keydown = function (e) {
         return true;
     };
     MainView.prototype.render = function () {
         this.$el.html(this.template);
-        this.baseTodoView.render().$el.appendTo(this.$('.items'));
+        this.currentTodoView.render().$el.appendTo(this.$('.items'));
         return this;
     };
     MainView.prototype.clickBody = function (e) {
-        _.map(this.baseTodoModel.flatten(), function (m) {
+        _.map(this.baseTodoView.model.flatten(), function (m) {
             m.view.trigger('click-body');
         });
+    };
+    MainView.prototype.zoomTo = function (todoView) {
+        this.currentTodoView = todoView;
+        this.render();
     };
     return MainView;
 })(Backbone.View);
@@ -1317,9 +1326,9 @@ $(function () {
     var detailView = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();
-    var archiveView = new TodoArchiveView({ model: mainView.baseTodoModel });
+    var archiveView = new TodoArchiveView({ model: mainView.baseTodoView.model });
     var footerView = new FooterView({
-        model: mainView.baseTodoModel,
+        model: mainView.baseTodoView.model,
         tabModel: tabbarView.model
     });
     var autosaveView = new SavedDataView({

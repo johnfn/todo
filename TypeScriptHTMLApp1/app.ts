@@ -617,6 +617,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		    'click .todo-set-starred-js': this.toggleSetStarred,
 		    'click .todo-done-js': this.completeTodo,
 		    'click .todo-remove-js': this.clickRemoveTodo,
+		    'click .todo-zoom-js': this.clickZoomTodo,
 		    'click .todo-hide-js': this.clickHideTodo,
             'keyup .name-edit': this.editName,
 		    'dragstart .todo-done-js': this.startDrag,
@@ -883,6 +884,12 @@ class TodoView extends Backbone.View<TodoModel> {
 		this.uiState.selected = true;
 
         this.render();
+
+        return false;
+    }
+
+    private clickZoomTodo() {
+        this.mainView.zoomTo(this);
 
         return false;
     }
@@ -1270,8 +1277,8 @@ class TodoAppModel extends Backbone.Model {
 
 class MainView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
-    baseTodoModel: TodoModel;
     baseTodoView: TodoView;
+    currentTodoView: TodoView;
 	savedData: SavedData;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
@@ -1289,25 +1296,25 @@ class MainView extends Backbone.View<TodoAppModel> {
 	    this.initializeTodoTree(this.savedData.load());
 
 	    this.listenTo(this.savedData, 'load', () => {
-			// Do something intelligent.
 		    self.initializeTodoTree(this.savedData.load());
 		    self.render();
 	    });
     }
 
 	private initializeTodoTree(data: ITodo) {
-        this.baseTodoModel = new TodoModel().initWithData(data, null);
+        var baseTodoModel = new TodoModel().initWithData(data, null);
 
-		TodoDetailView.instance.model = this.baseTodoModel;
+		TodoDetailView.instance.model = baseTodoModel;
 
-	    this.savedData.watch(this.baseTodoModel);
+	    this.savedData.watch(baseTodoModel);
 
         this.baseTodoView = new TodoView(<any> {
-            model: this.baseTodoModel,
+            model: baseTodoModel,
             mainView: this
         });
 
-		this.baseTodoModel.uiState.selected = true;
+		baseTodoModel.uiState.selected = true;
+	    this.currentTodoView = this.baseTodoView;
 	}
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -1316,15 +1323,21 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     render(): Backbone.View<TodoAppModel> {
         this.$el.html(this.template);
-        this.baseTodoView.render().$el.appendTo(this.$('.items'));
+        this.currentTodoView.render().$el.appendTo(this.$('.items'));
 
         return this;
     }
 
     private clickBody(e: JQueryMouseEventObject) {
-        _.map(this.baseTodoModel.flatten(), m => {
+        _.map(this.baseTodoView.model.flatten(), m => {
             m.view.trigger('click-body');
         });
+    }
+
+    zoomTo(todoView: TodoView) {
+        this.currentTodoView = todoView;
+
+        this.render();
     }
 }
 
@@ -1382,9 +1395,9 @@ $(() => {
     var mainView = new MainView();
     mainView.render();
 
-    var archiveView = new TodoArchiveView(<any> { model: mainView.baseTodoModel });
+    var archiveView = new TodoArchiveView(<any> { model: mainView.baseTodoView.model });
     var footerView = new FooterView(<any> {
-        model: mainView.baseTodoModel,
+        model: mainView.baseTodoView.model,
         tabModel: tabbarView.model
     });
 
