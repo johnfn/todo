@@ -993,6 +993,9 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
+    // NOTE: render() should not be called on views that are not currently
+    // being displayed; their children will disappear. 
+    // Checking if every node exists is O(n^2) naively which doesn't seem worth it...
     render(updateSidebar: boolean = true) {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
@@ -1016,7 +1019,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // render children
 
-        _.each(this.childrenViews,(child: TodoView) => {
+        _.each(this.childrenViews, (child: TodoView) => {
             if (!child.model.archived) {
                 child.render(false).$el.appendTo($childrenContainer);
             }
@@ -1375,7 +1378,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     private clickBody(e: JQueryMouseEventObject) {
-        _.map(this.model.baseTodoModel.flatten(), m => {
+        _.map(this.model.currentTodoModel.flatten(), m => {
             m.view.trigger('click-body');
         });
     }
@@ -1418,7 +1421,6 @@ class TabBarView extends Backbone.View<TabBarState> {
     changeTab(e: JQueryMouseEventObject) {
         // TODO: Don't store data in view.
         var tabName = $(e.currentTarget).find('a').data('tab');
-
         this.model.currentTab = tabName;
     }
 

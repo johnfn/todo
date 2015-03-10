@@ -943,6 +943,9 @@ var TodoView = (function (_super) {
         this.render();
         return false;
     };
+    // NOTE: render() should not be called on views that are not currently
+    // being displayed; their children will disappear. 
+    // Checking if every node exists is O(n^2) naively which doesn't seem worth it...
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
         var renderOptions = _.extend({
@@ -1330,7 +1333,7 @@ var MainView = (function (_super) {
         return this;
     };
     MainView.prototype.clickBody = function (e) {
-        _.map(this.model.baseTodoModel.flatten(), function (m) {
+        _.map(this.model.currentTodoModel.flatten(), function (m) {
             m.view.trigger('click-body');
         });
     };
