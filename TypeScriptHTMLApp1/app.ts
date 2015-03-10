@@ -918,8 +918,6 @@ class TodoView extends Backbone.View<TodoModel> {
 	}
 
     private hideAllEditNodes(e: JQueryMouseEventObject) {
-        _.each(this.childrenViews,(view: TodoView) => { view.trigger('click-body'); });
-
         this.uiState.editingContent = false;
         this.uiState.editingName = false;
         this.uiState.addTodoVisible = false;
@@ -1324,7 +1322,9 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     private clickBody(e: JQueryMouseEventObject) {
-        this.baseTodoView.trigger('click-body');
+        _.map(this.baseTodoModel.flatten(), m => {
+            m.view.trigger('click-body');
+        });
     }
 }
 

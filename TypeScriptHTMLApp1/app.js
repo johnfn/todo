@@ -890,9 +890,6 @@ var TodoView = (function (_super) {
         deleted.$el.slideUp(100, this.render);
     };
     TodoView.prototype.hideAllEditNodes = function (e) {
-        _.each(this.childrenViews, function (view) {
-            view.trigger('click-body');
-        });
         this.uiState.editingContent = false;
         this.uiState.editingName = false;
         this.uiState.addTodoVisible = false;
@@ -1259,7 +1256,9 @@ var MainView = (function (_super) {
         return this;
     };
     MainView.prototype.clickBody = function (e) {
-        this.baseTodoView.trigger('click-body');
+        _.map(this.baseTodoModel.flatten(), function (m) {
+            m.view.trigger('click-body');
+        });
     };
     return MainView;
 })(Backbone.View);
