@@ -231,11 +231,10 @@ class TodoModel extends Backbone.Model implements ITodo {
         // we need to go up the tree unarchiving parents. We bypass the setter because
         // we don't want recursive unarchival in this case.
 
-        var currentParent = this.parent;
-        while (currentParent != null && currentParent.archived) {
-            currentParent.set('archived', false);
+        var archivedParents = _.filter(this.pathToRoot(), m => m.archived);
 
-            currentParent = currentParent.parent;
+        for (var i = 0; i < archivedParents.length; i++) {
+            archivedParents[i].set('archived', false);
         }
         
         this.goodTimeToSave();
@@ -1296,7 +1295,7 @@ class TopBarView extends Backbone.View<TodoAppModel> {
     }
 
     render():TopBarView {
-        this.$el.html(this.template());
+        this.$el.html(this.template(this.model.toJSON()));
 
         return this;
     }

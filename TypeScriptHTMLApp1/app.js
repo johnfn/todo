@@ -193,10 +193,9 @@ var TodoModel = (function (_super) {
             // If we're unarchiving the child (or grandchild etc.) of an unarchived item, 
             // we need to go up the tree unarchiving parents. We bypass the setter because
             // we don't want recursive unarchival in this case.
-            var currentParent = this.parent;
-            while (currentParent != null && currentParent.archived) {
-                currentParent.set('archived', false);
-                currentParent = currentParent.parent;
+            var archivedParents = _.filter(this.pathToRoot(), function (m) { return m.archived; });
+            for (var i = 0; i < archivedParents.length; i++) {
+                archivedParents[i].set('archived', false);
             }
             this.goodTimeToSave();
         },
@@ -1266,7 +1265,7 @@ var TopBarView = (function (_super) {
         this.render();
     };
     TopBarView.prototype.render = function () {
-        this.$el.html(this.template());
+        this.$el.html(this.template(this.model.toJSON()));
         return this;
     };
     return TopBarView;
