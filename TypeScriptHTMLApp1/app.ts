@@ -569,11 +569,9 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 	render():TodoDetailView {
 		var createdDateAgo = $.timeago(new Date(this.model.createdDate));
-		var parentNames = _.map(this.model.pathToRoot(), (model) => model.name).reverse().join(' > ');
 
 		this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
-			createdDate: createdDateAgo,
-			breadcrumbs: parentNames
+			createdDate: createdDateAgo
 		})));
 
         if (this.uiState.isEditingContent) {

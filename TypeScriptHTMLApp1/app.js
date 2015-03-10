@@ -626,10 +626,8 @@ var TodoDetailView = (function (_super) {
     };
     TodoDetailView.prototype.render = function () {
         var createdDateAgo = $.timeago(new Date(this.model.createdDate));
-        var parentNames = _.map(this.model.pathToRoot(), function (model) { return model.name; }).reverse().join(' > ');
         this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
-            createdDate: createdDateAgo,
-            breadcrumbs: parentNames
+            createdDate: createdDateAgo
         })));
         if (this.uiState.isEditingContent) {
             this.$('.content-edit-js').focus().select();
