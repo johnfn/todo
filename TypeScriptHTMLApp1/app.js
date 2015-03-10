@@ -5,6 +5,37 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+// * TODO: rename name to content and content to desc.
+// X Make the check unicode into a checkbox
+//   X and have it be draggable
+// * Content on rightpanel
+//   * Markdown?
+// * Have the breadcrumbs in a little titlebar like thing.
+// X timeago on rightpanel
+// * Dragging items around
+//   X Can't drag item as child of itself.
+//     X Can't add item as subchild of itself.
+//   * Can't drag topmost parent.
+//   X Item should still be selected when you drop it.
+//     X I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
+//     X This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made.
+//       X It doesn't seem like a requirement that TodoModels have to be created without views though.
+//   X Drag items as children or same-level.
+//   X Have to be able to stop dragging somehow.
+// * Save to server
+// * Generalized search
+// * Individual view.
+//   * breadcrumb trail visible
+// * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
+// * mouseover one, highlight all
+// X pay the power bill
+// * listen to debussy
+var SearchMatch;
+(function (SearchMatch) {
+    SearchMatch[SearchMatch["NoMatch"] = 0] = "NoMatch";
+    SearchMatch[SearchMatch["ParentOfMatch"] = 1] = "ParentOfMatch";
+    SearchMatch[SearchMatch["Match"] = 2] = "Match";
+})(SearchMatch || (SearchMatch = {}));
 var Util = (function () {
     function Util() {
     }
@@ -62,6 +93,7 @@ var TodoModel = (function (_super) {
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
+        this.searchMatch = 0 /* NoMatch */;
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'global-change', function () {
             if (_this.parent) {
@@ -153,6 +185,35 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('isHeader', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "searchMatch", {
+        // TODO: More DRY enum serialization
+        get: function () {
+            var result = this.get('searchMatch');
+            if (result === 'NoMatch')
+                return 0 /* NoMatch */;
+            if (result === 'Match')
+                return 2 /* Match */;
+            if (result === 'ParentOfMatch')
+                return 1 /* ParentOfMatch */;
+            throw 'aaaaaaghjkl';
+            return 0 /* NoMatch */;
+        },
+        set: function (value) {
+            switch (value) {
+                case 0 /* NoMatch */:
+                    this.set('searchMatch', 'NoMatch');
+                    break;
+                case 2 /* Match */:
+                    this.set('searchMatch', 'Match');
+                    break;
+                case 1 /* ParentOfMatch */:
+                    this.set('searchMatch', 'ParentOfMatch');
+                    break;
+            }
         },
         enumerable: true,
         configurable: true
@@ -1199,6 +1260,16 @@ var TodoAppModel = (function (_super) {
     TodoAppModel.prototype.initialize = function () {
         this.isDragging = false;
     };
+    Object.defineProperty(TodoAppModel.prototype, "searchText", {
+        get: function () {
+            return this.get('searchText');
+        },
+        set: function (value) {
+            this.set('searchText', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoAppModel.prototype, "selectedTodo", {
         get: function () {
             return this.get('selectedTodo');
@@ -1269,18 +1340,24 @@ var TopBarView = (function (_super) {
     }
     TopBarView.prototype.events = function () {
         return {
-            'click .parent-todo': this.changeZoom
+            'click .parent-todo': this.changeZoom,
+            'keyup .search-input': this.search
         };
     };
     TopBarView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.topbar-container'));
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'change:currentTodoView', this.render);
         this.render();
     };
     TopBarView.prototype.changeZoom = function (e) {
         var index = parseInt($(e.currentTarget).data('index'));
         this.model.currentTodoView = this.model.currentTodoStack[index].view;
+        return false;
+    };
+    TopBarView.prototype.search = function () {
+        var search = this.$('.search-input').val();
+        this.model.searchText = search;
         return false;
     };
     TopBarView.prototype.render = function () {
@@ -1312,6 +1389,7 @@ var MainView = (function (_super) {
             self.render();
         });
         this.listenTo(this.model, 'change:currentTodoView', this.render);
+        this.listenTo(this.model, 'change:searchText', this.updateSearch);
     };
     MainView.prototype.initializeTodoTree = function (data) {
         var baseTodoModel = new TodoModel().initWithData(data, null);
@@ -1339,6 +1417,9 @@ var MainView = (function (_super) {
     };
     MainView.prototype.zoomTo = function (todoView) {
         this.model.currentTodoView = todoView;
+    };
+    MainView.prototype.updateSearch = function () {
+        console.log('search');
     };
     return MainView;
 })(Backbone.View);

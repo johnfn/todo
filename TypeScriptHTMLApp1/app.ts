@@ -28,6 +28,12 @@
 // X pay the power bill
 // * listen to debussy
 
+enum SearchMatch {
+    NoMatch,
+    ParentOfMatch,
+    Match
+}
+
 interface ITemplate { (...data: any[]): string; }
 interface ITodo {
     name: string;
@@ -35,6 +41,7 @@ interface ITodo {
     archivalDate: string;
     starred: boolean;
 	isHeader: boolean;
+    searchMatch: SearchMatch;
     content: string;
 	createdDate: string;
 	modifiedDate: string;
@@ -45,8 +52,7 @@ interface ITodo {
 
 class Util {
     static getTemplate(name: string): ITemplate {
-        var el: JQuery = $('#' + name);
-
+        var el = $('#' + name);
         return _.template(el.html());
     }
 
@@ -100,6 +106,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
+        this.searchMatch = SearchMatch.NoMatch;
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'global-change', () => {
@@ -194,10 +201,32 @@ class TodoModel extends Backbone.Model implements ITodo {
         return -1;
     }
 
-	public get uiState(): TodoUiState { return this.view.uiState; }
+	get uiState(): TodoUiState { return this.view.uiState; }
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
+
+    // TODO: More DRY enum serialization
+    get searchMatch(): SearchMatch {
+        var result = this.get('searchMatch');
+
+        if (result === 'NoMatch') return SearchMatch.NoMatch;
+        if (result === 'Match') return SearchMatch.Match;
+        if (result === 'ParentOfMatch') return SearchMatch.ParentOfMatch;
+
+        throw 'aaaaaaghjkl';
+        return SearchMatch.NoMatch;
+    }
+    set searchMatch(value: SearchMatch) {
+        switch (value) {
+            case SearchMatch.NoMatch:
+                this.set('searchMatch', 'NoMatch'); break;
+            case SearchMatch.Match:
+                this.set('searchMatch', 'Match'); break;
+            case SearchMatch.ParentOfMatch:
+                this.set('searchMatch', 'ParentOfMatch'); break;
+        }
+    }
 
     get starred(): boolean { return this.get('starred'); }
     set starred(value: boolean) {
@@ -387,7 +416,7 @@ class TodoUiState extends Backbone.Model {
 	     this.set('editingContent', value);
     }
 
-    public static selectedModel: TodoUiState;
+    static selectedModel: TodoUiState;
 
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {
@@ -1267,6 +1296,9 @@ class TodoAppModel extends Backbone.Model {
 		this.isDragging = false;
 	}
 
+    get searchText(): string { return this.get('searchText'); }
+    set searchText(value: string) { this.set('searchText', value); }
+
     get selectedTodo(): TodoModel { return this.get('selectedTodo'); }
     set selectedTodo(value: TodoModel) { this.set('selectedTodo', value); }
 
@@ -1293,7 +1325,8 @@ class TopBarView extends Backbone.View<TodoAppModel> {
 
     events() {
         return {
-            'click .parent-todo': this.changeZoom
+            'click .parent-todo': this.changeZoom,
+            'keyup .search-input': this.search
         };
     }
 
@@ -1301,7 +1334,7 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.topbar-container'));
 
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'change:currentTodoView', this.render);
         this.render();
     }
 
@@ -1309,6 +1342,14 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         var index = parseInt($(e.currentTarget).data('index'));
 
         this.model.currentTodoView = this.model.currentTodoStack[index].view;
+
+        return false;
+    }
+
+    search(): boolean {
+        var search: string = this.$('.search-input').val();
+
+        this.model.searchText = search;
 
         return false;
     }
@@ -1348,6 +1389,7 @@ class MainView extends Backbone.View<TodoAppModel> {
 	    });
 
         this.listenTo(this.model, 'change:currentTodoView', this.render);
+        this.listenTo(this.model, 'change:searchText', this.updateSearch);
     }
 
 	private initializeTodoTree(data: ITodo) {
@@ -1385,6 +1427,10 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     zoomTo(todoView: TodoView) {
         this.model.currentTodoView = todoView;
+    }
+
+    updateSearch() {
+        console.log('search');
     }
 }
 
