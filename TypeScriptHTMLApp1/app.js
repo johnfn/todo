@@ -1219,8 +1219,58 @@ var TodoAppModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoAppModel.prototype, "baseTodoView", {
+        get: function () {
+            return this.get('baseTodoView');
+        },
+        set: function (value) {
+            this.set('baseTodoView', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoAppModel.prototype, "currentTodoView", {
+        get: function () {
+            return this.get('currentTodoView');
+        },
+        set: function (value) {
+            this.set('currentTodoView', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoAppModel.prototype, "baseTodoModel", {
+        get: function () {
+            return this.baseTodoView.model;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoAppModel.prototype, "currentTodoModel", {
+        get: function () {
+            return this.currentTodoView.model;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return TodoAppModel;
 })(Backbone.Model);
+var TopBarView = (function (_super) {
+    __extends(TopBarView, _super);
+    function TopBarView() {
+        _super.apply(this, arguments);
+    }
+    TopBarView.prototype.initialize = function (attrs) {
+        this.template = Util.getTemplate('top-bar');
+        this.setElement($('.topbar-container'));
+        this.render();
+    };
+    TopBarView.prototype.render = function () {
+        this.$el.html(this.template());
+        return this;
+    };
+    return TopBarView;
+})(Backbone.View);
 var MainView = (function (_super) {
     __extends(MainView, _super);
     function MainView() {
@@ -1245,28 +1295,28 @@ var MainView = (function (_super) {
         var baseTodoModel = new TodoModel().initWithData(data, null);
         TodoDetailView.instance.model = baseTodoModel;
         this.savedData.watch(baseTodoModel);
-        this.baseTodoView = new TodoView({
+        this.model.baseTodoView = new TodoView({
             model: baseTodoModel,
             mainView: this
         });
         baseTodoModel.uiState.selected = true;
-        this.currentTodoView = this.baseTodoView;
+        this.model.currentTodoView = this.model.baseTodoView;
     };
     MainView.prototype.keydown = function (e) {
         return true;
     };
     MainView.prototype.render = function () {
         this.$el.html(this.template);
-        this.currentTodoView.render().$el.appendTo(this.$('.items'));
+        this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
         return this;
     };
     MainView.prototype.clickBody = function (e) {
-        _.map(this.baseTodoView.model.flatten(), function (m) {
+        _.map(this.model.baseTodoModel.flatten(), function (m) {
             m.view.trigger('click-body');
         });
     };
     MainView.prototype.zoomTo = function (todoView) {
-        this.currentTodoView = todoView;
+        this.model.currentTodoView = todoView;
         this.render();
     };
     return MainView;
@@ -1326,9 +1376,10 @@ $(function () {
     var detailView = new TodoDetailView();
     var mainView = new MainView();
     mainView.render();
-    var archiveView = new TodoArchiveView({ model: mainView.baseTodoView.model });
+    var topBar = new TopBarView({ model: mainView.model });
+    var archiveView = new TodoArchiveView({ model: mainView.model.baseTodoModel });
     var footerView = new FooterView({
-        model: mainView.baseTodoView.model,
+        model: mainView.model.baseTodoModel,
         tabModel: tabbarView.model
     });
     var autosaveView = new SavedDataView({

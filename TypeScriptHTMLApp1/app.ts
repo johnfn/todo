@@ -1273,12 +1273,37 @@ class TodoAppModel extends Backbone.Model {
 
     get isDragging(): boolean { return this.get('isDragging'); }
     set isDragging(value: boolean) { this.set('isDragging', value); }
+
+    get baseTodoView(): TodoView { return this.get('baseTodoView'); }
+    set baseTodoView(value: TodoView) { this.set('baseTodoView', value); }
+
+    get currentTodoView(): TodoView { return this.get('currentTodoView'); }
+    set currentTodoView(value: TodoView) { this.set('currentTodoView', value); }
+
+    get baseTodoModel(): TodoModel { return this.baseTodoView.model;  }
+
+    get currentTodoModel(): TodoModel { return this.currentTodoView.model;  }
+}
+
+class TopBarView extends Backbone.View<TodoAppModel> {
+    template: ITemplate;
+
+    initialize(attrs?: any) {
+        this.template = Util.getTemplate('top-bar');
+        this.setElement($('.topbar-container'));
+
+        this.render();
+    }
+
+    render():TopBarView {
+        this.$el.html(this.template());
+
+        return this;
+    }
 }
 
 class MainView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
-    baseTodoView: TodoView;
-    currentTodoView: TodoView;
 	savedData: SavedData;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
@@ -1308,13 +1333,13 @@ class MainView extends Backbone.View<TodoAppModel> {
 
 	    this.savedData.watch(baseTodoModel);
 
-        this.baseTodoView = new TodoView(<any> {
+        this.model.baseTodoView = new TodoView(<any> {
             model: baseTodoModel,
             mainView: this
         });
 
 		baseTodoModel.uiState.selected = true;
-	    this.currentTodoView = this.baseTodoView;
+	    this.model.currentTodoView = this.model.baseTodoView;
 	}
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -1323,19 +1348,19 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     render(): Backbone.View<TodoAppModel> {
         this.$el.html(this.template);
-        this.currentTodoView.render().$el.appendTo(this.$('.items'));
+        this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
 
         return this;
     }
 
     private clickBody(e: JQueryMouseEventObject) {
-        _.map(this.baseTodoView.model.flatten(), m => {
+        _.map(this.model.baseTodoModel.flatten(), m => {
             m.view.trigger('click-body');
         });
     }
 
     zoomTo(todoView: TodoView) {
-        this.currentTodoView = todoView;
+        this.model.currentTodoView = todoView;
 
         this.render();
     }
@@ -1395,9 +1420,11 @@ $(() => {
     var mainView = new MainView();
     mainView.render();
 
-    var archiveView = new TodoArchiveView(<any> { model: mainView.baseTodoView.model });
+    var topBar = new TopBarView(<any> { model: mainView.model });
+
+    var archiveView = new TodoArchiveView(<any> { model: mainView.model.baseTodoModel });
     var footerView = new FooterView(<any> {
-        model: mainView.baseTodoView.model,
+        model: mainView.model.baseTodoModel,
         tabModel: tabbarView.model
     });
 

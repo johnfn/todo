@@ -180,6 +180,18 @@
         </div>
     </script>
 
+    <script type="text/template" id="top-bar">
+        <div class="title">
+            <div class="title-content">
+                <i class="fa fa-cogs"></i>
+                <span class="title-text">todo</span>
+            </div>
+            <div class="title-below"></div>
+        </div>
+        
+        Worked!
+    </script>
+
     <script type="text/template" id="archival-footer">
         <div class="container">
             <button type="submit" class="btn btn-link delete-all" <% if (!hasThingsToDelete) print('disabled') %>>
@@ -216,12 +228,8 @@
     </script>
 </head>
 <body>
-    <div class="title">
-        <div class="title-content">
-            <i class="fa fa-cogs"></i>
-            <span class="title-text">todo</span>
-        </div>
-        <div class="title-below"></div>
+    <div class="topbar-container">
+        
     </div>
 
     <div class="container whole-todo-container">
