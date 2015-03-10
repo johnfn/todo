@@ -185,3 +185,9 @@ a {
 .hidden-ellipses:hover {
     border: 1px solid black;
 }
+
+.search-input {
+    color: black;
+    margin-top: 3px;
+    font-size: 14px;
+}
