@@ -79,7 +79,11 @@
                             <i class="fa fa-star"></i>
                         <% } %>
 
-                        <%= name %>
+                        <% if (!searchMatch) { %>
+                            <%= name %>
+                        <% } else { %>
+                            <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                        <% } %>
                     <% } %>
 				</span>
 

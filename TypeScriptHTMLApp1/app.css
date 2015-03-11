@@ -195,3 +195,7 @@ a {
 .search-result-parent {
     color: lightgray;
 }
+
+.search-match {
+    background-color: lightcyan;
+}

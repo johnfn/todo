@@ -1042,6 +1042,7 @@ var TodoView = (function (_super) {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
+            searchMatch: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         }, this.model.toJSON(), this.uiState.toJSON());
         if (this.mainView.model.searchIsOngoing) {
@@ -1049,8 +1050,17 @@ var TodoView = (function (_super) {
             if (searchMatch === 1 /* ParentOfMatch */) {
                 renderOptions['searchResultParent'] = true;
             }
-            console.log(searchMatch);
-            debugger;
+            if (searchMatch === 2 /* Match */) {
+                var start = this.model.searchResult.matchStart;
+                var end = this.model.searchResult.matchEnd;
+                var name = this.model.name;
+                _.extend(renderOptions, {
+                    firstSearchText: name.substring(0, start),
+                    middleSearchText: name.substring(start, end),
+                    finalSearchText: name.substring(end),
+                    searchMatch: true
+                });
+            }
             if (searchMatch === 2 /* Match */ || searchMatch === 1 /* ParentOfMatch */) {
                 this.$el.html(this.template(renderOptions));
             }
@@ -1483,10 +1493,13 @@ var MainView = (function (_super) {
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
-            if (todo.name.toLowerCase().indexOf(search.toLowerCase()) === -1)
+            var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
+            if (matchPosition === -1)
                 continue;
             var parents = todo.pathToRoot();
             todo.searchResult.searchMatch = 2 /* Match */;
+            todo.searchResult.matchStart = matchPosition;
+            todo.searchResult.matchEnd = matchPosition + search.length;
             for (var j = 0; j < parents.length; j++) {
                 if (parents[j].searchResult.searchMatch == 0 /* NoMatch */)
                     parents[j].searchResult.searchMatch = 1 /* ParentOfMatch */;

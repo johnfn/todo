@@ -1040,6 +1040,7 @@ class TodoView extends Backbone.View<TodoModel> {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
+            searchMatch: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         } , this.model.toJSON()
           , this.uiState.toJSON());
@@ -1051,8 +1052,18 @@ class TodoView extends Backbone.View<TodoModel> {
                 renderOptions['searchResultParent'] = true;
             }
 
-            console.log(searchMatch);
-            debugger;
+            if (searchMatch === SearchMatch.Match) {
+                var start = this.model.searchResult.matchStart;
+                var end = this.model.searchResult.matchEnd;
+                var name = this.model.name;
+
+                _.extend(renderOptions, {
+                    firstSearchText: name.substring(0, start),
+                    middleSearchText: name.substring(start, end),
+                    finalSearchText: name.substring(end),
+                    searchMatch: true
+                });
+            }
 
             if (searchMatch === SearchMatch.Match ||
                 searchMatch === SearchMatch.ParentOfMatch) {
@@ -1475,11 +1486,15 @@ class MainView extends Backbone.View<TodoAppModel> {
         // At best this is O(n) (leaves first); the way we're doing it is O(n^2).
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
+            var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
 
-            if (todo.name.toLowerCase().indexOf(search.toLowerCase()) === -1) continue;
+            if (matchPosition === -1) continue;
+
             var parents = todo.pathToRoot();
 
             todo.searchResult.searchMatch = SearchMatch.Match;
+            todo.searchResult.matchStart = matchPosition;
+            todo.searchResult.matchEnd = matchPosition + search.length;
 
             for (var j = 0; j < parents.length; j++) {
                 if (parents[j].searchResult.searchMatch == SearchMatch.NoMatch)
