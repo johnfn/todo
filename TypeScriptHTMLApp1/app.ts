@@ -28,6 +28,38 @@
 // X pay the power bill
 // * listen to debussy
 
+class SearchResult extends Backbone.Model {
+
+    initialize() {
+        this.searchMatch = SearchMatch.NoMatch;
+    }
+    
+    // TODO: More DRY enum serialization
+    get searchMatch(): SearchMatch {
+        var result = this.get('searchMatch');
+
+        if (result === 'NoMatch') return SearchMatch.NoMatch;
+        if (result === 'Match') return SearchMatch.Match;
+        if (result === 'ParentOfMatch') return SearchMatch.ParentOfMatch;
+
+        throw 'aaaaaaghjkl';
+        return SearchMatch.NoMatch;
+    }
+    set searchMatch(value: SearchMatch) {
+        switch (value) {
+            case SearchMatch.NoMatch: this.set('searchMatch', 'NoMatch'); break;
+            case SearchMatch.Match: this.set('searchMatch', 'Match'); break;
+            case SearchMatch.ParentOfMatch: this.set('searchMatch', 'ParentOfMatch'); break;
+        }
+    }
+
+    get matchStart(): number { return this.get('matchStart'); }
+    set matchStart(value: number) { this.set('matchStart', value); }
+
+    get matchEnd(): number { return this.get('matchEnd'); }
+    set matchEnd(value: number) { this.set('matchEnd', value); }
+}
+
 enum SearchMatch {
     NoMatch,
     ParentOfMatch,
@@ -41,7 +73,6 @@ interface ITodo {
     archivalDate: string;
     starred: boolean;
 	isHeader: boolean;
-    searchMatch: SearchMatch;
     content: string;
 	createdDate: string;
 	modifiedDate: string;
@@ -92,6 +123,8 @@ class TodoModel extends Backbone.Model implements ITodo {
     /** Unique identifier for this model */
     uid: string;
 
+    searchResult: SearchResult;
+
     private _children: TodoModel[] = [];
 
     initialize() {
@@ -106,7 +139,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
-        this.searchMatch = SearchMatch.NoMatch;
+        this.searchResult = new SearchResult();
 
 		// Pass this event up the hierarchy, so we can use it in SavedData.
 	    this.listenTo(this, 'global-change', () => {
@@ -205,28 +238,6 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
-
-    // TODO: More DRY enum serialization
-    get searchMatch(): SearchMatch {
-        var result = this.get('searchMatch');
-
-        if (result === 'NoMatch') return SearchMatch.NoMatch;
-        if (result === 'Match') return SearchMatch.Match;
-        if (result === 'ParentOfMatch') return SearchMatch.ParentOfMatch;
-
-        throw 'aaaaaaghjkl';
-        return SearchMatch.NoMatch;
-    }
-    set searchMatch(value: SearchMatch) {
-        switch (value) {
-            case SearchMatch.NoMatch:
-                this.set('searchMatch', 'NoMatch'); break;
-            case SearchMatch.Match:
-                this.set('searchMatch', 'Match'); break;
-            case SearchMatch.ParentOfMatch:
-                this.set('searchMatch', 'ParentOfMatch'); break;
-        }
-    }
 
     get starred(): boolean { return this.get('starred'); }
     set starred(value: boolean) {
@@ -1032,7 +1043,21 @@ class TodoView extends Backbone.View<TodoModel> {
         } , this.model.toJSON()
           , this.uiState.toJSON());
 
-        this.$el.html(this.template(renderOptions));
+        if (this.mainView.model.searchIsOngoing) {
+            var searchMatch = this.model.searchResult.searchMatch;
+
+            if (searchMatch === SearchMatch.Match ||
+                searchMatch === SearchMatch.ParentOfMatch) {
+
+                this.$el.html(this.template(renderOptions));
+            } else {
+                this.$el.empty();
+
+                return this;
+            }
+        } else {
+            this.$el.html(this.template(renderOptions));
+        }
 
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
@@ -1299,6 +1324,9 @@ class TodoAppModel extends Backbone.Model {
     get searchText(): string { return this.get('searchText'); }
     set searchText(value: string) { this.set('searchText', value); }
 
+    get searchIsOngoing(): boolean { return this.get('searchIsOngoing'); }
+    set searchIsOngoing(value: boolean) { this.set('searchIsOngoing', value); }
+
     get selectedTodo(): TodoModel { return this.get('selectedTodo'); }
     set selectedTodo(value: TodoModel) { this.set('selectedTodo', value); }
 
@@ -1430,7 +1458,29 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     updateSearch() {
-        console.log('search');
+        var search = this.model.searchText;
+        var allTodos = this.model.baseTodoModel.flatten();
+        var todo: TodoModel;
+
+        // clear previous search results
+        _.each(allTodos, m => m.searchResult.searchMatch = SearchMatch.NoMatch);
+
+        for (var i = 0; i < allTodos.length; i++) {
+            todo = allTodos[i];
+
+            if (todo.name.toLowerCase().indexOf(search.toLowerCase()) === -1) continue;
+            var parents = todo.pathToRoot();
+
+            todo.searchResult.searchMatch = SearchMatch.Match;
+
+            for (var j = 0; j < parents.length; j++) {
+                if (parents[j].searchResult.searchMatch == SearchMatch.NoMatch)
+                    parents[j].searchResult.searchMatch = SearchMatch.ParentOfMatch;
+            }
+        }
+
+        this.model.searchIsOngoing = true;
+        this.render();
     }
 }
 

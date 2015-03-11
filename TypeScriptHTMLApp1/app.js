@@ -30,6 +30,65 @@ var __extends = this.__extends || function (d, b) {
 // * mouseover one, highlight all
 // X pay the power bill
 // * listen to debussy
+var SearchResult = (function (_super) {
+    __extends(SearchResult, _super);
+    function SearchResult() {
+        _super.apply(this, arguments);
+    }
+    SearchResult.prototype.initialize = function () {
+        this.searchMatch = 0 /* NoMatch */;
+    };
+    Object.defineProperty(SearchResult.prototype, "searchMatch", {
+        // TODO: More DRY enum serialization
+        get: function () {
+            var result = this.get('searchMatch');
+            if (result === 'NoMatch')
+                return 0 /* NoMatch */;
+            if (result === 'Match')
+                return 2 /* Match */;
+            if (result === 'ParentOfMatch')
+                return 1 /* ParentOfMatch */;
+            throw 'aaaaaaghjkl';
+            return 0 /* NoMatch */;
+        },
+        set: function (value) {
+            switch (value) {
+                case 0 /* NoMatch */:
+                    this.set('searchMatch', 'NoMatch');
+                    break;
+                case 2 /* Match */:
+                    this.set('searchMatch', 'Match');
+                    break;
+                case 1 /* ParentOfMatch */:
+                    this.set('searchMatch', 'ParentOfMatch');
+                    break;
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SearchResult.prototype, "matchStart", {
+        get: function () {
+            return this.get('matchStart');
+        },
+        set: function (value) {
+            this.set('matchStart', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SearchResult.prototype, "matchEnd", {
+        get: function () {
+            return this.get('matchEnd');
+        },
+        set: function (value) {
+            this.set('matchEnd', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    return SearchResult;
+})(Backbone.Model);
 var SearchMatch;
 (function (SearchMatch) {
     SearchMatch[SearchMatch["NoMatch"] = 0] = "NoMatch";
@@ -93,7 +152,7 @@ var TodoModel = (function (_super) {
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
-        this.searchMatch = 0 /* NoMatch */;
+        this.searchResult = new SearchResult();
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'global-change', function () {
             if (_this.parent) {
@@ -185,35 +244,6 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('isHeader', value);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TodoModel.prototype, "searchMatch", {
-        // TODO: More DRY enum serialization
-        get: function () {
-            var result = this.get('searchMatch');
-            if (result === 'NoMatch')
-                return 0 /* NoMatch */;
-            if (result === 'Match')
-                return 2 /* Match */;
-            if (result === 'ParentOfMatch')
-                return 1 /* ParentOfMatch */;
-            throw 'aaaaaaghjkl';
-            return 0 /* NoMatch */;
-        },
-        set: function (value) {
-            switch (value) {
-                case 0 /* NoMatch */:
-                    this.set('searchMatch', 'NoMatch');
-                    break;
-                case 2 /* Match */:
-                    this.set('searchMatch', 'Match');
-                    break;
-                case 1 /* ParentOfMatch */:
-                    this.set('searchMatch', 'ParentOfMatch');
-                    break;
-            }
         },
         enumerable: true,
         configurable: true
@@ -1013,7 +1043,19 @@ var TodoView = (function (_super) {
             numActiveChildren: this.model.numActiveChildren,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         }, this.model.toJSON(), this.uiState.toJSON());
-        this.$el.html(this.template(renderOptions));
+        if (this.mainView.model.searchIsOngoing) {
+            var searchMatch = this.model.searchResult.searchMatch;
+            if (searchMatch === 2 /* Match */ || searchMatch === 1 /* ParentOfMatch */) {
+                this.$el.html(this.template(renderOptions));
+            }
+            else {
+                this.$el.empty();
+                return this;
+            }
+        }
+        else {
+            this.$el.html(this.template(renderOptions));
+        }
         var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
         // Update state per uiState
@@ -1270,6 +1312,16 @@ var TodoAppModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoAppModel.prototype, "searchIsOngoing", {
+        get: function () {
+            return this.get('searchIsOngoing');
+        },
+        set: function (value) {
+            this.set('searchIsOngoing', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoAppModel.prototype, "selectedTodo", {
         get: function () {
             return this.get('selectedTodo');
@@ -1419,7 +1471,24 @@ var MainView = (function (_super) {
         this.model.currentTodoView = todoView;
     };
     MainView.prototype.updateSearch = function () {
-        console.log('search');
+        var search = this.model.searchText;
+        var allTodos = this.model.baseTodoModel.flatten();
+        var todo;
+        // clear previous search results
+        _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
+        for (var i = 0; i < allTodos.length; i++) {
+            todo = allTodos[i];
+            if (todo.name.toLowerCase().indexOf(search.toLowerCase()) === -1)
+                continue;
+            var parents = todo.pathToRoot();
+            todo.searchResult.searchMatch = 2 /* Match */;
+            for (var j = 0; j < parents.length; j++) {
+                if (parents[j].searchResult.searchMatch == 0 /* NoMatch */)
+                    parents[j].searchResult.searchMatch = 1 /* ParentOfMatch */;
+            }
+        }
+        this.model.searchIsOngoing = true;
+        this.render();
     };
     return MainView;
 })(Backbone.View);
