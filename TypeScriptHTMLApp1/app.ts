@@ -1039,12 +1039,20 @@ class TodoView extends Backbone.View<TodoModel> {
     render(updateSidebar: boolean = true) {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
+            searchResultParent: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         } , this.model.toJSON()
           , this.uiState.toJSON());
 
         if (this.mainView.model.searchIsOngoing) {
             var searchMatch = this.model.searchResult.searchMatch;
+
+            if (searchMatch === SearchMatch.ParentOfMatch) {
+                renderOptions['searchResultParent'] = true;
+            }
+
+            console.log(searchMatch);
+            debugger;
 
             if (searchMatch === SearchMatch.Match ||
                 searchMatch === SearchMatch.ParentOfMatch) {
@@ -1460,13 +1468,13 @@ class MainView extends Backbone.View<TodoAppModel> {
     updateSearch() {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
-        var todo: TodoModel;
 
         // clear previous search results
         _.each(allTodos, m => m.searchResult.searchMatch = SearchMatch.NoMatch);
 
+        // At best this is O(n) (leaves first); the way we're doing it is O(n^2).
         for (var i = 0; i < allTodos.length; i++) {
-            todo = allTodos[i];
+            var todo = allTodos[i];
 
             if (todo.name.toLowerCase().indexOf(search.toLowerCase()) === -1) continue;
             var parents = todo.pathToRoot();

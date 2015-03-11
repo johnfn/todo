@@ -1041,10 +1041,16 @@ var TodoView = (function (_super) {
         if (updateSidebar === void 0) { updateSidebar = true; }
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
+            searchResultParent: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         }, this.model.toJSON(), this.uiState.toJSON());
         if (this.mainView.model.searchIsOngoing) {
             var searchMatch = this.model.searchResult.searchMatch;
+            if (searchMatch === 1 /* ParentOfMatch */) {
+                renderOptions['searchResultParent'] = true;
+            }
+            console.log(searchMatch);
+            debugger;
             if (searchMatch === 2 /* Match */ || searchMatch === 1 /* ParentOfMatch */) {
                 this.$el.html(this.template(renderOptions));
             }
@@ -1473,11 +1479,10 @@ var MainView = (function (_super) {
     MainView.prototype.updateSearch = function () {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
-        var todo;
         // clear previous search results
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
         for (var i = 0; i < allTodos.length; i++) {
-            todo = allTodos[i];
+            var todo = allTodos[i];
             if (todo.name.toLowerCase().indexOf(search.toLowerCase()) === -1)
                 continue;
             var parents = todo.pathToRoot();

@@ -59,11 +59,11 @@
 
 <script type="text/template" id="todo">
         <div class="todo 
-             <% if (searchResultParent) print('search-result-parent') %>
 			 <% if (selected) print ('selected') %>
 			 <% if (isDraggedOver && !isDraggedOverAsChild) print ('dragged-over') %>
 			 <% if (isDraggedOverAsChild) print ('dragged-over-as-child') %>">
-            <div class="todo-name">
+            <div class="todo-name
+                 <% if (searchResultParent) print('search-result-parent') %>">
                 <span class="edit-name-js todo-name-content
 					  <% if (done) print('todo-done') %>
 					  <% if (isHeader) print('todo-header') %>">
