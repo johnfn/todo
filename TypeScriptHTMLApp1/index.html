@@ -59,6 +59,7 @@
 
 <script type="text/template" id="todo">
         <div class="todo 
+             <% if (searchResultParent) print('search-result-parent') %>
 			 <% if (selected) print ('selected') %>
 			 <% if (isDraggedOver && !isDraggedOverAsChild) print ('dragged-over') %>
 			 <% if (isDraggedOverAsChild) print ('dragged-over-as-child') %>">
@@ -154,12 +155,12 @@
 
         <% if (!archived) { %>
             <div>
-                <input type="checkbox" class="header-checkbox-js" <% if (isHeader) print('checked') %>/>Header
+                <input type="checkbox" class="header-checkbox-js" <% if (isHeader) print('checked') %>/> Header
             </div>
         <% } %>
 
         <div>
-            <input type="checkbox" class="archived-checkbox-js"  <% if (archived) print('checked') %>/>Archived
+            <input type="checkbox" class="archived-checkbox-js"  <% if (archived) print('checked') %>/> Archived
         </div>
 	</script>
 
