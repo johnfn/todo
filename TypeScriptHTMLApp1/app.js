@@ -1606,7 +1606,7 @@ var MainView = (function (_super) {
         if (!this.model.searchIsOngoing) {
             return;
         }
-        $('.search-input').val('');
+        $('.search-input').val('').blur();
         this.model.searchIsOngoing = false;
         this.model.searchText = '';
         if (restorePreviousZoomLevel) {

@@ -1570,7 +1570,7 @@ class MainView extends Backbone.View<TodoAppModel> {
             return;
         }
 
-        $('.search-input').val('');
+        $('.search-input').val('').blur();
 
         this.model.searchIsOngoing = false;
         this.model.searchText = '';
