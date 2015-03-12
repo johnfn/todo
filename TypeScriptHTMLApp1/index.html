@@ -84,7 +84,11 @@
                             <%= name %>
                         <% } else { %>
                             <a href="#" class="search-link">
-                                <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                                <% if (!isMatchInContent) { %>
+                                    <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                                <% } else { %>
+                                    <%= name %>
+                                <% } %>
                             </a>
                         <% } %>
                     <% } %>
@@ -112,7 +116,13 @@
             </div>
 
             <% if (content.length > 0) { %>
-                <div class="todo-content edit-content-js"> <%= content %> </div>
+                <div class="todo-content edit-content-js"> 
+                    <% if (searchMatch && isMatchInContent) { %>
+                        <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                    <% } else { %>
+                        <%= content %> 
+                    <% } %>
+                </div>
             <% } %>
             <input class='content-edit-js'/>
 

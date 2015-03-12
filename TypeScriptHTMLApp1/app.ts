@@ -56,6 +56,10 @@ class SearchResult extends Backbone.Model {
     get isFirstMatch(): boolean { return this.get('isFirstMatch'); }
     set isFirstMatch(value: boolean) { this.set('isFirstMatch', value); }
 
+    /** True if the match is in the content; false if it is in the name. */
+    get isMatchInContent(): boolean { return this.get('isMatchInContent'); }
+    set isMatchInContent(value: boolean) { this.set('isMatchInContent', value); }
+
     get matchStart(): number { return this.get('matchStart'); }
     set matchStart(value: number) { this.set('matchStart', value); }
 
@@ -1061,6 +1065,7 @@ class TodoView extends Backbone.View<TodoModel> {
             searchResultParent: false,
             searchMatch: false,
             isFirstMatch: false,
+            isMatchInContent: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         } , this.model.toJSON()
           , this.uiState.toJSON());
@@ -1075,13 +1080,14 @@ class TodoView extends Backbone.View<TodoModel> {
             if (searchMatch === SearchMatch.Match) {
                 var start = this.model.searchResult.matchStart;
                 var end = this.model.searchResult.matchEnd;
-                var name = this.model.name;
+                var matchedText = this.model.searchResult.isMatchInContent ? this.model.content : this.model.name;
 
                 _.extend(renderOptions, {
-                    firstSearchText: name.substring(0, start),
-                    middleSearchText: name.substring(start, end),
-                    finalSearchText: name.substring(end),
+                    firstSearchText: matchedText.substring(0, start),
+                    middleSearchText: matchedText.substring(start, end),
+                    finalSearchText: matchedText.substring(end),
                     isFirstMatch: this.model.searchResult.isFirstMatch,
+                    isMatchInContent: this.model.searchResult.isMatchInContent,
                     searchMatch: true
                 });
             }
@@ -1554,9 +1560,20 @@ class MainView extends Backbone.View<TodoAppModel> {
         // At best this algo could be O(n) (leaves first); the way we're doing it is O(n^2).
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
-            var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
 
-            if (matchPosition === -1) continue;
+            // First try name...
+            var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
+            todo.searchResult.isMatchInContent = false;
+
+            // Then try content...
+            if (matchPosition === -1) {
+                matchPosition = todo.content.toLowerCase().indexOf(search.toLowerCase());
+                todo.searchResult.isMatchInContent = true;
+            }
+
+            if (matchPosition === -1) {
+                continue;
+            }
 
             var parents = todo.pathToRoot();
 

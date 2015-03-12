@@ -77,6 +77,17 @@ var SearchResult = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(SearchResult.prototype, "isMatchInContent", {
+        /** True if the match is in the content; false if it is in the name. */
+        get: function () {
+            return this.get('isMatchInContent');
+        },
+        set: function (value) {
+            this.set('isMatchInContent', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(SearchResult.prototype, "matchStart", {
         get: function () {
             return this.get('matchStart');
@@ -1076,6 +1087,7 @@ var TodoView = (function (_super) {
             searchResultParent: false,
             searchMatch: false,
             isFirstMatch: false,
+            isMatchInContent: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         }, this.model.toJSON(), this.uiState.toJSON());
         if (this.mainView.model.searchIsOngoing) {
@@ -1086,12 +1098,13 @@ var TodoView = (function (_super) {
             if (searchMatch === 2 /* Match */) {
                 var start = this.model.searchResult.matchStart;
                 var end = this.model.searchResult.matchEnd;
-                var name = this.model.name;
+                var matchedText = this.model.searchResult.isMatchInContent ? this.model.content : this.model.name;
                 _.extend(renderOptions, {
-                    firstSearchText: name.substring(0, start),
-                    middleSearchText: name.substring(start, end),
-                    finalSearchText: name.substring(end),
+                    firstSearchText: matchedText.substring(0, start),
+                    middleSearchText: matchedText.substring(start, end),
+                    finalSearchText: matchedText.substring(end),
                     isFirstMatch: this.model.searchResult.isFirstMatch,
+                    isMatchInContent: this.model.searchResult.isMatchInContent,
                     searchMatch: true
                 });
             }
@@ -1571,9 +1584,17 @@ var MainView = (function (_super) {
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
+            // First try name...
             var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
-            if (matchPosition === -1)
+            todo.searchResult.isMatchInContent = false;
+            // Then try content...
+            if (matchPosition === -1) {
+                matchPosition = todo.content.toLowerCase().indexOf(search.toLowerCase());
+                todo.searchResult.isMatchInContent = true;
+            }
+            if (matchPosition === -1) {
                 continue;
+            }
             var parents = todo.pathToRoot();
             todo.searchResult.searchMatch = 2 /* Match */;
             todo.searchResult.matchStart = matchPosition;
