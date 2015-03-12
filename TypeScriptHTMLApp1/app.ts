@@ -1474,6 +1474,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     zoomTo(todoView: TodoView) {
+        this.model.searchIsOngoing = false;
         this.model.currentTodoView = todoView;
     }
 

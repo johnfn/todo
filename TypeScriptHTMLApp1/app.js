@@ -1485,6 +1485,7 @@ var MainView = (function (_super) {
         });
     };
     MainView.prototype.zoomTo = function (todoView) {
+        this.model.searchIsOngoing = false;
         this.model.currentTodoView = todoView;
     };
     MainView.prototype.updateSearch = function () {
