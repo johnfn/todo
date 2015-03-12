@@ -82,7 +82,9 @@
                         <% if (!searchMatch) { %>
                             <%= name %>
                         <% } else { %>
-                            <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                            <a href="#" class="search-link">
+                                <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                            </a>
                         <% } %>
                     <% } %>
 				</span>

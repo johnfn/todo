@@ -655,6 +655,7 @@ class TodoView extends Backbone.View<TodoModel> {
 		    'click .todo-remove-js': this.clickRemoveTodo,
 		    'click .todo-zoom-js': this.clickZoomTodo,
 		    'click .todo-hide-js': this.clickHideTodo,
+            'click .search-link': this.clickZoomTodo,
             'keyup .name-edit': this.editName,
 		    'dragstart .todo-done-js': this.startDrag,
 		    'mouseover': this.mouseoverStartDrag,
