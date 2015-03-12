@@ -1523,13 +1523,24 @@ var MainView = (function (_super) {
             return true;
         }
         if (e.which === 27) {
+            // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
                 $('.search-input').val('');
                 this.model.searchText = '';
                 this.model.searchIsOngoing = false;
                 this.render();
+                return true;
             }
-            return true;
+            else {
+                // Up one step in the todo heirarchy stack (if there is one)
+                if (this.model.currentTodoView !== this.model.baseTodoView) {
+                    this.zoomTo(this.model.currentTodoModel.parent.view);
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
         }
         return false;
     };
@@ -1551,6 +1562,11 @@ var MainView = (function (_super) {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
         var foundMatch = false;
+        if (search == "") {
+            this.model.searchIsOngoing = false;
+            this.render();
+            return;
+        }
         // clear previous search results
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
         for (var i = 0; i < allTodos.length; i++) {

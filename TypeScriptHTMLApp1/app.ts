@@ -1492,16 +1492,27 @@ class MainView extends Backbone.View<TodoAppModel> {
             return true;
         }
 
-        if (e.which === 27) {
+        if (e.which === 27) { // ESC
+
+            // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
                 $('.search-input').val('');
 
                 this.model.searchText = '';
                 this.model.searchIsOngoing = false;
                 this.render();
-            }
 
-            return true;
+                return true;
+            } else {
+                // Up one step in the todo heirarchy stack (if there is one)
+                if (this.model.currentTodoView !== this.model.baseTodoView) {
+                    this.zoomTo(this.model.currentTodoModel.parent.view);
+
+                    return true;
+                } else {
+                    return false;
+                }
+            }
         }
 
         return false;
@@ -1529,6 +1540,13 @@ class MainView extends Backbone.View<TodoAppModel> {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
         var foundMatch = false;
+
+        if (search == "") {
+            this.model.searchIsOngoing = false;
+            this.render();
+
+            return;
+        }
 
         // clear previous search results
         _.each(allTodos, m => m.searchResult.searchMatch = SearchMatch.NoMatch);
