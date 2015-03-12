@@ -1600,6 +1600,7 @@ var MainView = (function (_super) {
     MainView.prototype.zoomTo = function (todoView) {
         this.stopSearch(false);
         this.model.currentTodoView = todoView;
+        this.model.currentTodoModel.uiState.selected = true;
     };
     MainView.prototype.stopSearch = function (restorePreviousZoomLevel) {
         if (restorePreviousZoomLevel === void 0) { restorePreviousZoomLevel = true; }

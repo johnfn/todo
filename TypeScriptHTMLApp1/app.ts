@@ -1563,6 +1563,7 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.stopSearch(false);
 
         this.model.currentTodoView = todoView;
+        this.model.currentTodoModel.uiState.selected = true;
     }
 
     stopSearch(restorePreviousZoomLevel: boolean = true) {
