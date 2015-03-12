@@ -1483,7 +1483,7 @@ class MainView extends Backbone.View<TodoAppModel> {
         // clear previous search results
         _.each(allTodos, m => m.searchResult.searchMatch = SearchMatch.NoMatch);
 
-        // At best this is O(n) (leaves first); the way we're doing it is O(n^2).
+        // At best this algo could be O(n) (leaves first); the way we're doing it is O(n^2).
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
             var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
@@ -1573,12 +1573,21 @@ $(() => {
 	});
 
     $('body').on('keydown', (e: JQueryKeyEventObject) => {
+        // Ctrl + S: Save dialog
 		if (e.which === 83 && e.ctrlKey) {
 			e.preventDefault();
 			autosaveView.render();
 
 			return;
 		}
+
+        // Ctrl + F (or / for vim users! :): Focus on find textbox
+        if (!$('.search-input').is(':focus') && 
+            ((e.which == 70 && e.ctrlKey) || e.which == 191)) {
+            $('.search-input').focus();
+
+            return false;
+        }
 
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e))

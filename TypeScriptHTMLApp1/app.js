@@ -1575,10 +1575,16 @@ $(function () {
         collection: mainView.savedData
     });
     $('body').on('keydown', function (e) {
+        // Ctrl + S: Save dialog
         if (e.which === 83 && e.ctrlKey) {
             e.preventDefault();
             autosaveView.render();
             return;
+        }
+        // Ctrl + F (or / for vim users! :): Focus on find textbox
+        if (!$('.search-input').is(':focus') && ((e.which == 70 && e.ctrlKey) || e.which == 191)) {
+            $('.search-input').focus();
+            return false;
         }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e))
