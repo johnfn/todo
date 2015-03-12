@@ -718,6 +718,8 @@ class TodoView extends Backbone.View<TodoModel> {
 	// that would force a render(), which would re-render the selection box and
 	// quit the drag.
 	mouseoverStartDrag() {
+        debugger;
+
 		if (!this.mainView.model.isDragging)
 			this.uiState.selected = true;
 
@@ -1037,10 +1039,15 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
-    // NOTE: render() should not be called on views that are not currently
-    // being displayed; their children will disappear. 
-    // Checking if every node exists is O(n^2) naively which doesn't seem worth it...
     render(updateSidebar: boolean = true) {
+        // If this is not a visible todo, then exit early, because having us
+        // try to render our children may destroy otherwise visible nodes.
+        var topmostVisibleTodo = this.mainView.model.currentTodoModel;
+        if (topmostVisibleTodo) {
+            var visibleTodoModels = topmostVisibleTodo.flatten();
+            if (visibleTodoModels.indexOf(this.model) === -1) return this;
+        }
+
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
@@ -1352,6 +1359,9 @@ class TodoAppModel extends Backbone.Model {
     get searchIsOngoing(): boolean { return this.get('searchIsOngoing'); }
     set searchIsOngoing(value: boolean) { this.set('searchIsOngoing', value); }
 
+    get selectedSearchModel(): TodoModel { return this.get('selectedSearchModel'); }
+    set selectedSearchModel(value: TodoModel) { this.set('selectedSearchModel', value); }
+
     get selectedTodo(): TodoModel { return this.get('selectedTodo'); }
     set selectedTodo(value: TodoModel) { this.set('selectedTodo', value); }
 
@@ -1366,7 +1376,13 @@ class TodoAppModel extends Backbone.Model {
 
     get baseTodoModel(): TodoModel { return this.baseTodoView.model;  }
 
-    get currentTodoModel(): TodoModel { return this.currentTodoView.model;  }
+    get currentTodoModel(): TodoModel {
+        if (!this.currentTodoView) {
+            return null;
+        }
+
+        return this.currentTodoView.model;
+    }
 
     get currentTodoStack(): TodoModel[] {
         return this.currentTodoModel.pathToRoot().reverse();
@@ -1462,6 +1478,10 @@ class MainView extends Backbone.View<TodoAppModel> {
 	}
 
     keydown(e: JQueryKeyEventObject): boolean {
+        if (e.which === 13 && $('.search-input').is(':focus')) {
+            this.zoomTo(this.model.selectedSearchModel.view);
+        }
+
         return true;
     }
 
@@ -1504,6 +1524,10 @@ class MainView extends Backbone.View<TodoAppModel> {
             todo.searchResult.matchStart = matchPosition;
             todo.searchResult.matchEnd = matchPosition + search.length;
             todo.searchResult.isFirstMatch = !foundMatch;
+
+            if (todo.searchResult.isFirstMatch) {
+                this.model.selectedSearchModel = todo;
+            }
 
             for (var j = 0; j < parents.length; j++) {
                 if (parents[j].searchResult.searchMatch == SearchMatch.NoMatch)
@@ -1584,6 +1608,8 @@ $(() => {
 	});
 
     $('body').on('keydown', (e: JQueryKeyEventObject) => {
+        // TODO: Move these 2 into mainview
+
         // Ctrl + S: Save dialog
 		if (e.which === 83 && e.ctrlKey) {
 			e.preventDefault();
@@ -1600,9 +1626,14 @@ $(() => {
             return false;
         }
 
+        if (mainView.keydown(e)) {
+            return;
+        }
+
         for (var i = 0; i < TodoView.todoViews.length; i++) {
-            if (!TodoView.todoViews[i].keydown(e))
-                break; // stop propagation
+            if (!TodoView.todoViews[i].keydown(e)) {
+                break;
+            }
         }
     });
 });

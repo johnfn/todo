@@ -805,6 +805,7 @@ var TodoView = (function (_super) {
     // that would force a render(), which would re-render the selection box and
     // quit the drag.
     TodoView.prototype.mouseoverStartDrag = function () {
+        debugger;
         if (!this.mainView.model.isDragging)
             this.uiState.selected = true;
         return false;
@@ -1045,11 +1046,16 @@ var TodoView = (function (_super) {
         this.render();
         return false;
     };
-    // NOTE: render() should not be called on views that are not currently
-    // being displayed; their children will disappear. 
-    // Checking if every node exists is O(n^2) naively which doesn't seem worth it...
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
+        // If this is not a visible todo, then exit early, because having us
+        // try to render our children may destroy otherwise visible nodes.
+        var topmostVisibleTodo = this.mainView.model.currentTodoModel;
+        if (topmostVisibleTodo) {
+            var visibleTodoModels = topmostVisibleTodo.flatten();
+            if (visibleTodoModels.indexOf(this.model) === -1)
+                return this;
+        }
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
@@ -1351,6 +1357,16 @@ var TodoAppModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoAppModel.prototype, "selectedSearchModel", {
+        get: function () {
+            return this.get('selectedSearchModel');
+        },
+        set: function (value) {
+            this.set('selectedSearchModel', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoAppModel.prototype, "selectedTodo", {
         get: function () {
             return this.get('selectedTodo');
@@ -1400,6 +1416,9 @@ var TodoAppModel = (function (_super) {
     });
     Object.defineProperty(TodoAppModel.prototype, "currentTodoModel", {
         get: function () {
+            if (!this.currentTodoView) {
+                return null;
+            }
             return this.currentTodoView.model;
         },
         enumerable: true,
@@ -1484,6 +1503,9 @@ var MainView = (function (_super) {
         this.model.currentTodoView = this.model.baseTodoView;
     };
     MainView.prototype.keydown = function (e) {
+        if (e.which === 13 && $('.search-input').is(':focus')) {
+            this.zoomTo(this.model.selectedSearchModel.view);
+        }
         return true;
     };
     MainView.prototype.render = function () {
@@ -1516,6 +1538,9 @@ var MainView = (function (_super) {
             todo.searchResult.matchStart = matchPosition;
             todo.searchResult.matchEnd = matchPosition + search.length;
             todo.searchResult.isFirstMatch = !foundMatch;
+            if (todo.searchResult.isFirstMatch) {
+                this.model.selectedSearchModel = todo;
+            }
             for (var j = 0; j < parents.length; j++) {
                 if (parents[j].searchResult.searchMatch == 0 /* NoMatch */)
                     parents[j].searchResult.searchMatch = 1 /* ParentOfMatch */;
@@ -1592,6 +1617,7 @@ $(function () {
         collection: mainView.savedData
     });
     $('body').on('keydown', function (e) {
+        // TODO: Move these 2 into mainview
         // Ctrl + S: Save dialog
         if (e.which === 83 && e.ctrlKey) {
             e.preventDefault();
@@ -1603,9 +1629,13 @@ $(function () {
             $('.search-input').focus();
             return false;
         }
+        if (mainView.keydown(e)) {
+            return;
+        }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
-            if (!TodoView.todoViews[i].keydown(e))
-                break; // stop propagation
+            if (!TodoView.todoViews[i].keydown(e)) {
+                break;
+            }
         }
     });
 });
