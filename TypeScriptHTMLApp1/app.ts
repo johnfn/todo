@@ -1478,9 +1478,11 @@ class MainView extends Backbone.View<TodoAppModel> {
     keydown(e: JQueryKeyEventObject): boolean {
         if (e.which === 13 && $('.search-input').is(':focus')) {
             this.zoomTo(this.model.selectedSearchModel.view);
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     render(): Backbone.View<TodoAppModel> {
@@ -1622,6 +1624,10 @@ $(() => {
             $('.search-input').focus();
 
             return false;
+        }
+
+        if (mainView.keydown(e)) {
+            return;
         }
 
         for (var i = 0; i < TodoView.todoViews.length; i++) {

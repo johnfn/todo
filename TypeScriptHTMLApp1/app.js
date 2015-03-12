@@ -1504,8 +1504,9 @@ var MainView = (function (_super) {
     MainView.prototype.keydown = function (e) {
         if (e.which === 13 && $('.search-input').is(':focus')) {
             this.zoomTo(this.model.selectedSearchModel.view);
+            return true;
         }
-        return true;
+        return false;
     };
     MainView.prototype.render = function () {
         this.$el.html(this.template());
@@ -1627,6 +1628,9 @@ $(function () {
         if (!$('.search-input').is(':focus') && ((e.which == 70 && e.ctrlKey) || e.which == 191)) {
             $('.search-input').focus();
             return false;
+        }
+        if (mainView.keydown(e)) {
+            return;
         }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e)) {
