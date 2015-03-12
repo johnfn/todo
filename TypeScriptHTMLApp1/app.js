@@ -1522,6 +1522,15 @@ var MainView = (function (_super) {
             this.zoomTo(this.model.selectedSearchModel.view);
             return true;
         }
+        if (e.which === 27) {
+            if (this.model.searchIsOngoing) {
+                $('.search-input').val('');
+                this.model.searchText = '';
+                this.model.searchIsOngoing = false;
+                this.render();
+            }
+            return true;
+        }
         return false;
     };
     MainView.prototype.render = function () {

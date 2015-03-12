@@ -1492,6 +1492,18 @@ class MainView extends Backbone.View<TodoAppModel> {
             return true;
         }
 
+        if (e.which === 27) {
+            if (this.model.searchIsOngoing) {
+                $('.search-input').val('');
+
+                this.model.searchText = '';
+                this.model.searchIsOngoing = false;
+                this.render();
+            }
+
+            return true;
+        }
+
         return false;
     }
 
