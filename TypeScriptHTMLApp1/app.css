@@ -199,3 +199,7 @@ a {
 .search-match {
     background-color: lightcyan;
 }
+
+.first-match {
+    font-weight: bold;
+}

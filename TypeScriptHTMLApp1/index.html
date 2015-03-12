@@ -63,6 +63,7 @@
 			 <% if (isDraggedOver && !isDraggedOverAsChild) print ('dragged-over') %>
 			 <% if (isDraggedOverAsChild) print ('dragged-over-as-child') %>">
             <div class="todo-name
+                 <% if (isFirstMatch) print('search-match') %>
                  <% if (searchResultParent) print('search-result-parent') %>">
                 <span class="edit-name-js todo-name-content
 					  <% if (done) print('todo-done') %>

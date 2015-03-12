@@ -53,6 +53,9 @@ class SearchResult extends Backbone.Model {
         }
     }
 
+    get isFirstMatch(): boolean { return this.get('isFirstMatch'); }
+    set isFirstMatch(value: boolean) { this.set('isFirstMatch', value); }
+
     get matchStart(): number { return this.get('matchStart'); }
     set matchStart(value: number) { this.set('matchStart', value); }
 
@@ -1042,6 +1045,7 @@ class TodoView extends Backbone.View<TodoModel> {
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
             searchMatch: false,
+            isFirstMatch: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         } , this.model.toJSON()
           , this.uiState.toJSON());
@@ -1062,6 +1066,7 @@ class TodoView extends Backbone.View<TodoModel> {
                     firstSearchText: name.substring(0, start),
                     middleSearchText: name.substring(start, end),
                     finalSearchText: name.substring(end),
+                    isFirstMatch: this.model.searchResult.isFirstMatch,
                     searchMatch: true
                 });
             }
@@ -1481,6 +1486,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     updateSearch() {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
+        var foundMatch = false;
 
         // clear previous search results
         _.each(allTodos, m => m.searchResult.searchMatch = SearchMatch.NoMatch);
@@ -1497,11 +1503,14 @@ class MainView extends Backbone.View<TodoAppModel> {
             todo.searchResult.searchMatch = SearchMatch.Match;
             todo.searchResult.matchStart = matchPosition;
             todo.searchResult.matchEnd = matchPosition + search.length;
+            todo.searchResult.isFirstMatch = !foundMatch;
 
             for (var j = 0; j < parents.length; j++) {
                 if (parents[j].searchResult.searchMatch == SearchMatch.NoMatch)
                     parents[j].searchResult.searchMatch = SearchMatch.ParentOfMatch;
             }
+
+            foundMatch = true;
         }
 
         this.model.searchIsOngoing = true;

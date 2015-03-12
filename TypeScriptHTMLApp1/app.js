@@ -67,6 +67,16 @@ var SearchResult = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(SearchResult.prototype, "isFirstMatch", {
+        get: function () {
+            return this.get('isFirstMatch');
+        },
+        set: function (value) {
+            this.set('isFirstMatch', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(SearchResult.prototype, "matchStart", {
         get: function () {
             return this.get('matchStart');
@@ -1044,6 +1054,7 @@ var TodoView = (function (_super) {
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
             searchMatch: false,
+            isFirstMatch: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
         }, this.model.toJSON(), this.uiState.toJSON());
         if (this.mainView.model.searchIsOngoing) {
@@ -1059,6 +1070,7 @@ var TodoView = (function (_super) {
                     firstSearchText: name.substring(0, start),
                     middleSearchText: name.substring(start, end),
                     finalSearchText: name.substring(end),
+                    isFirstMatch: this.model.searchResult.isFirstMatch,
                     searchMatch: true
                 });
             }
@@ -1491,6 +1503,7 @@ var MainView = (function (_super) {
     MainView.prototype.updateSearch = function () {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
+        var foundMatch = false;
         // clear previous search results
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
         for (var i = 0; i < allTodos.length; i++) {
@@ -1502,10 +1515,12 @@ var MainView = (function (_super) {
             todo.searchResult.searchMatch = 2 /* Match */;
             todo.searchResult.matchStart = matchPosition;
             todo.searchResult.matchEnd = matchPosition + search.length;
+            todo.searchResult.isFirstMatch = !foundMatch;
             for (var j = 0; j < parents.length; j++) {
                 if (parents[j].searchResult.searchMatch == 0 /* NoMatch */)
                     parents[j].searchResult.searchMatch = 1 /* ParentOfMatch */;
             }
+            foundMatch = true;
         }
         this.model.searchIsOngoing = true;
         this.render();
