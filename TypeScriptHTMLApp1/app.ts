@@ -343,6 +343,14 @@ class TodoModel extends Backbone.Model implements ITodo {
             return this.parent.children[this.childIndex - 1];
         }
     }
+
+    get doneCount(): number {
+        return _.filter(this.flatten(), m => m.archived || m.done).length;
+    }
+
+    get totalCount(): number {
+        return this.flatten().length;
+    }
 }
 
 class TodoUiState extends Backbone.Model {
@@ -614,7 +622,9 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 		var createdDateAgo = $.timeago(new Date(this.model.createdDate));
 
 		this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
-			createdDate: createdDateAgo
+            createdDate: createdDateAgo,
+            doneCount: this.model.doneCount,
+            totalCount: this.model.totalCount
 		})));
 
         if (this.uiState.isEditingContent) {

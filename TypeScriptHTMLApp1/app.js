@@ -440,6 +440,20 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoModel.prototype, "doneCount", {
+        get: function () {
+            return _.filter(this.flatten(), function (m) { return m.archived || m.done; }).length;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "totalCount", {
+        get: function () {
+            return this.flatten().length;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return TodoModel;
 })(Backbone.Model);
 var TodoUiState = (function (_super) {
@@ -728,7 +742,9 @@ var TodoDetailView = (function (_super) {
     TodoDetailView.prototype.render = function () {
         var createdDateAgo = $.timeago(new Date(this.model.createdDate));
         this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
-            createdDate: createdDateAgo
+            createdDate: createdDateAgo,
+            doneCount: this.model.doneCount,
+            totalCount: this.model.totalCount
         })));
         if (this.uiState.isEditingContent) {
             this.$('.content-edit-js').focus().select();
