@@ -805,7 +805,6 @@ var TodoView = (function (_super) {
     // that would force a render(), which would re-render the selection box and
     // quit the drag.
     TodoView.prototype.mouseoverStartDrag = function () {
-        debugger;
         if (!this.mainView.model.isDragging)
             this.uiState.selected = true;
         return false;
@@ -1628,9 +1627,6 @@ $(function () {
         if (!$('.search-input').is(':focus') && ((e.which == 70 && e.ctrlKey) || e.which == 191)) {
             $('.search-input').focus();
             return false;
-        }
-        if (mainView.keydown(e)) {
-            return;
         }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e)) {

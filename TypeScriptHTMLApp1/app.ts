@@ -718,8 +718,6 @@ class TodoView extends Backbone.View<TodoModel> {
 	// that would force a render(), which would re-render the selection box and
 	// quit the drag.
 	mouseoverStartDrag() {
-        debugger;
-
 		if (!this.mainView.model.isDragging)
 			this.uiState.selected = true;
 
@@ -1624,10 +1622,6 @@ $(() => {
             $('.search-input').focus();
 
             return false;
-        }
-
-        if (mainView.keydown(e)) {
-            return;
         }
 
         for (var i = 0; i < TodoView.todoViews.length; i++) {
