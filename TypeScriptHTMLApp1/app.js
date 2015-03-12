@@ -1364,6 +1364,7 @@ var TodoAppModel = (function (_super) {
     }
     TodoAppModel.prototype.initialize = function () {
         this.isDragging = false;
+        this.cachedTodoView = null;
     };
     Object.defineProperty(TodoAppModel.prototype, "searchText", {
         get: function () {
@@ -1435,6 +1436,19 @@ var TodoAppModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoAppModel.prototype, "cachedTodoView", {
+        // In case you're in the middle of an operation that changes your currentTodoView,
+        // but that could become reverted.
+        // Currently only used for search.
+        get: function () {
+            return this.get('cachedTodoView');
+        },
+        set: function (value) {
+            this.set('cachedTodoView', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoAppModel.prototype, "baseTodoModel", {
         get: function () {
             return this.baseTodoView.model;
@@ -1461,6 +1475,25 @@ var TodoAppModel = (function (_super) {
     });
     return TodoAppModel;
 })(Backbone.Model);
+var BreadcrumbModel = (function (_super) {
+    __extends(BreadcrumbModel, _super);
+    function BreadcrumbModel() {
+        _super.apply(this, arguments);
+    }
+    // TODO set el in parent
+    BreadcrumbModel.prototype.initialize = function (attrs) {
+        this.template = Util.getTemplate('breadcrumb-bar');
+        this.listenTo(this.model, 'change:currentTodoView', this.render);
+        this.render();
+    };
+    BreadcrumbModel.prototype.render = function () {
+        this.$el.html(this.template({
+            parents: this.model.currentTodoStack
+        }));
+        return this;
+    };
+    return BreadcrumbModel;
+})(Backbone.View);
 var TopBarView = (function (_super) {
     __extends(TopBarView, _super);
     function TopBarView() {
@@ -1475,7 +1508,6 @@ var TopBarView = (function (_super) {
     TopBarView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.topbar-container'));
-        this.listenTo(this.model, 'change:currentTodoView', this.render);
         this.render();
     };
     TopBarView.prototype.changeZoom = function (e) {
@@ -1489,10 +1521,11 @@ var TopBarView = (function (_super) {
         return false;
     };
     TopBarView.prototype.render = function () {
-        var templateOpts = _.extend({}, this.model.toJSON(), {
-            parents: this.model.currentTodoStack
+        this.$el.html(this.template(this.model.toJSON()));
+        var breadcrumbView = new BreadcrumbModel({
+            model: this.model,
+            el: this.$('.breadcrumb-container')
         });
-        this.$el.html(this.template(templateOpts));
         return this;
     };
     return TopBarView;
@@ -1538,10 +1571,7 @@ var MainView = (function (_super) {
         if (e.which === 27) {
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
-                $('.search-input').val('');
-                this.model.searchText = '';
-                this.model.searchIsOngoing = false;
-                this.render();
+                this.stopSearch();
                 return true;
             }
             else {
@@ -1568,17 +1598,34 @@ var MainView = (function (_super) {
         });
     };
     MainView.prototype.zoomTo = function (todoView) {
-        this.model.searchIsOngoing = false;
+        this.stopSearch(false);
         this.model.currentTodoView = todoView;
+    };
+    MainView.prototype.stopSearch = function (restorePreviousZoomLevel) {
+        if (restorePreviousZoomLevel === void 0) { restorePreviousZoomLevel = true; }
+        if (!this.model.searchIsOngoing) {
+            return;
+        }
+        $('.search-input').val('');
+        this.model.searchIsOngoing = false;
+        this.model.searchText = '';
+        if (restorePreviousZoomLevel) {
+            this.model.currentTodoView = this.model.cachedTodoView;
+        }
+        this.model.cachedTodoView = null;
+        this.render();
     };
     MainView.prototype.updateSearch = function () {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
         var foundMatch = false;
         if (search == "") {
-            this.model.searchIsOngoing = false;
-            this.render();
+            this.stopSearch();
             return;
+        }
+        if (!this.model.searchIsOngoing) {
+            this.model.cachedTodoView = this.model.currentTodoView;
+            this.model.currentTodoView = this.model.baseTodoView;
         }
         // clear previous search results
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });

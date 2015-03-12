@@ -1365,6 +1365,7 @@ class TodoArchiveView extends Backbone.View<TodoModel> {
 class TodoAppModel extends Backbone.Model {
 	initialize() {
 		this.isDragging = false;
+        this.cachedTodoView = null;
 	}
 
     get searchText(): string { return this.get('searchText'); }
@@ -1388,6 +1389,12 @@ class TodoAppModel extends Backbone.Model {
     get currentTodoView(): TodoView { return this.get('currentTodoView'); }
     set currentTodoView(value: TodoView) { this.set('currentTodoView', value); }
 
+    // In case you're in the middle of an operation that changes your currentTodoView,
+    // but that could become reverted.
+    // Currently only used for search.
+    get cachedTodoView(): TodoView { return this.get('cachedTodoView'); }
+    set cachedTodoView(value: TodoView) { this.set('cachedTodoView', value); }
+
     get baseTodoModel(): TodoModel { return this.baseTodoView.model;  }
 
     get currentTodoModel(): TodoModel {
@@ -1400,6 +1407,26 @@ class TodoAppModel extends Backbone.Model {
 
     get currentTodoStack(): TodoModel[] {
         return this.currentTodoModel.pathToRoot().reverse();
+    }
+}
+
+class BreadcrumbModel extends Backbone.View<TodoAppModel> {
+    template: ITemplate;
+
+    // TODO set el in parent
+    initialize(attrs?: any) {
+        this.template = Util.getTemplate('breadcrumb-bar');
+
+        this.listenTo(this.model, 'change:currentTodoView', this.render);
+        this.render();
+    }
+
+    render() {
+        this.$el.html(this.template({
+            parents: this.model.currentTodoStack
+        }));
+
+        return this;
     }
 }
 
@@ -1417,7 +1444,6 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.topbar-container'));
 
-        this.listenTo(this.model, 'change:currentTodoView', this.render);
         this.render();
     }
 
@@ -1433,16 +1459,16 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         var search: string = this.$('.search-input').val();
 
         this.model.searchText = search;
-
         return false;
     }
 
     render():TopBarView {
-        var templateOpts = _.extend({}, this.model.toJSON(), {
-            parents: this.model.currentTodoStack
-        });
+        this.$el.html(this.template(this.model.toJSON()));
 
-        this.$el.html(this.template(templateOpts));
+        var breadcrumbView = new BreadcrumbModel({
+            model: this.model,
+            el: this.$('.breadcrumb-container')
+        });
 
         return this;
     }
@@ -1502,11 +1528,7 @@ class MainView extends Backbone.View<TodoAppModel> {
 
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
-                $('.search-input').val('');
-
-                this.model.searchText = '';
-                this.model.searchIsOngoing = false;
-                this.render();
+                this.stopSearch();
 
                 return true;
             } else {
@@ -1538,8 +1560,28 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     zoomTo(todoView: TodoView) {
-        this.model.searchIsOngoing = false;
+        this.stopSearch(false);
+
         this.model.currentTodoView = todoView;
+    }
+
+    stopSearch(restorePreviousZoomLevel: boolean = true) {
+        if (!this.model.searchIsOngoing) {
+            return;
+        }
+
+        $('.search-input').val('');
+
+        this.model.searchIsOngoing = false;
+        this.model.searchText = '';
+
+        if (restorePreviousZoomLevel) {
+            this.model.currentTodoView = this.model.cachedTodoView;
+        }
+
+        this.model.cachedTodoView = null;
+
+        this.render();
     }
 
     updateSearch() {
@@ -1548,10 +1590,14 @@ class MainView extends Backbone.View<TodoAppModel> {
         var foundMatch = false;
 
         if (search == "") {
-            this.model.searchIsOngoing = false;
-            this.render();
+            this.stopSearch();
 
             return;
+        }
+
+        if (!this.model.searchIsOngoing) {
+            this.model.cachedTodoView = this.model.currentTodoView;
+            this.model.currentTodoView = this.model.baseTodoView;
         }
 
         // clear previous search results
