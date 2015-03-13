@@ -94,7 +94,7 @@
                     <% } %>
 				</span>
 
-                <% if (hidden) { %> 
+                <% if (collapsed) { %> 
                     <a href="#" class="todo-hide-js hidden-ellipses">(<%= numActiveTotalChildren %>)</a>
                 <% } %>
 
@@ -108,7 +108,7 @@
                         <% } %>
 						<a href="#" class="todo-remove-js"> - </a>
 						<% if (numActiveChildren > 0) { %>
-							<a href="#" class="todo-hide-js"> <%= hidden ? '[+]' : '[-]' %> </a>
+							<a href="#" class="todo-hide-js"> <%= collapsed ? '[+]' : '[-]' %> </a>
 						<% } %>
                         <a href="#" class="todo-zoom-js">O</a>
 					</span>
@@ -126,7 +126,7 @@
             <% } %>
             <input class='content-edit-js'/>
 
-            <div class="children-js children <%= hidden ? 'hide' : '' %>"> </div>
+            <div class="children-js children <%= collapsed ? 'hide' : '' %>"> </div>
             <div class="todo-add"> </div>
         </div>
     </script>

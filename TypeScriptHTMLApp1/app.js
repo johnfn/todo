@@ -473,14 +473,14 @@ var TodoUiState = (function (_super) {
         _super.call(this, attrs);
         this.showUiToolbarTrigger = new Trigger();
         this.hideUiToolbarTrigger = new Trigger();
-        this.hiddenTrigger = new Trigger();
+        this.collapsedTrigger = new Trigger();
         this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
         this.selected = false;
         this.isDraggedOver = false;
         this.isDraggedOverAsChild = false;
-        this.hidden = false;
+        this.collapsed = false;
         if (!attrs['view'])
             console.error('No view assigned for TodoUiState');
         this.view = attrs['view'];
@@ -515,13 +515,13 @@ var TodoUiState = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(TodoUiState.prototype, "hidden", {
+    Object.defineProperty(TodoUiState.prototype, "collapsed", {
         get: function () {
-            return this.get('hidden');
+            return this.get('collapsed');
         },
         set: function (value) {
-            this.set('hidden', value);
-            this.hiddenTrigger.value = value;
+            this.set('collapsed', value);
+            this.collapsedTrigger.value = value;
         },
         enumerable: true,
         configurable: true
@@ -1010,7 +1010,7 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.clickHideTodo = function () {
-        this.uiState.hidden = !this.uiState.hidden;
+        this.uiState.collapsed = !this.uiState.collapsed;
         this.render();
         return false;
     };
@@ -1151,7 +1151,7 @@ var TodoView = (function (_super) {
         // if someone called a render() on us during or after the hide was triggered,
         // this code won't run, the hide class will continue to exist and the node
         // will instantly be invisible.
-        if (this.uiState.hiddenTrigger.value) {
+        if (this.uiState.collapsedTrigger.value) {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
         return this;

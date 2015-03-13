@@ -372,7 +372,7 @@ class TodoUiState extends Backbone.Model {
 	    this.selected = false;
 	    this.isDraggedOver = false;
 	    this.isDraggedOverAsChild = false;
-	    this.hidden = false;
+	    this.collapsed = false;
 
 	    if (!attrs['view']) console.error('No view assigned for TodoUiState');
 
@@ -382,7 +382,7 @@ class TodoUiState extends Backbone.Model {
     showUiToolbarTrigger = new Trigger();
     hideUiToolbarTrigger = new Trigger();
 
-    hiddenTrigger = new Trigger();
+    collapsedTrigger = new Trigger();
 
 	get model(): TodoModel { return this.view.model; }
 
@@ -400,10 +400,10 @@ class TodoUiState extends Backbone.Model {
     get addTodoVisible(): boolean { return this.get('addTodoVisible'); }
     set addTodoVisible(value: boolean) { this.set('addTodoVisible', value); }
 
-    get hidden(): boolean { return this.get('hidden'); }
-    set hidden(value: boolean) {
-        this.set('hidden', value);
-        this.hiddenTrigger.value = value;
+    get collapsed(): boolean { return this.get('collapsed'); }
+    set collapsed(value: boolean) {
+        this.set('collapsed', value);
+        this.collapsedTrigger.value = value;
     }
 
     get editingName(): boolean { return this.get('editingName'); }
@@ -964,7 +964,7 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
 	private clickHideTodo() {
-		this.uiState.hidden = !this.uiState.hidden;
+		this.uiState.collapsed = !this.uiState.collapsed;
 
 		this.render();
 		return false;
@@ -1149,7 +1149,7 @@ class TodoView extends Backbone.View<TodoModel> {
         // if someone called a render() on us during or after the hide was triggered,
         // this code won't run, the hide class will continue to exist and the node
         // will instantly be invisible.
-        if (this.uiState.hiddenTrigger.value) {
+        if (this.uiState.collapsedTrigger.value) {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
 
