@@ -94,7 +94,7 @@
                     <% } %>
 				</span>
 
-                <% if (collapsed) { %> 
+                <% if (collapsed && !searching) { %> 
                     <a href="#" class="todo-hide-js hidden-ellipses">(<%= numActiveTotalChildren %>)</a>
                 <% } %>
 
@@ -126,7 +126,7 @@
             <% } %>
             <input class='content-edit-js'/>
 
-            <div class="children-js children <%= collapsed ? 'hide' : '' %>"> </div>
+            <div class="children-js children <%= collapsed && !searching ? 'hide' : '' %>"> </div>
             <div class="todo-add"> </div>
         </div>
     </script>

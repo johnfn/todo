@@ -1092,6 +1092,7 @@ class TodoView extends Backbone.View<TodoModel> {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
+            searching: this.mainView.model.searchIsOngoing,
             searchMatch: false,
             isFirstMatch: false,
             isMatchInContent: false,
