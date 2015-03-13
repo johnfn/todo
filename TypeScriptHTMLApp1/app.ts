@@ -214,6 +214,20 @@ class TodoModel extends Backbone.Model implements ITodo {
 		return result;
 	}
 
+    /** Return a list of all todos nested under this todo, ordered by depth,
+        so that a deeper todo will never precede a less-deep one. */
+    flattenByRow(): TodoModel[] {
+        var result:TodoModel[] = [];
+        var edge = [this];
+
+        while (edge.length != 0) {
+            result = result.concat(edge);
+            edge = _.chain(edge).map(m => m.children).flatten().value();
+        }
+
+        return result;
+    }
+
 	pathToRoot(): TodoModel[] {
 		var list: TodoModel[] = [];
 		var current = this.parent;
@@ -1477,6 +1491,7 @@ class TopBarView extends Backbone.View<TodoAppModel> {
 class MainView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
 	savedData: SavedData;
+    hasRendered: boolean = false;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
 	    var self = this;
@@ -1546,9 +1561,18 @@ class MainView extends Backbone.View<TodoAppModel> {
         return false;
     }
 
+    collapseHugeTodosIntelligently() {
+        console.log(_.map(this.model.baseTodoModel.flattenByRow(), m => m.name));
+    }
+
     render(): Backbone.View<TodoAppModel> {
         this.$el.html(this.template());
         this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
+
+        if (!this.hasRendered) {
+            this.collapseHugeTodosIntelligently();
+            this.hasRendered = true;
+        }
 
         return this;
     }

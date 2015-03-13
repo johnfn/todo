@@ -227,6 +227,17 @@ var TodoModel = (function (_super) {
         }
         return result;
     };
+    /** Return a list of all todos nested under this todo, ordered by depth,
+        so that a deeper todo will never precede a less-deep one. */
+    TodoModel.prototype.flattenByRow = function () {
+        var result = [];
+        var edge = [this];
+        while (edge.length != 0) {
+            result = result.concat(edge);
+            edge = _.chain(edge).map(function (m) { return m.children; }).flatten().value();
+        }
+        return result;
+    };
     TodoModel.prototype.pathToRoot = function () {
         var list = [];
         var current = this.parent;
@@ -1534,6 +1545,7 @@ var MainView = (function (_super) {
     __extends(MainView, _super);
     function MainView() {
         _super.apply(this, arguments);
+        this.hasRendered = false;
     }
     MainView.prototype.initialize = function (options) {
         var _this = this;
@@ -1587,9 +1599,16 @@ var MainView = (function (_super) {
         }
         return false;
     };
+    MainView.prototype.collapseHugeTodosIntelligently = function () {
+        console.log(_.map(this.model.baseTodoModel.flattenByRow(), function (m) { return m.name; }));
+    };
     MainView.prototype.render = function () {
         this.$el.html(this.template());
         this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
+        if (!this.hasRendered) {
+            this.collapseHugeTodosIntelligently();
+            this.hasRendered = true;
+        }
         return this;
     };
     MainView.prototype.clickBody = function (e) {
