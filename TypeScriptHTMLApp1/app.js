@@ -1640,6 +1640,7 @@ var MainView = (function (_super) {
     };
     MainView.prototype.zoomTo = function (todoView) {
         this.stopSearch(true, false);
+        todoView.uiState.collapsed = false;
         this.model.currentTodoView = todoView;
         this.model.currentTodoModel.uiState.selected = true;
     };

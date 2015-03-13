@@ -1611,6 +1611,7 @@ class MainView extends Backbone.View<TodoAppModel> {
     zoomTo(todoView: TodoView) {
         this.stopSearch(true, false);
 
+        todoView.uiState.collapsed = false;
         this.model.currentTodoView = todoView;
         this.model.currentTodoModel.uiState.selected = true;
     }
