@@ -1316,7 +1316,6 @@ var FooterView = (function (_super) {
         });
     };
     FooterView.prototype.render = function () {
-        console.log(this.tabModel.currentTab);
         if (this.tabModel.currentTab === TabBarState.TabSelectionTodo) {
             this.$el.html(this.template(this.uiState.toJSON()));
         }
@@ -1616,10 +1615,9 @@ var MainView = (function (_super) {
     };
     MainView.prototype.collapseHugeTodosIntelligently = function () {
         var todos = this.model.baseTodoModel.flattenByRow().reverse();
-        var collapseThreshold = 15;
+        var collapseThreshold = 11;
         for (var i = 0; i < todos.length - 1; i++) {
-            console.log(todos[i].visibleTodosUnder);
-            if (todos[i].visibleTodosUnder > collapseThreshold) {
+            if (todos[i].visibleTodosUnder >= collapseThreshold) {
                 todos[i].uiState.collapsed = true;
             }
         }

@@ -1312,8 +1312,6 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     render():FooterView {
-        console.log(this.tabModel.currentTab);
-
         if (this.tabModel.currentTab === TabBarState.TabSelectionTodo) {
             this.$el.html(this.template(this.uiState.toJSON()));
         } else if (this.tabModel.currentTab === TabBarState.TabSelectionArchive) {
@@ -1578,13 +1576,11 @@ class MainView extends Backbone.View<TodoAppModel> {
 
     collapseHugeTodosIntelligently() {
         var todos = this.model.baseTodoModel.flattenByRow().reverse();
-        var collapseThreshold = 15;
+        var collapseThreshold = 11;
 
         // Subtract 1 because we never want to collapse the root. That's just dumb.
         for (var i = 0; i < todos.length - 1; i++) {
-            console.log(todos[i].visibleTodosUnder);
-
-            if (todos[i].visibleTodosUnder > collapseThreshold) {
+            if (todos[i].visibleTodosUnder >= collapseThreshold) {
                 todos[i].uiState.collapsed = true;
             }
         }
