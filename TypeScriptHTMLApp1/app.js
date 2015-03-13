@@ -476,6 +476,21 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoModel.prototype, "visibleTodosUnder", {
+        /** Count the number of todos under a todo, weighting a collapsed todo
+            and all it's children as just a single todo. */
+        get: function () {
+            var result = 1;
+            if (!this.uiState.collapsed) {
+                for (var i = 0; i < this.children.length; i++) {
+                    result += this.children[i].visibleTodosUnder;
+                }
+            }
+            return result;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return TodoModel;
 })(Backbone.Model);
 var TodoUiState = (function (_super) {
@@ -1600,14 +1615,22 @@ var MainView = (function (_super) {
         return false;
     };
     MainView.prototype.collapseHugeTodosIntelligently = function () {
-        console.log(_.map(this.model.baseTodoModel.flattenByRow(), function (m) { return m.name; }));
+        var todos = this.model.baseTodoModel.flattenByRow().reverse();
+        var collapseThreshold = 15;
+        for (var i = 0; i < todos.length - 1; i++) {
+            console.log(todos[i].visibleTodosUnder);
+            if (todos[i].visibleTodosUnder > collapseThreshold) {
+                todos[i].uiState.collapsed = true;
+            }
+        }
+        this.render();
     };
     MainView.prototype.render = function () {
         this.$el.html(this.template());
         this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
         if (!this.hasRendered) {
-            this.collapseHugeTodosIntelligently();
             this.hasRendered = true;
+            this.collapseHugeTodosIntelligently();
         }
         return this;
     };

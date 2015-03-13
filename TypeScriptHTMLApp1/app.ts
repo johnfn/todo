@@ -369,6 +369,21 @@ class TodoModel extends Backbone.Model implements ITodo {
     get totalCount(): number {
         return this.flatten().length;
     }
+
+    /** Count the number of todos under a todo, weighting a collapsed todo
+        and all it's children as just a single todo. */
+    get visibleTodosUnder(): number {
+        var result = 1;
+
+        if (!this.uiState.collapsed) {
+            for (var i = 0; i < this.children.length; i++) {
+                result += this.children[i].visibleTodosUnder;
+            }
+        }
+
+        return result;
+    }
+
 }
 
 class TodoUiState extends Backbone.Model {
@@ -1562,7 +1577,19 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     collapseHugeTodosIntelligently() {
-        console.log(_.map(this.model.baseTodoModel.flattenByRow(), m => m.name));
+        var todos = this.model.baseTodoModel.flattenByRow().reverse();
+        var collapseThreshold = 15;
+
+        // Subtract 1 because we never want to collapse the root. That's just dumb.
+        for (var i = 0; i < todos.length - 1; i++) {
+            console.log(todos[i].visibleTodosUnder);
+
+            if (todos[i].visibleTodosUnder > collapseThreshold) {
+                todos[i].uiState.collapsed = true;
+            }
+        }
+
+        this.render();
     }
 
     render(): Backbone.View<TodoAppModel> {
@@ -1570,8 +1597,9 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.model.currentTodoView.render().$el.appendTo(this.$('.items'));
 
         if (!this.hasRendered) {
-            this.collapseHugeTodosIntelligently();
             this.hasRendered = true;
+
+            this.collapseHugeTodosIntelligently();
         }
 
         return this;
