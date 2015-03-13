@@ -1639,16 +1639,20 @@ var MainView = (function (_super) {
         });
     };
     MainView.prototype.zoomTo = function (todoView) {
-        this.stopSearch(false);
+        this.stopSearch(true, false);
         this.model.currentTodoView = todoView;
         this.model.currentTodoModel.uiState.selected = true;
     };
-    MainView.prototype.stopSearch = function (restorePreviousZoomLevel) {
+    MainView.prototype.stopSearch = function (removeFocus, restorePreviousZoomLevel) {
+        if (removeFocus === void 0) { removeFocus = true; }
         if (restorePreviousZoomLevel === void 0) { restorePreviousZoomLevel = true; }
         if (!this.model.searchIsOngoing) {
             return;
         }
-        $('.search-input').val('').blur();
+        var $input = $('.search-input');
+        $input.val('');
+        if (removeFocus)
+            $input.blur();
         this.model.searchIsOngoing = false;
         this.model.searchText = '';
         if (restorePreviousZoomLevel) {
@@ -1662,7 +1666,7 @@ var MainView = (function (_super) {
         var allTodos = this.model.baseTodoModel.flatten();
         var foundMatch = false;
         if (search == "") {
-            this.stopSearch();
+            this.stopSearch(false);
             return;
         }
         if (!this.model.searchIsOngoing) {

@@ -1609,18 +1609,21 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     zoomTo(todoView: TodoView) {
-        this.stopSearch(false);
+        this.stopSearch(true, false);
 
         this.model.currentTodoView = todoView;
         this.model.currentTodoModel.uiState.selected = true;
     }
 
-    stopSearch(restorePreviousZoomLevel: boolean = true) {
+    stopSearch(removeFocus: boolean = true, restorePreviousZoomLevel: boolean = true) {
         if (!this.model.searchIsOngoing) {
             return;
         }
 
-        $('.search-input').val('').blur();
+        var $input = $('.search-input');
+
+        $input.val('');
+        if (removeFocus) $input.blur();
 
         this.model.searchIsOngoing = false;
         this.model.searchText = '';
@@ -1640,7 +1643,7 @@ class MainView extends Backbone.View<TodoAppModel> {
         var foundMatch = false;
 
         if (search == "") {
-            this.stopSearch();
+            this.stopSearch(false);
 
             return;
         }
