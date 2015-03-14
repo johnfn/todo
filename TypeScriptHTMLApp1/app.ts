@@ -680,6 +680,7 @@ class TodoDetailView extends Backbone.View<TodoModel> {
 
 class TodoView extends Backbone.View<TodoModel> {
     template: ITemplate;
+    topmostTemplate: ITemplate;
     childrenViews: TodoView[];
     uiState: TodoUiState;
 
@@ -726,6 +727,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
+        this.topmostTemplate = Util.getTemplate('topmost-todo');
         this.childrenViews = [];
         this.uiState = new TodoUiState({ view: this });
         this.model.view = this;
@@ -1108,11 +1110,37 @@ class TodoView extends Backbone.View<TodoModel> {
         return true;
     }
 
+    renderTopmostTodo():TodoView {
+        this.$el.html(this.topmostTemplate());
+        this.renderChildren();
+
+        return this;
+    }
+
+    renderChildren() {
+        var searchIsOngoing = this.mainView.model.searchIsOngoing;
+        var $childrenContainer = this.$('.children-js');
+
+        // render children
+        if (!this.uiState.collapsed || searchIsOngoing) {
+            _.each(this.childrenViews,(child: TodoView) => {
+                if (!child.model.archived) {
+                    child.render(false).$el.appendTo($childrenContainer);
+                }
+            });
+        }
+    }
+
+
     render(updateSidebar: boolean = true) {
         // If this is not a visible todo, then exit early, because having us
         // try to render our children may destroy otherwise visible nodes.
         var searchIsOngoing = this.mainView.model.searchIsOngoing;
         if (!this.isVisible()) return this;
+
+        if (this.model.depth == 0) {
+            return this.renderTopmostTodo();
+        }
 
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
@@ -1160,7 +1188,6 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$el.html(this.template(renderOptions));
         }
 
-        var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
 
         // Update state per uiState
@@ -1172,15 +1199,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.delegateEvents(); // We might lose our own events. D:
 
-        // render children
-        if (!this.uiState.collapsed || searchIsOngoing) {
-            _.each(this.childrenViews,(child: TodoView) => {
-                if (!child.model.archived) {
-                    child.render(false).$el.appendTo($childrenContainer);
-                }
-            });
-        }
-
+        this.renderChildren();
         this.editView.render().$el.appendTo($addTodo);
 
         if (this.uiState.addTodoVisible) {

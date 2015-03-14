@@ -832,6 +832,7 @@ var TodoView = (function (_super) {
             console.error('no mainView for TodoView');
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
+        this.topmostTemplate = Util.getTemplate('topmost-todo');
         this.childrenViews = [];
         this.uiState = new TodoUiState({ view: this });
         this.model.view = this;
@@ -1124,6 +1125,23 @@ var TodoView = (function (_super) {
         }
         return true;
     };
+    TodoView.prototype.renderTopmostTodo = function () {
+        this.$el.html(this.topmostTemplate());
+        this.renderChildren();
+        return this;
+    };
+    TodoView.prototype.renderChildren = function () {
+        var searchIsOngoing = this.mainView.model.searchIsOngoing;
+        var $childrenContainer = this.$('.children-js');
+        // render children
+        if (!this.uiState.collapsed || searchIsOngoing) {
+            _.each(this.childrenViews, function (child) {
+                if (!child.model.archived) {
+                    child.render(false).$el.appendTo($childrenContainer);
+                }
+            });
+        }
+    };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
         // If this is not a visible todo, then exit early, because having us
@@ -1131,6 +1149,9 @@ var TodoView = (function (_super) {
         var searchIsOngoing = this.mainView.model.searchIsOngoing;
         if (!this.isVisible())
             return this;
+        if (this.model.depth == 0) {
+            return this.renderTopmostTodo();
+        }
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
@@ -1169,21 +1190,13 @@ var TodoView = (function (_super) {
         else {
             this.$el.html(this.template(renderOptions));
         }
-        var $childrenContainer = this.$('.children-js');
         var $addTodo = this.$('.todo-add');
         // Update state per uiState
         $addTodo.toggle(this.uiState.addTodoVisible);
         this.renderTodoName();
         this.renderTodoContent();
         this.delegateEvents(); // We might lose our own events. D:
-        // render children
-        if (!this.uiState.collapsed || searchIsOngoing) {
-            _.each(this.childrenViews, function (child) {
-                if (!child.model.archived) {
-                    child.render(false).$el.appendTo($childrenContainer);
-                }
-            });
-        }
+        this.renderChildren();
         this.editView.render().$el.appendTo($addTodo);
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
