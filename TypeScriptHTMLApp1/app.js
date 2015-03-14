@@ -972,7 +972,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.navigateBetweenTodos = function (which) {
         var newSelection;
         if (which === 40 || which === 39) {
-            if (this.model.numChildren !== 0) {
+            if (this.model.numChildren !== 0 && !this.model.uiState.collapsed) {
                 newSelection = this.model.children[0];
             }
             else {

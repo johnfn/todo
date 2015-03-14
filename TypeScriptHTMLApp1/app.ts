@@ -908,7 +908,7 @@ class TodoView extends Backbone.View<TodoModel> {
         var newSelection: TodoModel;
 
         if (which === 40 || which === 39) { // down
-            if (this.model.numChildren !== 0) {
+            if (this.model.numChildren !== 0 && !this.model.uiState.collapsed) {
                 newSelection = this.model.children[0];
             } else {
                 newSelection = this.model.nextChild;
