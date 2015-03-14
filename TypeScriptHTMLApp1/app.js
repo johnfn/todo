@@ -1103,6 +1103,7 @@ var TodoView = (function (_super) {
         // If this is not a visible todo, then exit early, because having us
         // try to render our children may destroy otherwise visible nodes.
         var topmostVisibleTodo = this.mainView.model.currentTodoModel;
+        var searchIsOngoing = this.mainView.model.searchIsOngoing;
         if (topmostVisibleTodo) {
             var visibleTodoModels = topmostVisibleTodo.flatten();
             if (visibleTodoModels.indexOf(this.model) === -1)
@@ -1111,7 +1112,7 @@ var TodoView = (function (_super) {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
-            searching: this.mainView.model.searchIsOngoing,
+            searching: searchIsOngoing,
             searchMatch: false,
             isFirstMatch: false,
             isMatchInContent: false,
@@ -1154,11 +1155,13 @@ var TodoView = (function (_super) {
         this.renderTodoContent();
         this.delegateEvents(); // We might lose our own events. D:
         // render children
-        _.each(this.childrenViews, function (child) {
-            if (!child.model.archived) {
-                child.render(false).$el.appendTo($childrenContainer);
-            }
-        });
+        if (!this.uiState.collapsed || searchIsOngoing) {
+            _.each(this.childrenViews, function (child) {
+                if (!child.model.archived) {
+                    child.render(false).$el.appendTo($childrenContainer);
+                }
+            });
+        }
         this.editView.render().$el.appendTo($addTodo);
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();

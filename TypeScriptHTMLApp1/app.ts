@@ -1084,6 +1084,7 @@ class TodoView extends Backbone.View<TodoModel> {
         // If this is not a visible todo, then exit early, because having us
         // try to render our children may destroy otherwise visible nodes.
         var topmostVisibleTodo = this.mainView.model.currentTodoModel;
+        var searchIsOngoing = this.mainView.model.searchIsOngoing;
         if (topmostVisibleTodo) {
             var visibleTodoModels = topmostVisibleTodo.flatten();
             if (visibleTodoModels.indexOf(this.model) === -1) return this;
@@ -1092,7 +1093,7 @@ class TodoView extends Backbone.View<TodoModel> {
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
-            searching: this.mainView.model.searchIsOngoing,
+            searching: searchIsOngoing,
             searchMatch: false,
             isFirstMatch: false,
             isMatchInContent: false,
@@ -1148,12 +1149,13 @@ class TodoView extends Backbone.View<TodoModel> {
         this.delegateEvents(); // We might lose our own events. D:
 
         // render children
-
-        _.each(this.childrenViews, (child: TodoView) => {
-            if (!child.model.archived) {
-                child.render(false).$el.appendTo($childrenContainer);
-            }
-        });
+        if (!this.uiState.collapsed || searchIsOngoing) {
+            _.each(this.childrenViews,(child: TodoView) => {
+                if (!child.model.archived) {
+                    child.render(false).$el.appendTo($childrenContainer);
+                }
+            });
+        }
 
         this.editView.render().$el.appendTo($addTodo);
 
