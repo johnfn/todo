@@ -1502,8 +1502,33 @@ class BreadcrumbModel extends Backbone.View<TodoAppModel> {
     }
 }
 
+class AutocompleteView extends Backbone.View<TodoAppModel> {
+    template: ITemplate;
+
+    initialize(attrs?: any) {
+        this.template = Util.getTemplate('autocomplete');
+
+        this.listenTo(this.model, 'change:searchText', () => {
+            this.render(this.model.searchText);
+        });
+    }
+
+    render(text: string = ""): AutocompleteView {
+        var typedAnything = text != "";
+
+        this.$el.toggle(typedAnything);
+
+        if (!typedAnything) return;
+
+        this.$el.html(this.template());
+
+        return this;
+    }
+}
+
 class TopBarView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
+    autocomplete: AutocompleteView;
 
     events() {
         return {
@@ -1517,6 +1542,11 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         this.setElement($('.top-bar-container'));
 
         this.render();
+
+        this.autocomplete = new AutocompleteView({
+            model: this.model,
+            el: this.$('.autocomplete-container')
+        });
     }
 
     changeZoom(e:JQueryMouseEventObject): boolean {
