@@ -1557,29 +1557,6 @@ var BreadcrumbModel = (function (_super) {
     };
     return BreadcrumbModel;
 })(Backbone.View);
-var AutocompleteView = (function (_super) {
-    __extends(AutocompleteView, _super);
-    function AutocompleteView() {
-        _super.apply(this, arguments);
-    }
-    AutocompleteView.prototype.initialize = function (attrs) {
-        var _this = this;
-        this.template = Util.getTemplate('autocomplete');
-        this.listenTo(this.model, 'change:searchText', function () {
-            _this.render(_this.model.searchText);
-        });
-    };
-    AutocompleteView.prototype.render = function (text) {
-        if (text === void 0) { text = ""; }
-        var typedAnything = text != "";
-        this.$el.toggle(typedAnything);
-        if (!typedAnything)
-            return;
-        this.$el.html(this.template());
-        return this;
-    };
-    return AutocompleteView;
-})(Backbone.View);
 var TopBarView = (function (_super) {
     __extends(TopBarView, _super);
     function TopBarView() {
