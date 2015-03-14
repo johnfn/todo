@@ -272,6 +272,9 @@ class TodoModel extends Backbone.Model implements ITodo {
     set archived(value: boolean) {
         if (this.archived === value) return;
 
+        if (value) this.starred = false;
+
+
         var now = Util.fairlyLegibleDateTime();
         this.set('archived', value);
 
@@ -1511,7 +1514,7 @@ class TopBarView extends Backbone.View<TodoAppModel> {
 
     initialize(attrs?: any) {
         this.template = Util.getTemplate('top-bar');
-        this.setElement($('.topbar-container'));
+        this.setElement($('.top-bar-container'));
 
         this.render();
     }

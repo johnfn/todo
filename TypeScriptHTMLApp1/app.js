@@ -300,6 +300,8 @@ var TodoModel = (function (_super) {
         set: function (value) {
             if (this.archived === value)
                 return;
+            if (value)
+                this.starred = false;
             var now = Util.fairlyLegibleDateTime();
             this.set('archived', value);
             if (value) {
@@ -1568,7 +1570,7 @@ var TopBarView = (function (_super) {
     };
     TopBarView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('top-bar');
-        this.setElement($('.topbar-container'));
+        this.setElement($('.top-bar-container'));
         this.render();
     };
     TopBarView.prototype.changeZoom = function (e) {
