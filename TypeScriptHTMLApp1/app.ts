@@ -1668,6 +1668,8 @@ class MainView extends Backbone.View<TodoAppModel> {
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
 
+            if (todo.archived) continue;
+
             // First try name...
             var matchPosition = todo.name.toLowerCase().indexOf(search.toLowerCase());
             todo.searchResult.isMatchInContent = false;
