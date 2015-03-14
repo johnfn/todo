@@ -373,6 +373,8 @@ class TodoModel extends Backbone.Model implements ITodo {
     /** Count the number of todos under a todo, weighting a collapsed todo
         and all it's children as just a single todo. */
     get visibleTodosUnder(): number {
+        if (this.archived) return 0;
+
         var result = 1;
 
         if (!this.uiState.collapsed) {

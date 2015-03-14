@@ -480,6 +480,8 @@ var TodoModel = (function (_super) {
         /** Count the number of todos under a todo, weighting a collapsed todo
             and all it's children as just a single todo. */
         get: function () {
+            if (this.archived)
+                return 0;
             var result = 1;
             if (!this.uiState.collapsed) {
                 for (var i = 0; i < this.children.length; i++) {
