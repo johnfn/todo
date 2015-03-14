@@ -952,6 +952,9 @@ var TodoView = (function (_super) {
             this.render();
             return false;
         }
+        // Stop the keypress from propagating if we were typing.
+        if (this.uiState.isEditing)
+            return false;
         return true;
     };
     /** Given a keypress, move appropriately between todos.
@@ -1594,6 +1597,7 @@ var MainView = (function (_super) {
         this.model.currentTodoView = this.model.baseTodoView;
     };
     MainView.prototype.keydown = function (e) {
+        // Finish a search.
         if (e.which === 13 && $('.search-input').is(':focus')) {
             this.zoomTo(this.model.selectedSearchModel.view);
             return true;
@@ -1605,7 +1609,7 @@ var MainView = (function (_super) {
                 return true;
             }
             else {
-                // Up one step in the todo heirarchy stack (if there is one)
+                // Up one step in the todo hierarchy stack (if there is one)
                 if (this.model.currentTodoView !== this.model.baseTodoView) {
                     this.zoomTo(this.model.currentTodoModel.parent.view);
                     return true;
@@ -1783,18 +1787,25 @@ $(function () {
             autosaveView.render();
             return;
         }
-        // Ctrl + F (or / for vim users! :): Focus on find textbox
-        if (!$('.search-input').is(':focus') && ((e.which == 70 && e.ctrlKey) || e.which == 191)) {
-            $('.search-input').focus();
-            return false;
-        }
         if (mainView.keydown(e)) {
             return;
         }
+        // Ctrl + f: Focus on find textbox
+        if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
+            $('.search-input').focus();
+            return false;
+        }
         for (var i = 0; i < TodoView.todoViews.length; i++) {
             if (!TodoView.todoViews[i].keydown(e)) {
-                break;
+                return;
             }
+        }
+        // / (for vim users! :): Focus on find textbox
+        // Comes after processing todo keydowns, because they could legitimately
+        // type /.
+        if (!$('.search-input').is(':focus') && e.which == 191) {
+            $('.search-input').focus();
+            return false;
         }
     });
 });
