@@ -844,6 +844,16 @@ var TodoView = (function (_super) {
         this.model.name = $('.name-edit').val();
         return false;
     };
+    TodoView.prototype.scrollToMe = function () {
+        if (this.isVisible()) {
+            $('html, body').animate({
+                scrollTop: this.$el.offset().top
+            }, 150);
+        }
+        else {
+            this.mainView.zoomTo(this);
+        }
+    };
     TodoView.prototype.toggleSetStarred = function () {
         this.model.starred = !this.model.starred;
         this.render();
@@ -1101,17 +1111,24 @@ var TodoView = (function (_super) {
         this.render();
         return false;
     };
+    /** Returns true if this TodoView is contained under the current zoomed in
+        TodoView. */
+    TodoView.prototype.isVisible = function () {
+        var topmostVisibleTodo = this.mainView.model.currentTodoModel;
+        if (topmostVisibleTodo) {
+            var visibleTodoModels = topmostVisibleTodo.flatten();
+            if (visibleTodoModels.indexOf(this.model) === -1)
+                return false;
+        }
+        return true;
+    };
     TodoView.prototype.render = function (updateSidebar) {
         if (updateSidebar === void 0) { updateSidebar = true; }
         // If this is not a visible todo, then exit early, because having us
         // try to render our children may destroy otherwise visible nodes.
-        var topmostVisibleTodo = this.mainView.model.currentTodoModel;
         var searchIsOngoing = this.mainView.model.searchIsOngoing;
-        if (topmostVisibleTodo) {
-            var visibleTodoModels = topmostVisibleTodo.flatten();
-            if (visibleTodoModels.indexOf(this.model) === -1)
-                return this;
-        }
+        if (!this.isVisible())
+            return this;
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
             searchResultParent: false,
@@ -1309,10 +1326,7 @@ var FooterView = (function (_super) {
         _.each(archived, function (m) { return m.destroy(); });
     };
     FooterView.prototype.gotoStarredItem = function () {
-        var item = this.uiState.firstStarredTodo;
-        $('html, body').animate({
-            scrollTop: $(item.view.el).offset().top
-        }, 150);
+        this.uiState.firstStarredTodo.view.scrollToMe();
         return false;
     };
     FooterView.prototype.archiveAllDone = function () {
