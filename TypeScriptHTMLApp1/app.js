@@ -30,6 +30,29 @@ var __extends = this.__extends || function (d, b) {
 // * mouseover one, highlight all
 // X pay the power bill
 // * listen to debussy
+var VaguelyMagicalModel = (function (_super) {
+    __extends(VaguelyMagicalModel, _super);
+    function VaguelyMagicalModel() {
+        _super.apply(this, arguments);
+    }
+    VaguelyMagicalModel.prototype.toJSON = function () {
+        var _this = this;
+        var result = _.clone(this.attributes);
+        var getters = [];
+        for (var accessorName in this) {
+            var proto = Object.getPrototypeOf(this);
+            var pd = Object.getOwnPropertyDescriptor(proto, accessorName);
+            if (pd && pd.get) {
+                getters.push(accessorName);
+            }
+        }
+        _.each(getters, function (prop) {
+            result[prop] = _this[prop];
+        });
+        return result;
+    };
+    return VaguelyMagicalModel;
+})(Backbone.Model);
 var SearchResult = (function (_super) {
     __extends(SearchResult, _super);
     function SearchResult() {

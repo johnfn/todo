@@ -77,24 +77,8 @@ var AutocompleteItem = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    AutocompleteItem.prototype.toJSON = function () {
-        var _this = this;
-        var result = _.clone(this.attributes);
-        var getters = [];
-        for (var accessorName in this) {
-            var proto = Object.getPrototypeOf(this);
-            var pd = Object.getOwnPropertyDescriptor(proto, accessorName);
-            if (pd && pd.get) {
-                getters.push(accessorName);
-            }
-        }
-        _.each(getters, function (prop) {
-            result[prop] = _this[prop];
-        });
-        return result;
-    };
     return AutocompleteItem;
-})(Backbone.Model);
+})(VaguelyMagicalModel);
 var AutocompleteSectionItems = (function (_super) {
     __extends(AutocompleteSectionItems, _super);
     function AutocompleteSectionItems() {

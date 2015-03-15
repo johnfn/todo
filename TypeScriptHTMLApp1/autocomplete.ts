@@ -1,4 +1,4 @@
-﻿class AutocompleteItem extends Backbone.Model {
+﻿class AutocompleteItem extends VaguelyMagicalModel {
     get todo(): TodoModel { return this.get('todo'); }
     set todo(value: TodoModel) {
         this.set('todo', value);
@@ -29,26 +29,6 @@
     get endPosition(): number { return this.get('endPosition'); }
     set endPosition(value: number) { this.set('endPosition', value); }
 
-    toJSON(): any {
-        var result = _.clone(this.attributes);
-        var getters: string[] = [];
-
-        // Get all getters of this object. Dark magic @_@
-        for (var accessorName in this) {
-            var proto = Object.getPrototypeOf(this);
-            var pd: PropertyDescriptor = Object.getOwnPropertyDescriptor(proto, accessorName);
-
-            if (pd && pd.get) {
-                getters.push(accessorName);
-            }
-        }
-
-        _.each(getters, prop => {
-            result[prop] = this[prop];
-        });
-
-        return result;
-    }
 }
 
 class AutocompleteSectionItems extends Backbone.Collection<AutocompleteItem> {

@@ -28,6 +28,29 @@
 // X pay the power bill
 // * listen to debussy
 
+class VaguelyMagicalModel extends Backbone.Model {
+    toJSON(): any {
+        var result = _.clone(this.attributes);
+        var getters: string[] = [];
+
+        // Get all getters of this object. Dark magic @_@
+        for (var accessorName in this) {
+            var proto = Object.getPrototypeOf(this);
+            var pd: PropertyDescriptor = Object.getOwnPropertyDescriptor(proto, accessorName);
+
+            if (pd && pd.get) {
+                getters.push(accessorName);
+            }
+        }
+
+        _.each(getters, prop => {
+            result[prop] = this[prop];
+        });
+
+        return result;
+    }
+}
+
 class SearchResult extends Backbone.Model {
 
     initialize() {
