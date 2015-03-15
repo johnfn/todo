@@ -19,6 +19,34 @@ var AutocompleteItem = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(AutocompleteItem.prototype, "matchedString", {
+        get: function () {
+            return this.todo.get(this.typeOfMatch);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "startOfMatchString", {
+        get: function () {
+            return this.matchedString.substring(0, this.startPosition);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "middleOfMatchString", {
+        get: function () {
+            return this.matchedString.substring(this.startPosition, this.endPosition);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "endOfMatchString", {
+        get: function () {
+            return this.matchedString.substring(this.endPosition);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(AutocompleteItem.prototype, "typeOfMatch", {
         get: function () {
             return this.get('typeOfMatch');
@@ -49,6 +77,22 @@ var AutocompleteItem = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    AutocompleteItem.prototype.toJSON = function () {
+        var _this = this;
+        var result = _.clone(this.attributes);
+        var getters = [];
+        for (var accessorName in this) {
+            var proto = Object.getPrototypeOf(this);
+            var pd = Object.getOwnPropertyDescriptor(proto, accessorName);
+            if (pd && pd.get) {
+                getters.push(accessorName);
+            }
+        }
+        _.each(getters, function (prop) {
+            result[prop] = _this[prop];
+        });
+        return result;
+    };
     return AutocompleteItem;
 })(Backbone.Model);
 var AutocompleteSectionItems = (function (_super) {

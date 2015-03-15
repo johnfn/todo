@@ -204,8 +204,10 @@
         <div class="autocomplete-heading">
             <span><%= section.headingName %></span>
         </div>
-        <% _.each(items, function(item, i) { %>
-            <div class="autocomplete-item"> <%= item.todo.get('name') %> <span class="kbd-shortcut">ctrl + <%= i %></span> </div>
+        <% debugger; _.each(items, function(item, i) { %>
+            <div class="autocomplete-item"> 
+                <%= item.startOfMatchString %><b><%= item.middleOfMatchString %></b><%= item.endOfMatchString %>
+                <span class="kbd-shortcut">ctrl + <%= i %></span> </div>
         <% }) %>
     </script>
 
