@@ -84,21 +84,29 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
     addTextSearchSection(): void {
         var search = this.appModel.searchText;
         var allTodos = _.filter(this.baseTodo.flatten(), m => m.inSearchResults);
-        var matches: AutocompleteItem[] = [];
+        var sections: { [key: string]: AutocompleteItem[] } = {
+            "Headings": [],
+            "Todos": []
+        };
+        var thingsAdded = 0;
 
-        for (var i = 0; i < allTodos.length; i++) {
+        for (var i = 0; i < allTodos.length && thingsAdded < 10; i++) {
             var currentTodo = allTodos[i];
+            var matchPosition: number;
 
             // Check for a name match.
-            var matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
+            matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
             if (matchPosition !== -1) {
-                matches.push(new AutocompleteItem({
+                var destinationList = currentTodo.isHeader ? "Headings" : "Todos";
+
+                sections[destinationList].push(new AutocompleteItem({
                     todo: currentTodo,
                     typeOfMatch: "name",
                     startPosition: matchPosition,
                     endPosition: matchPosition + search.length
                 }));
 
+                ++thingsAdded;
                 continue;
             }
 
@@ -106,23 +114,28 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
             matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
 
             if (matchPosition !== -1) {
-                matches.push(new AutocompleteItem({
+                sections["Todos"].push(new AutocompleteItem({
                     todo: currentTodo,
                     typeOfMatch: "content",
                     startPosition: matchPosition,
                     endPosition: matchPosition + search.length
                 }));
 
+                ++thingsAdded;
                 continue;
             }
         }
 
-        matches = _.first(matches, 10);
+        for (var name in sections) {
+            var items = sections[name];
 
-        this.add(new AutocompleteSection({
-            headingName: "Matches by text",
-            items: new AutocompleteSectionItems(matches)
-        }));
+            if (items.length == 0) continue;
+
+            this.add(new AutocompleteSection({
+                headingName: name,
+                items: new AutocompleteSectionItems(sections[name])
+            }));
+        }
     }
 }
 

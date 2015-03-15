@@ -352,7 +352,7 @@ var TodoModel = (function (_super) {
     });
     Object.defineProperty(TodoModel.prototype, "inSearchResults", {
         get: function () {
-            return !this.archived;
+            return !this.archived && this.depth > 0;
         },
         enumerable: true,
         configurable: true

@@ -328,7 +328,7 @@ class TodoModel extends Backbone.Model implements ITodo {
     }
 
     get inSearchResults(): boolean {
-        return !this.archived;
+        return !this.archived && this.depth > 0;
     }
 
     get createdDate(): string { return this.get('createdDate'); }

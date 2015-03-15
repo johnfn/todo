@@ -152,37 +152,49 @@ var AutocompleteResult = (function (_super) {
     AutocompleteResult.prototype.addTextSearchSection = function () {
         var search = this.appModel.searchText;
         var allTodos = _.filter(this.baseTodo.flatten(), function (m) { return m.inSearchResults; });
-        var matches = [];
-        for (var i = 0; i < allTodos.length; i++) {
+        var sections = {
+            "Headings": [],
+            "Todos": []
+        };
+        var thingsAdded = 0;
+        for (var i = 0; i < allTodos.length && thingsAdded < 10; i++) {
             var currentTodo = allTodos[i];
+            var matchPosition;
             // Check for a name match.
-            var matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
+            matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
             if (matchPosition !== -1) {
-                matches.push(new AutocompleteItem({
+                var destinationList = currentTodo.isHeader ? "Headings" : "Todos";
+                sections[destinationList].push(new AutocompleteItem({
                     todo: currentTodo,
                     typeOfMatch: "name",
                     startPosition: matchPosition,
                     endPosition: matchPosition + search.length
                 }));
+                ++thingsAdded;
                 continue;
             }
             // Check for a content match.
             matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
             if (matchPosition !== -1) {
-                matches.push(new AutocompleteItem({
+                sections["Todos"].push(new AutocompleteItem({
                     todo: currentTodo,
                     typeOfMatch: "content",
                     startPosition: matchPosition,
                     endPosition: matchPosition + search.length
                 }));
+                ++thingsAdded;
                 continue;
             }
         }
-        matches = _.first(matches, 10);
-        this.add(new AutocompleteSection({
-            headingName: "Matches by text",
-            items: new AutocompleteSectionItems(matches)
-        }));
+        for (var name in sections) {
+            var items = sections[name];
+            if (items.length == 0)
+                continue;
+            this.add(new AutocompleteSection({
+                headingName: name,
+                items: new AutocompleteSectionItems(sections[name])
+            }));
+        }
     };
     return AutocompleteResult;
 })(Backbone.Collection);
