@@ -1710,6 +1710,8 @@ class MainView extends Backbone.View<TodoAppModel> {
             this.model.currentTodoView = this.model.baseTodoView;
         }
 
+        // TODO: Merge this whole thing with AutocompleteResult.
+
         // clear previous search results
         _.each(allTodos, m => m.searchResult.searchMatch = SearchMatch.NoMatch);
 

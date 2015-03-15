@@ -1723,6 +1723,7 @@ var MainView = (function (_super) {
             this.model.cachedTodoView = this.model.currentTodoView;
             this.model.currentTodoView = this.model.baseTodoView;
         }
+        // TODO: Merge this whole thing with AutocompleteResult.
         // clear previous search results
         _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
         for (var i = 0; i < allTodos.length; i++) {

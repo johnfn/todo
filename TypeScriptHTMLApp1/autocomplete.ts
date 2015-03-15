@@ -1,12 +1,9 @@
 ﻿class AutocompleteItem extends Backbone.Model {
-    get name(): string { return this.get('name'); }
-    set name(value: string) { this.set('name', value); }
+    get todo(): TodoModel { return this.get('todo'); }
+    set todo(value: TodoModel) { this.set('todo', value); }
 
-    get desc(): string { return this.get('desc'); }
-    set desc(value: string) { this.set('desc', value); }
-
-    get matchFoundIn(): string { return this.get('matchFoundIn'); }
-    set matchFoundIn(value: string) { this.set('matchFoundIn', value); }
+    get typeOfMatch(): string { return this.get('typeOfMatch'); }
+    set typeOfMatch(value: string) { this.set('typeOfMatch', value); }
 
     get startPosition(): number { return this.get('startPosition'); }
     set startPosition(value: number) { this.set('startPosition', value); }
@@ -59,25 +56,46 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
     initialize(models: AutocompleteSection[], opts?: any) {
         this.appModel = opts['appModel'];
         this.baseTodo = this.appModel.baseTodoModel;
+    }
 
+    compileSearch() {
         this.addTextSearchSection();
     }
 
     addTextSearchSection(): void {
+        var search = this.appModel.searchText;
         var allTodos = _.filter(this.baseTodo.flatten(), m => m.inSearchResults);
+        var matches: AutocompleteItem[] = [];
 
-        var matchItem = new AutocompleteItem({
-            name: allTodos[0].name,
-            desc: allTodos[0].content,
-            matchFoundIn: "name",
-            startPosition: 4,
-            endPosition: 8
-        });
+        for (var i = 0; i < allTodos.length; i++) {
+            var currentTodo = allTodos[i];
+            var typeOfMatch = "name";
 
-        var section = new AutocompleteSection({
+            // First try name...
+            var matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
+
+            // Then try content...
+            if (matchPosition === -1) {
+                matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
+                typeOfMatch = "content";
+            }
+
+            if (matchPosition === -1) {
+                continue;
+            }
+
+            matches.push(new AutocompleteItem({
+                todo: currentTodo,
+                typeOfMatch: typeOfMatch,
+                startPosition: matchPosition,
+                endPosition: matchPosition + search.length
+            }));
+        }
+
+        this.add(new AutocompleteSection({
             headingName: "Matches by text",
-            items: new AutocompleteSectionItems([matchItem])
-        });
+            items: new AutocompleteSectionItems(matches)
+        }));
     }
 }
 
@@ -95,15 +113,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     getAutocompleteResult(): AutocompleteResult {
         var result = new AutocompleteResult([], { appModel: this.model });
 
-        result.add(new AutocompleteSection({
-            headingName: 'test',
-            items: new AutocompleteSectionItems([
-                new AutocompleteItem({ name: "item 1" }),
-                new AutocompleteItem({ name: "item 2" })
-            ])
-        }));
-
-        console.log(result.toJSON());
+        result.compileSearch();
 
         return result;
     }

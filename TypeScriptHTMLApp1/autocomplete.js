@@ -9,32 +9,22 @@ var AutocompleteItem = (function (_super) {
     function AutocompleteItem() {
         _super.apply(this, arguments);
     }
-    Object.defineProperty(AutocompleteItem.prototype, "name", {
+    Object.defineProperty(AutocompleteItem.prototype, "todo", {
         get: function () {
-            return this.get('name');
+            return this.get('todo');
         },
         set: function (value) {
-            this.set('name', value);
+            this.set('todo', value);
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AutocompleteItem.prototype, "desc", {
+    Object.defineProperty(AutocompleteItem.prototype, "typeOfMatch", {
         get: function () {
-            return this.get('desc');
+            return this.get('typeOfMatch');
         },
         set: function (value) {
-            this.set('desc', value);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(AutocompleteItem.prototype, "matchFoundIn", {
-        get: function () {
-            return this.get('matchFoundIn');
-        },
-        set: function (value) {
-            this.set('matchFoundIn', value);
+            this.set('typeOfMatch', value);
         },
         enumerable: true,
         configurable: true
@@ -127,21 +117,38 @@ var AutocompleteResult = (function (_super) {
     AutocompleteResult.prototype.initialize = function (models, opts) {
         this.appModel = opts['appModel'];
         this.baseTodo = this.appModel.baseTodoModel;
+    };
+    AutocompleteResult.prototype.compileSearch = function () {
         this.addTextSearchSection();
     };
     AutocompleteResult.prototype.addTextSearchSection = function () {
+        var search = this.appModel.searchText;
         var allTodos = _.filter(this.baseTodo.flatten(), function (m) { return m.inSearchResults; });
-        var matchItem = new AutocompleteItem({
-            name: allTodos[0].name,
-            desc: allTodos[0].content,
-            matchFoundIn: "name",
-            startPosition: 4,
-            endPosition: 8
-        });
-        var section = new AutocompleteSection({
+        var matches = [];
+        for (var i = 0; i < allTodos.length; i++) {
+            var currentTodo = allTodos[i];
+            var typeOfMatch = "name";
+            // First try name...
+            var matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
+            // Then try content...
+            if (matchPosition === -1) {
+                matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
+                typeOfMatch = "content";
+            }
+            if (matchPosition === -1) {
+                continue;
+            }
+            matches.push(new AutocompleteItem({
+                todo: currentTodo,
+                typeOfMatch: typeOfMatch,
+                startPosition: matchPosition,
+                endPosition: matchPosition + search.length
+            }));
+        }
+        this.add(new AutocompleteSection({
             headingName: "Matches by text",
-            items: new AutocompleteSectionItems([matchItem])
-        });
+            items: new AutocompleteSectionItems(matches)
+        }));
     };
     return AutocompleteResult;
 })(Backbone.Collection);
@@ -159,14 +166,7 @@ var AutocompleteView = (function (_super) {
     };
     AutocompleteView.prototype.getAutocompleteResult = function () {
         var result = new AutocompleteResult([], { appModel: this.model });
-        result.add(new AutocompleteSection({
-            headingName: 'test',
-            items: new AutocompleteSectionItems([
-                new AutocompleteItem({ name: "item 1" }),
-                new AutocompleteItem({ name: "item 2" })
-            ])
-        }));
-        console.log(result.toJSON());
+        result.compileSearch();
         return result;
     };
     AutocompleteView.prototype.render = function (text) {
