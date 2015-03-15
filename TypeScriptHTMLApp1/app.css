@@ -217,7 +217,45 @@ a {
     padding: 3px;
 }
 
+.autocomplete-item {
+    padding-left: 10px;
+    padding-top: 5px;
+}
+
 .autocomplete-heading {
     font-weight: bold;
-    background: #eee;
+    text-align: center;
+    position: relative;
+}
+
+.autocomplete-heading span {
+  background: #fff;
+  padding: 0 15px;
+  position: relative;
+  z-index: 1;
+}
+
+.autocomplete-heading:before {
+  background: #ddd;
+  content: "";
+  display: block;
+  height: 1px;
+  position: absolute;
+    top: 50%;
+  width: 100%;
+}
+
+.autocomplete-heading:before {
+  left: 0;
+}
+
+.kbd-shortcut {
+    border: 1px solid #D2D2D2;
+    font-size: 11px;
+    float: right;
+    margin-right: 10px;
+    padding: 0 5px 0 5px;
+    color: #6A6A6A;
+    border-radius: 3px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
 }
