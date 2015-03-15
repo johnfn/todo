@@ -161,7 +161,7 @@ a {
 .time {
 	font-size: .8em;
 	font-style: italic;
-    color: lightgray;
+    color: rgb(126, 126, 126);
 }
 
 .whole-todo-container {
@@ -229,14 +229,19 @@ a {
     padding-top: 3px;
 }
 
-.autocomplete-item {
-    padding-left: 10px;
-    padding-top: 5px;
+a.autocomplete-item {
+    text-decoration: none;
 }
 
-.autocomplete-item:hover {
+.autocomplete-item div {
+    padding-left: 10px;
+    padding-top: 5px;
+
+    color: black;
+}
+
+.autocomplete-item div:hover {
     background-color: #f3f3f3;
-    color: white;
 }
 
 .autocomplete-heading {
@@ -268,7 +273,7 @@ a {
   left: 0;
 }
 
-.autocomplete-item-content {
+.autocomplete-item .autocomplete-item-content {
     color: #bbb;
 }
 
@@ -289,6 +294,7 @@ a {
     color: #6A6A6A;
     border-radius: 3px;
     box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+    background-color: white;
 }
 
 .autocomplete-bottom-bar {

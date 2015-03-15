@@ -206,21 +206,23 @@
         </div>
 
         <% _.each(items, function(item, i) { %>
-            <div class="autocomplete-item">
-                <% if (item.typeOfMatch == "name") { %>
-                    <%= item.startOfMatchString %><span class="autocomplete-match"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
-                <% } else { %>
-                    <%= item.todo.get('name') %>
-                <% } %>
+            <a href="#" class="autocomplete-item">
+                <div>
+                    <% if (item.typeOfMatch == "name") { %>
+                        <%= item.startOfMatchString %><span class="autocomplete-match"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
+                    <% } else { %>
+                        <%= item.todo.get('name') %>
+                    <% } %>
 
-                <span class="kbd-shortcut">ctrl + <%= i %></span>
+                    <span class="kbd-shortcut">ctrl + <%= i %></span>
 
-                <% if (item.typeOfMatch == "content") { %>
-                    <div class="autocomplete-item-content">
-                        <%= item.startOfMatchString %><span class="autocomplete-match-content"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
-                    </div>
-                <% } %>
-             </div>
+                    <% if (item.typeOfMatch == "content") { %>
+                        <div class="autocomplete-item-content">
+                            <%= item.startOfMatchString %><span class="autocomplete-match-content"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
+                        </div>
+                    <% } %>
+                 </div>
+            </a>
         <% }) %>
     </script>
 
