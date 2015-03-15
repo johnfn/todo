@@ -304,6 +304,10 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.goodTimeToSave();
     }
 
+    get inSearchResults(): boolean {
+        return !this.archived;
+    }
+
     get createdDate(): string { return this.get('createdDate'); }
     set createdDate(value: string) { this.set('createdDate', value); }
 

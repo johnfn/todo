@@ -1,6 +1,18 @@
 ﻿class AutocompleteItem extends Backbone.Model {
     get name(): string { return this.get('name'); }
     set name(value: string) { this.set('name', value); }
+
+    get desc(): string { return this.get('desc'); }
+    set desc(value: string) { this.set('desc', value); }
+
+    get matchFoundIn(): string { return this.get('matchFoundIn'); }
+    set matchFoundIn(value: string) { this.set('matchFoundIn', value); }
+
+    get startPosition(): number { return this.get('startPosition'); }
+    set startPosition(value: number) { this.set('startPosition', value); }
+
+    get endPosition(): number { return this.get('endPosition'); }
+    set endPosition(value: number) { this.set('endPosition', value); }
 }
 
 class AutocompleteSectionItems extends Backbone.Collection<AutocompleteItem> {
@@ -29,7 +41,10 @@ class AutocompleteSectionView extends Backbone.View<AutocompleteSection> {
     }
 
     render(): AutocompleteSectionView {
-        this.$el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.template({
+            section: this.model.toJSON(),
+            items: this.model.items.toJSON()
+        }));
 
         return this;
     }
@@ -38,6 +53,32 @@ class AutocompleteSectionView extends Backbone.View<AutocompleteSection> {
 /** The *entire* autocomplete result - currently just composed of many 
     sections. */
 class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
+    appModel: TodoAppModel;
+    baseTodo: TodoModel;
+
+    initialize(models: AutocompleteSection[], opts?: any) {
+        this.appModel = opts['appModel'];
+        this.baseTodo = this.appModel.baseTodoModel;
+
+        this.addTextSearchSection();
+    }
+
+    addTextSearchSection(): void {
+        var allTodos = _.filter(this.baseTodo.flatten(), m => m.inSearchResults);
+
+        var matchItem = new AutocompleteItem({
+            name: allTodos[0].name,
+            desc: allTodos[0].content,
+            matchFoundIn: "name",
+            startPosition: 4,
+            endPosition: 8
+        });
+
+        var section = new AutocompleteSection({
+            headingName: "Matches by text",
+            items: new AutocompleteSectionItems([matchItem])
+        });
+    }
 }
 
 class AutocompleteView extends Backbone.View<TodoAppModel> {
@@ -52,7 +93,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     }
 
     getAutocompleteResult(): AutocompleteResult {
-        var result = new AutocompleteResult();
+        var result = new AutocompleteResult([], { appModel: this.model });
 
         result.add(new AutocompleteSection({
             headingName: 'test',

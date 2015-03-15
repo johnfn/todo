@@ -201,8 +201,10 @@
     </script>
 
     <script type="text/template" id="autocomplete-section">
-        <div class="autocomplete-heading"><%= headingName %></div>
-        <div class="autocomplete-item"> item potentially goes here </div>
+        <div class="autocomplete-heading"><%= section.headingName %></div>
+        <% _.each(items, function(item) { %>
+            <div class="autocomplete-item"> <%= item.name %> </div>
+        <% }) %>
     </script>
 
     <script type="text/template" id="autocomplete">

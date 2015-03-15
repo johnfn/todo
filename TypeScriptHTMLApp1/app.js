@@ -327,6 +327,13 @@ var TodoModel = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoModel.prototype, "inSearchResults", {
+        get: function () {
+            return !this.archived;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoModel.prototype, "createdDate", {
         get: function () {
             return this.get('createdDate');

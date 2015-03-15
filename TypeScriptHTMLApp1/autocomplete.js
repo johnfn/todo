@@ -19,6 +19,46 @@ var AutocompleteItem = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(AutocompleteItem.prototype, "desc", {
+        get: function () {
+            return this.get('desc');
+        },
+        set: function (value) {
+            this.set('desc', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "matchFoundIn", {
+        get: function () {
+            return this.get('matchFoundIn');
+        },
+        set: function (value) {
+            this.set('matchFoundIn', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "startPosition", {
+        get: function () {
+            return this.get('startPosition');
+        },
+        set: function (value) {
+            this.set('startPosition', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "endPosition", {
+        get: function () {
+            return this.get('endPosition');
+        },
+        set: function (value) {
+            this.set('endPosition', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     return AutocompleteItem;
 })(Backbone.Model);
 var AutocompleteSectionItems = (function (_super) {
@@ -69,7 +109,10 @@ var AutocompleteSectionView = (function (_super) {
         this.template = Util.getTemplate('autocomplete-section');
     };
     AutocompleteSectionView.prototype.render = function () {
-        this.$el.html(this.template(this.model.toJSON()));
+        this.$el.html(this.template({
+            section: this.model.toJSON(),
+            items: this.model.items.toJSON()
+        }));
         return this;
     };
     return AutocompleteSectionView;
@@ -81,6 +124,25 @@ var AutocompleteResult = (function (_super) {
     function AutocompleteResult() {
         _super.apply(this, arguments);
     }
+    AutocompleteResult.prototype.initialize = function (models, opts) {
+        this.appModel = opts['appModel'];
+        this.baseTodo = this.appModel.baseTodoModel;
+        this.addTextSearchSection();
+    };
+    AutocompleteResult.prototype.addTextSearchSection = function () {
+        var allTodos = _.filter(this.baseTodo.flatten(), function (m) { return m.inSearchResults; });
+        var matchItem = new AutocompleteItem({
+            name: allTodos[0].name,
+            desc: allTodos[0].content,
+            matchFoundIn: "name",
+            startPosition: 4,
+            endPosition: 8
+        });
+        var section = new AutocompleteSection({
+            headingName: "Matches by text",
+            items: new AutocompleteSectionItems([matchItem])
+        });
+    };
     return AutocompleteResult;
 })(Backbone.Collection);
 var AutocompleteView = (function (_super) {
@@ -96,7 +158,7 @@ var AutocompleteView = (function (_super) {
         });
     };
     AutocompleteView.prototype.getAutocompleteResult = function () {
-        var result = new AutocompleteResult();
+        var result = new AutocompleteResult([], { appModel: this.model });
         result.add(new AutocompleteSection({
             headingName: 'test',
             items: new AutocompleteSectionItems([
