@@ -155,24 +155,30 @@ var AutocompleteResult = (function (_super) {
         var matches = [];
         for (var i = 0; i < allTodos.length; i++) {
             var currentTodo = allTodos[i];
-            var typeOfMatch = "name";
-            // First try name...
+            // Check for a name match.
             var matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
-            // Then try content...
-            if (matchPosition === -1) {
-                matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
-                typeOfMatch = "content";
-            }
-            if (matchPosition === -1) {
+            if (matchPosition !== -1) {
+                matches.push(new AutocompleteItem({
+                    todo: currentTodo,
+                    typeOfMatch: "name",
+                    startPosition: matchPosition,
+                    endPosition: matchPosition + search.length
+                }));
                 continue;
             }
-            matches.push(new AutocompleteItem({
-                todo: currentTodo,
-                typeOfMatch: typeOfMatch,
-                startPosition: matchPosition,
-                endPosition: matchPosition + search.length
-            }));
+            // Check for a content match.
+            matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
+            if (matchPosition !== -1) {
+                matches.push(new AutocompleteItem({
+                    todo: currentTodo,
+                    typeOfMatch: "content",
+                    startPosition: matchPosition,
+                    endPosition: matchPosition + search.length
+                }));
+                continue;
+            }
         }
+        matches = _.first(matches, 10);
         this.add(new AutocompleteSection({
             headingName: "Matches by text",
             items: new AutocompleteSectionItems(matches)
@@ -209,7 +215,7 @@ var AutocompleteView = (function (_super) {
         this.$el.html(this.template());
         ar.each(function (m) {
             var section = new AutocompleteSectionView({
-                el: $('<div>').appendTo(_this.$('.autocomplete')),
+                el: $('<div>').appendTo(_this.$('.autocomplete-sections')),
                 model: m
             }).render();
         });
