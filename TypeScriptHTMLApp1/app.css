@@ -33,7 +33,7 @@
 
 .title-below {
     background-color: #6E96B8;
-    height: 3px;
+    height: 2px;
 }
 
 body {
@@ -204,6 +204,8 @@ a {
     color: black;
     margin-top: 3px;
     font-size: 14px;
+    position: absolute;
+    bottom: 3px;
 }
 
 .search-result-parent {
@@ -313,4 +315,15 @@ a.autocomplete-item {
 
 .breadcrumb-container {
     padding-left: 50px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.row {
+    display: table;
+}
+
+[class*="col-"] {
+    float: none;
+    display: table-cell;
+    vertical-align: top;
 }
