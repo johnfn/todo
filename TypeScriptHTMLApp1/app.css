@@ -1,9 +1,7 @@
 ﻿.title {
     color: #fff;
     font-family: 'Open Sans', sans-serif;
-
-    background-color: rgb(114, 161, 194);
-
+    background-color: rgb(105, 202, 255);
     font-weight: 500;
 }
 
@@ -13,7 +11,8 @@
     box-shadow: 3px -3px 5px 6px #ccc;
 
     z-index: 1;
-    position: relative;
+    position: fixed;
+    width: 100%;
 }
 
 .title-content {
@@ -27,7 +26,9 @@
 
 .title-text {
     padding-left: 10px;
-    letter-spacing: -1px;
+    letter-spacing: 2px;
+    font-size: 30px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.26);
 }
 
 .title-below {
@@ -166,6 +167,7 @@ a {
 
 .whole-todo-container {
     margin-bottom: 300px;
+    padding-top: 50px;
 }
 
 .hide {
@@ -307,4 +309,8 @@ a.autocomplete-item {
 
 .autocomplete-bottom-bar a {
     color: rgb(92, 92, 92);
+}
+
+.breadcrumb-container {
+    padding-left: 50px;
 }

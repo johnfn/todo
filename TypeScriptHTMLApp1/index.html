@@ -262,7 +262,7 @@
         <% for (var i = 0; i < parents.length; i++) { %>
             <a href="#" class="parent-todo" data-index="<%= i %>">
                 <%= parents[i].name %>
-            </a>
+            </a> <% if (i != parents.length - 1) print('>>') %>
         <% } %>
     </script>
 
@@ -305,7 +305,6 @@
     <div class="top-bar-container">
         
     </div>
-
     <div class="container whole-todo-container">
 
     </div>
