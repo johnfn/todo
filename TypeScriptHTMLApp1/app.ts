@@ -732,9 +732,9 @@ class TodoView extends Backbone.View<TodoModel> {
 		    'click .todo-set-starred-js': this.toggleSetStarred,
 		    'click .todo-done-js': this.completeTodo,
 		    'click .todo-remove-js': this.clickRemoveTodo,
-		    'click .todo-zoom-js': this.clickZoomTodo,
+		    'click .todo-zoom-js': this.zoomToTodo,
 		    'click .todo-hide-js': this.clickHideTodo,
-            'click .search-link': this.clickZoomTodo,
+            'click .search-link': this.zoomToTodo,
             'keyup .name-edit': this.editName,
 		    'dragstart .todo-done-js': this.startDrag,
 		    'mouseover': this.mouseoverStartDrag,
@@ -1019,7 +1019,7 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
-    private clickZoomTodo() {
+    zoomToTodo() {
         this.mainView.zoomTo(this);
 
         return false;

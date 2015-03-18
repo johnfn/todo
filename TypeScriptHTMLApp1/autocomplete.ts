@@ -52,8 +52,20 @@ class AutocompleteSection extends Backbone.Model {
 class AutocompleteSectionView extends Backbone.View<AutocompleteSection> {
     template: ITemplate;
 
+    events() {
+        return {
+            'click .click-autocomplete-item-js': 'clickItem'
+        };
+    }
+
     initialize(attrs?: any) {
         this.template = Util.getTemplate('autocomplete-section');
+    }
+
+    clickItem(e: JQueryMouseEventObject) {
+        var item = this.model.items.at(parseInt($(e.currentTarget).data('index')));
+
+        item.todo.view.zoomToTodo();
     }
 
     render(): AutocompleteSectionView {

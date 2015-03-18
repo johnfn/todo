@@ -123,8 +123,17 @@ var AutocompleteSectionView = (function (_super) {
     function AutocompleteSectionView() {
         _super.apply(this, arguments);
     }
+    AutocompleteSectionView.prototype.events = function () {
+        return {
+            'click .click-autocomplete-item-js': 'clickItem'
+        };
+    };
     AutocompleteSectionView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('autocomplete-section');
+    };
+    AutocompleteSectionView.prototype.clickItem = function (e) {
+        var item = this.model.items.at(parseInt($(e.currentTarget).data('index')));
+        item.todo.view.zoomToTodo();
     };
     AutocompleteSectionView.prototype.render = function () {
         this.$el.html(this.template({

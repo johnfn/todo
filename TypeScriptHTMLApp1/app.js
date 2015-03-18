@@ -841,9 +841,9 @@ var TodoView = (function (_super) {
             'click .todo-set-starred-js': this.toggleSetStarred,
             'click .todo-done-js': this.completeTodo,
             'click .todo-remove-js': this.clickRemoveTodo,
-            'click .todo-zoom-js': this.clickZoomTodo,
+            'click .todo-zoom-js': this.zoomToTodo,
             'click .todo-hide-js': this.clickHideTodo,
-            'click .search-link': this.clickZoomTodo,
+            'click .search-link': this.zoomToTodo,
             'keyup .name-edit': this.editName,
             'dragstart .todo-done-js': this.startDrag,
             'mouseover': this.mouseoverStartDrag,
@@ -1068,7 +1068,7 @@ var TodoView = (function (_super) {
         this.render();
         return false;
     };
-    TodoView.prototype.clickZoomTodo = function () {
+    TodoView.prototype.zoomToTodo = function () {
         this.mainView.zoomTo(this);
         return false;
     };
