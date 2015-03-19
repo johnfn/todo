@@ -203,9 +203,9 @@ a {
 .search-input {
     color: black;
     margin-top: 3px;
-    font-size: 14px;
+    font-size: 18px;
     position: absolute;
-    bottom: 3px;
+    bottom: 6px;
 }
 
 .search-result-parent {
@@ -318,6 +318,9 @@ a.autocomplete-item {
     background: rgba(255, 255, 255, 0.9);
 }
 
+/* The following insane hax make bootstrap columns equal-height. */
+
+/*
 .row {
     display: table;
 }
@@ -327,3 +330,5 @@ a.autocomplete-item {
     display: table-cell;
     vertical-align: top;
 }
+*/
+
