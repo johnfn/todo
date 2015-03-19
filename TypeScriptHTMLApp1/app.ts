@@ -28,6 +28,9 @@
 // X pay the power bill
 // * listen to debussy
 
+var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
+// var baseUrl = "http://192.168.0.11:5000";
+
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
         var result = _.clone(this.attributes);
@@ -52,11 +55,10 @@ class VaguelyMagicalModel extends Backbone.Model {
 }
 
 class SearchResult extends Backbone.Model {
-
     initialize() {
         this.searchMatch = SearchMatch.NoMatch;
     }
-    
+
     // TODO: More DRY enum serialization
     get searchMatch(): SearchMatch {
         var result = this.get('searchMatch');
@@ -102,10 +104,10 @@ interface ITodo {
     archived: boolean;
     archivalDate: string;
     starred: boolean;
-	isHeader: boolean;
+    isHeader: boolean;
     content: string;
-	createdDate: string;
-	modifiedDate: string;
+    createdDate: string;
+    modifiedDate: string;
     depth?: number; // TODO: This really shouldn't be optional - it's currently that way bc of my dummy data
     done: boolean;
     children: ITodo[];
@@ -117,17 +119,17 @@ class Util {
         return _.template(el.html());
     }
 
-	static id(a: any): any {
-		return a;
-	}
-
-    static makeDateTimeReadable(date: string): string {
-		return date.slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+    static id(a: any): any {
+        return a;
     }
 
-	static fairlyLegibleDateTime(): string {
-	    return Util.makeDateTimeReadable(new Date().toString());
-	}
+    static makeDateTimeReadable(date: string): string {
+        return date.slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+    }
+
+    static fairlyLegibleDateTime(): string {
+        return Util.makeDateTimeReadable(new Date().toString());
+    }
 }
 
 class Trigger {
@@ -139,7 +141,7 @@ class Trigger {
 
             return true;
         }
-        
+
         return false;
     }
     set value(value: boolean) { this._value = value; }
@@ -162,21 +164,21 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.content = '';
         this.done = false;
         this.childIndex = -1;
-	    this.isHeader = false;
+        this.isHeader = false;
         this.uid = Math.random() + ' ' + Math.random();
-	    this.createdDate = (new Date()).toString();
-	    this.modifiedDate = (new Date()).toString();
+        this.createdDate = (new Date()).toString();
+        this.modifiedDate = (new Date()).toString();
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
         this.searchResult = new SearchResult();
 
-		// Pass this event up the hierarchy, so we can use it in SavedData.
-	    this.listenTo(this, 'global-change', () => {
-		    if (this.parent) {
-			    this.parent.trigger('global-change');
-		    }
-	    });
+        // Pass this event up the hierarchy, so we can use it in SavedData.
+        this.listenTo(this, 'global-change',() => {
+            if (this.parent) {
+                this.parent.trigger('global-change');
+            }
+        });
     }
 
     /** recursively create this todo and all sub-todos from the provided data. */
@@ -208,15 +210,15 @@ class TodoModel extends Backbone.Model implements ITodo {
     /** Recursively get the ITodo data of this Todo. */
     getData(): ITodo {
         var result = this.toJSON();
-        result['children'] = _.map(this.children,(model: TodoModel) => model.getData());
+        result['children'] = _.map(this.children, (model: TodoModel) => model.getData());
 
         return result;
     }
 
-	/** Indicate that now would be a good time to save. */
-	goodTimeToSave(): void {
-		this.trigger('global-change');
-	}
+    /** Indicate that now would be a good time to save. */
+    goodTimeToSave(): void {
+        this.trigger('global-change');
+    }
 
     /** Destroys this todo entirely. Unfortunately it currently has to go through
         the view. TODO: Investigate if we can just delete ourselves and re-render
@@ -226,21 +228,21 @@ class TodoModel extends Backbone.Model implements ITodo {
     }
 
     /** Return a list of all todos nested under this todo. */
-	flatten():TodoModel[] {
-		var result = [this];
-		var children = this.children;
+    flatten(): TodoModel[] {
+        var result = [this];
+        var children = this.children;
 
-		for (var i = 0; i < children.length; i++) {
-			result = result.concat(children[i].flatten());
-		}
+        for (var i = 0; i < children.length; i++) {
+            result = result.concat(children[i].flatten());
+        }
 
-		return result;
-	}
+        return result;
+    }
 
     /** Return a list of all todos nested under this todo, ordered by depth,
         so that a deeper todo will never precede a less-deep one. */
     flattenByRow(): TodoModel[] {
-        var result:TodoModel[] = [];
+        var result: TodoModel[] = [];
         var edge = [this];
 
         while (edge.length != 0) {
@@ -251,17 +253,17 @@ class TodoModel extends Backbone.Model implements ITodo {
         return result;
     }
 
-	pathToRoot(): TodoModel[] {
-		var list: TodoModel[] = [];
-		var current = this.parent;
+    pathToRoot(): TodoModel[] {
+        var list: TodoModel[] = [];
+        var current = this.parent;
 
-		while (current != null) {
-			list.push(current);
-			current = current.parent;
-		}
+        while (current != null) {
+            list.push(current);
+            current = current.parent;
+        }
 
-		return list;
-	}
+        return list;
+    }
 
     /** What index is this model in its parent's "children" list, or -1 if it doesn't have a parent. */
     get childIndex(): number {
@@ -278,7 +280,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         return -1;
     }
 
-	get uiState(): TodoUiState { return this.view.uiState; }
+    get uiState(): TodoUiState { return this.view.uiState; }
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
@@ -297,7 +299,6 @@ class TodoModel extends Backbone.Model implements ITodo {
 
         if (value) this.starred = false;
 
-
         var now = Util.fairlyLegibleDateTime();
         this.set('archived', value);
 
@@ -305,7 +306,7 @@ class TodoModel extends Backbone.Model implements ITodo {
             this.archivalDate = now;
         }
 
-        // Set all children to their parent's archived status. We 
+        // Set all children to their parent's archived status. We
         // bypass the setter because otherwise we'd have a crazy number
         // of recursive calls for deeply nested trees.
 
@@ -314,7 +315,7 @@ class TodoModel extends Backbone.Model implements ITodo {
             if (value) m.archivalDate = now;
         });
 
-        // If we're unarchiving the child (or grandchild etc.) of an unarchived item, 
+        // If we're unarchiving the child (or grandchild etc.) of an unarchived item,
         // we need to go up the tree unarchiving parents. We bypass the setter because
         // we don't want recursive unarchival in this case.
 
@@ -323,7 +324,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         for (var i = 0; i < archivedParents.length; i++) {
             archivedParents[i].set('archived', false);
         }
-        
+
         this.goodTimeToSave();
     }
 
@@ -415,14 +416,13 @@ class TodoModel extends Backbone.Model implements ITodo {
 
         return result;
     }
-
 }
 
 class TodoUiState extends Backbone.Model {
-	static isAnyoneEditingName: boolean;
-	static isAnyoneEditingContent: boolean;
+    static isAnyoneEditingName: boolean;
+    static isAnyoneEditingContent: boolean;
 
-	view: TodoView;
+    view: TodoView;
 
     constructor(attrs?: any) {
         super(attrs);
@@ -430,14 +430,14 @@ class TodoUiState extends Backbone.Model {
         this.addTodoVisible = false;
         this.editingName = false;
         this.editingContent = false;
-	    this.selected = false;
-	    this.isDraggedOver = false;
-	    this.isDraggedOverAsChild = false;
-	    this.collapsed = false;
+        this.selected = false;
+        this.isDraggedOver = false;
+        this.isDraggedOverAsChild = false;
+        this.collapsed = false;
 
-	    if (!attrs['view']) console.error('No view assigned for TodoUiState');
+        if (!attrs['view']) console.error('No view assigned for TodoUiState');
 
-	    this.view = attrs['view'];
+        this.view = attrs['view'];
     }
 
     showUiToolbarTrigger = new Trigger();
@@ -445,7 +445,7 @@ class TodoUiState extends Backbone.Model {
 
     collapsedTrigger = new Trigger();
 
-	get model(): TodoModel { return this.view.model; }
+    get model(): TodoModel { return this.view.model; }
 
     /** Returns true if the user is currently editing anything. See also: editingName, editingContent. */
     get isEditing(): boolean {
@@ -469,50 +469,50 @@ class TodoUiState extends Backbone.Model {
 
     get editingName(): boolean { return this.get('editingName'); }
     set editingName(value: boolean) {
-	    if (TodoUiState.isAnyoneEditingName) {
-		    if (value) {
-			    return;
-		    } else {
-			    TodoUiState.isAnyoneEditingName = false;
-		    }
-	    } else {
-		    if (value) {
-			    TodoUiState.isAnyoneEditingName = true;
-		    }
-			// else { console.log("??? bad code ???"); }
-	    }
+        if (TodoUiState.isAnyoneEditingName) {
+            if (value) {
+                return;
+            } else {
+                TodoUiState.isAnyoneEditingName = false;
+            }
+        } else {
+            if (value) {
+                TodoUiState.isAnyoneEditingName = true;
+            }
+            // else { console.log("??? bad code ???"); }
+        }
 
-	    this.set('editingName', value);
+        this.set('editingName', value);
     }
 
     get editingContent(): boolean { return this.get('editingContent'); }
     set editingContent(value: boolean) {
-	    if (TodoUiState.isAnyoneEditingContent) {
-		    if (value) {
-			    return;
-		    } else {
-			    TodoUiState.isAnyoneEditingContent = false;
-		    }
-	    } else {
-		    if (value) {
-			    TodoUiState.isAnyoneEditingContent = true;
-		    }
-			// else { console.log("??? bad code ???"); }
-	    }
+        if (TodoUiState.isAnyoneEditingContent) {
+            if (value) {
+                return;
+            } else {
+                TodoUiState.isAnyoneEditingContent = false;
+            }
+        } else {
+            if (value) {
+                TodoUiState.isAnyoneEditingContent = true;
+            }
+            // else { console.log("??? bad code ???"); }
+        }
 
-	     this.set('editingContent', value);
+        this.set('editingContent', value);
     }
 
     static selectedModel: TodoUiState;
 
     get selected(): boolean { return this.get('selected'); }
     set selected(value: boolean) {
-		if (value === this.selected) return;
+        if (value === this.selected) return;
 
-		// Deselect the old one.
+        // Deselect the old one.
         if (TodoUiState.selectedModel && value) {
-			// Totally refuse to change the selection during an edit.
-			if (TodoUiState.selectedModel.isEditing) return;
+            // Totally refuse to change the selection during an edit.
+            if (TodoUiState.selectedModel.isEditing) return;
 
             TodoUiState.selectedModel.set('selected', false); // don't infinitely recurse
             TodoUiState.selectedModel.hideUiToolbarTrigger.value = true;
@@ -522,7 +522,7 @@ class TodoUiState extends Backbone.Model {
         if (value) {
             TodoUiState.selectedModel = this;
             this.showUiToolbarTrigger.value = true;
-	        this.trigger('selected');
+            this.trigger('selected');
         }
 
         this.set('selected', value);
@@ -532,36 +532,36 @@ class TodoUiState extends Backbone.Model {
         }
     }
 
-	static draggedOverModel: TodoUiState;
+    static draggedOverModel: TodoUiState;
 
     get isDraggedOverAsChild(): boolean { return this.get('isDraggedOverAsChild'); }
     set isDraggedOverAsChild(value: boolean) {
-		var oldValue = this.isDraggedOverAsChild;
+        var oldValue = this.isDraggedOverAsChild;
 
-	     this.set('isDraggedOverAsChild', value);
+        this.set('isDraggedOverAsChild', value);
 
-	    if (oldValue !== value && this.view) this.view.render();
+        if (oldValue !== value && this.view) this.view.render();
     }
 
-	get isDraggedOver(): boolean { return this.get('isDraggedOver');  }
-	set isDraggedOver(value: boolean) {
-		var oldValue = this.isDraggedOver;
+    get isDraggedOver(): boolean { return this.get('isDraggedOver'); }
+    set isDraggedOver(value: boolean) {
+        var oldValue = this.isDraggedOver;
 
-		// Turn off the value on the previously-dragged-over element.
-		if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
-			TodoUiState.draggedOverModel.set('isDraggedOver', false);
-			TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
-			TodoUiState.draggedOverModel.view.render();
-		}
+        // Turn off the value on the previously-dragged-over element.
+        if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
+            TodoUiState.draggedOverModel.set('isDraggedOver', false);
+            TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
+            TodoUiState.draggedOverModel.view.render();
+        }
 
-		if (value) TodoUiState.draggedOverModel = this;
+        if (value) TodoUiState.draggedOverModel = this;
 
-		this.set('isDraggedOver', value);
+        this.set('isDraggedOver', value);
 
-		if (!value) this.isDraggedOverAsChild = false;
+        if (!value) this.isDraggedOverAsChild = false;
 
-		if (this.view && oldValue !== value) this.view.render();
-	}
+        if (this.view && oldValue !== value) this.view.render();
+    }
 }
 
 class NewTodoView extends Backbone.View<TodoModel> {
@@ -593,11 +593,11 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 
     addTodo(e: JQueryMouseEventObject) {
-		if (this.getNameText() === "") {
-			this.trigger('cancel');
+        if (this.getNameText() === "") {
+            this.trigger('cancel');
 
-			return false;
-		}
+            return false;
+        }
 
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
@@ -622,46 +622,46 @@ class NewTodoView extends Backbone.View<TodoModel> {
 }
 
 class TodoDetailUiState extends Backbone.Model {
-	initialize() {
-		this.isEditingContent = false;
-	}
+    initialize() {
+        this.isEditingContent = false;
+    }
 
     get isEditingContent(): boolean { return this.get('isEditingContent'); }
     set isEditingContent(value: boolean) { this.set('isEditingContent', value); }
 }
 
 class TodoDetailView extends Backbone.View<TodoModel> {
-	static instance: TodoDetailView;
+    static instance: TodoDetailView;
 
-	private template:ITemplate;
+    private template: ITemplate;
 
-	private uiState:TodoDetailUiState;
+    private uiState: TodoDetailUiState;
 
-    private _model:TodoModel;
+    private _model: TodoModel;
 
     events() {
         return {
             'click .header-checkbox-js': this.toggleHeader,
             'click .archived-checkbox-js': this.unarchiveTodo,
-			'click .content-js': this.toggleContent,
-			'click .content-input-js': this.toggleContent
+            'click .content-js': this.toggleContent,
+            'click .content-input-js': this.toggleContent
         };
     }
 
-	initialize() {
+    initialize() {
         _.bindAll(this, 'render', 'unarchiveTodo');
 
-		if (TodoDetailView.instance) {
-			console.error('Multiple instantiation of TodoDetailView');
-			return;
-		}
+        if (TodoDetailView.instance) {
+            console.error('Multiple instantiation of TodoDetailView');
+            return;
+        }
 
-		this.uiState = new TodoDetailUiState();
-		this.template = Util.getTemplate('right-panel');
-		this.setElement($('.right-panel'));
+        this.uiState = new TodoDetailUiState();
+        this.template = Util.getTemplate('right-panel');
+        this.setElement($('.right-panel'));
 
-		TodoDetailView.instance = this;
-	}
+        TodoDetailView.instance = this;
+    }
 
     unarchiveTodo() {
         this.model.archived = false;
@@ -675,37 +675,37 @@ class TodoDetailView extends Backbone.View<TodoModel> {
         this.render();
     }
 
-	toggleHeader(e:JQueryMouseEventObject) {
-		this.model.isHeader = $(e.currentTarget).is(':checked');
-		this.model.view.render();
-		this.render();
+    toggleHeader(e: JQueryMouseEventObject) {
+        this.model.isHeader = $(e.currentTarget).is(':checked');
+        this.model.view.render();
+        this.render();
 
-		return false;
-	}
+        return false;
+    }
 
-	render():TodoDetailView {
-		var createdDateAgo = $.timeago(new Date(this.model.createdDate));
+    render(): TodoDetailView {
+        var createdDateAgo = $.timeago(new Date(this.model.createdDate));
 
-		this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
+        this.$el.html(this.template(_.extend(this.model.toJSON(), this.uiState.toJSON(), {
             createdDate: createdDateAgo,
             doneCount: this.model.doneCount,
             totalCount: this.model.totalCount
-		})));
+        })));
 
         if (this.uiState.isEditingContent) {
             this.$('.content-edit-js').focus().select();
         }
 
-		return this;
-	}
+        return this;
+    }
 
-	toggleContent(e: JQueryMouseEventObject) {
-	    if (this.uiState.isEditingContent) {
-	        this.model.content = this.$('.content-edit-js').val();
-	    }
+    toggleContent(e: JQueryMouseEventObject) {
+        if (this.uiState.isEditingContent) {
+            this.model.content = this.$('.content-edit-js').val();
+        }
 
-	    this.uiState.isEditingContent = !this.uiState.isEditingContent;
-	}
+        this.uiState.isEditingContent = !this.uiState.isEditingContent;
+    }
 }
 
 class TodoView extends Backbone.View<TodoModel> {
@@ -714,8 +714,8 @@ class TodoView extends Backbone.View<TodoModel> {
     childrenViews: TodoView[];
     uiState: TodoUiState;
 
-	/** The right-panel view for detailed todo editing. */
-	detailView: TodoDetailView;
+    /** The right-panel view for detailed todo editing. */
+    detailView: TodoDetailView;
 
     /** The view for making a new todo. */
     editView: NewTodoView;
@@ -727,20 +727,20 @@ class TodoView extends Backbone.View<TodoModel> {
     static todoViews: TodoView[];
 
     events() {
-	    return {
-		    'click .todo-add-js': this.toggleAddChildTodo,
-		    'click .todo-set-starred-js': this.toggleSetStarred,
-		    'click .todo-done-js': this.completeTodo,
-		    'click .todo-remove-js': this.clickRemoveTodo,
-		    'click .todo-zoom-js': this.zoomToTodo,
-		    'click .todo-hide-js': this.clickHideTodo,
+        return {
+            'click .todo-add-js': this.toggleAddChildTodo,
+            'click .todo-set-starred-js': this.toggleSetStarred,
+            'click .todo-done-js': this.completeTodo,
+            'click .todo-remove-js': this.clickRemoveTodo,
+            'click .todo-zoom-js': this.zoomToTodo,
+            'click .todo-hide-js': this.clickHideTodo,
             'click .search-link': this.zoomToTodo,
             'keyup .name-edit': this.editName,
-		    'dragstart .todo-done-js': this.startDrag,
-		    'mouseover': this.mouseoverStartDrag,
-		    // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
-			'dragover': this.dragTodoOver,
-			'drop': this.drop,
+            'dragstart .todo-done-js': this.startDrag,
+            'mouseover': this.mouseoverStartDrag,
+            // 'mouseout': () => console.log('out'), (triggers all the time for some reason)
+            'dragover': this.dragTodoOver,
+            'drop': this.drop,
             'click .edit-name-js': this.showTodoNameEdit,
             'click .edit-content-js': this.showTodoContentEdit,
             'click input': () => false
@@ -753,7 +753,7 @@ class TodoView extends Backbone.View<TodoModel> {
         if (!TodoView.todoViews) TodoView.todoViews = [];
         TodoView.todoViews.push(this);
 
-	    if (!options['mainView']) console.error('no mainView for TodoView');
+        if (!options['mainView']) console.error('no mainView for TodoView');
 
         this.mainView = options['mainView'];
         this.template = Util.getTemplate('todo');
@@ -769,7 +769,7 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
-	    this.listenTo(this, 'remove-todo', this.removeTodo);
+        this.listenTo(this, 'remove-todo', this.removeTodo);
     }
 
     editName() {
@@ -788,7 +788,6 @@ class TodoView extends Backbone.View<TodoModel> {
         }
     }
 
-
     toggleSetStarred() {
         this.model.starred = !this.model.starred;
         this.render();
@@ -796,60 +795,60 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
-	startDrag() {
-		// this.uiState.selected = true;
-		this.mainView.model.isDragging = true;
-	}
+    startDrag() {
+        // this.uiState.selected = true;
+        this.mainView.model.isDragging = true;
+    }
 
-	// TODO: This is a bit of a (UX) hack. We want to select the item that
-	// the user just started dragging, but if we were to do this.uiState.selected = true,
-	// that would force a render(), which would re-render the selection box and
-	// quit the drag.
-	mouseoverStartDrag() {
-		if (!this.mainView.model.isDragging)
-			this.uiState.selected = true;
+    // TODO: This is a bit of a (UX) hack. We want to select the item that
+    // the user just started dragging, but if we were to do this.uiState.selected = true,
+    // that would force a render(), which would re-render the selection box and
+    // quit the drag.
+    mouseoverStartDrag() {
+        if (!this.mainView.model.isDragging)
+            this.uiState.selected = true;
 
-		return false;
-	}
+        return false;
+    }
 
-	dragTodoOver(e: JQueryMouseEventObject): boolean {
-		var yOffset = (e.pageY || (<any> e.originalEvent).pageY) - $(e.currentTarget).offset().top;
+    dragTodoOver(e: JQueryMouseEventObject): boolean {
+        var yOffset = (e.pageY || (<any> e.originalEvent).pageY) - $(e.currentTarget).offset().top;
 
-		this.uiState.isDraggedOver = true;
-		this.uiState.isDraggedOverAsChild = yOffset > this.$('.todo-name').height() / 2;
+        this.uiState.isDraggedOver = true;
+        this.uiState.isDraggedOverAsChild = yOffset > this.$('.todo-name').height() / 2;
 
-		return false;
-	}
+        return false;
+    }
 
-	drop(e: JQueryMouseEventObject): boolean {
-		var selectedModel = TodoUiState.selectedModel.model;
-		var parentView = selectedModel.parent.view;
+    drop(e: JQueryMouseEventObject): boolean {
+        var selectedModel = TodoUiState.selectedModel.model;
+        var parentView = selectedModel.parent.view;
 
-		// TODO: Check if the position we're adding at is a
-		// child of the selectedModel at all and quit if so.
-		if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
-			this.uiState.isDraggedOver = false;
-			this.uiState.isDraggedOverAsChild = false;
-			this.mainView.model.isDragging = false;
+        // TODO: Check if the position we're adding at is a
+        // child of the selectedModel at all and quit if so.
+        if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
+            this.uiState.isDraggedOver = false;
+            this.uiState.isDraggedOverAsChild = false;
+            this.mainView.model.isDragging = false;
 
-			return false;
-		}
+            return false;
+        }
 
-		parentView.removeTodo(selectedModel.childIndex);
+        parentView.removeTodo(selectedModel.childIndex);
 
-		if (this.uiState.isDraggedOverAsChild) {
-			this.addChildTodo(selectedModel);
-		} else {
-			this.model.parent.view.addChildTodo(selectedModel, this.model.childIndex + 1);
-		}
+        if (this.uiState.isDraggedOverAsChild) {
+            this.addChildTodo(selectedModel);
+        } else {
+            this.model.parent.view.addChildTodo(selectedModel, this.model.childIndex + 1);
+        }
 
-		selectedModel.view.uiState.selected = true;
+        selectedModel.view.uiState.selected = true;
 
-		this.uiState.isDraggedOver = false;
-		this.mainView.model.isDragging = false;
+        this.uiState.isDraggedOver = false;
+        this.mainView.model.isDragging = false;
 
-		return false;
-	}
+        return false;
+    }
 
     keydown(e: JQueryKeyEventObject): boolean {
         if (!this.uiState.selected) return true;
@@ -1012,7 +1011,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         if (this.model.done) this.model.starred = false;
 
-		this.uiState.selected = true;
+        this.uiState.selected = true;
 
         this.render();
 
@@ -1037,23 +1036,23 @@ class TodoView extends Backbone.View<TodoModel> {
         // TODO: Reincorporate this code once I do full on deletion.
         // this.model.parent.view.trigger('remove-todo', this.model.childIndex);
 
-	    return false;
+        return false;
     }
 
-	private clickHideTodo() {
-		this.uiState.collapsed = !this.uiState.collapsed;
+    private clickHideTodo() {
+        this.uiState.collapsed = !this.uiState.collapsed;
 
-		this.render();
-		return false;
-	}
+        this.render();
+        return false;
+    }
 
-	private removeTodo(index: number) {
-		var deleted = this.childrenViews.splice(index, 1)[0];
-		this.model.children.splice(index, 1);
-		this.model.goodTimeToSave();
+    private removeTodo(index: number) {
+        var deleted = this.childrenViews.splice(index, 1)[0];
+        this.model.children.splice(index, 1);
+        this.model.goodTimeToSave();
 
-		deleted.$el.slideUp(100, this.render);
-	}
+        deleted.$el.slideUp(100, this.render);
+    }
 
     private hideAllEditNodes(e: JQueryMouseEventObject) {
         this.uiState.editingContent = false;
@@ -1086,15 +1085,15 @@ class TodoView extends Backbone.View<TodoModel> {
         this.editView = new NewTodoView();
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
-        this.listenTo(this.editView, 'add-todo', (model: TodoModel) => {
-			self.addChildTodo(model);
+        this.listenTo(this.editView, 'add-todo',(model: TodoModel) => {
+            self.addChildTodo(model);
             self.toggleAddChildTodo();
         });
     }
 
-	/** Add childModel as a child of this view. */
+    /** Add childModel as a child of this view. */
     addChildTodo(childModel: TodoModel, index: number = -1) {
-		childModel.parent = this.model;
+        childModel.parent = this.model;
 
         var newView = new TodoView(<any> { model: childModel, mainView: this.mainView });
         index = index !== -1 ? index : this.childrenViews.length;
@@ -1110,9 +1109,9 @@ class TodoView extends Backbone.View<TodoModel> {
             this.model.children.splice(index, 0, childModel);
         }
 
-		this.model.goodTimeToSave();
+        this.model.goodTimeToSave();
 
-	    this.render();
+        this.render();
     }
 
     toggleAddChildTodo() {
@@ -1128,7 +1127,7 @@ class TodoView extends Backbone.View<TodoModel> {
         return false;
     }
 
-    /** Returns true if this TodoView is contained under the current zoomed in 
+    /** Returns true if this TodoView is contained under the current zoomed in
         TodoView. */
     isVisible(): boolean {
         var topmostVisibleTodo = this.mainView.model.currentTodoModel;
@@ -1140,7 +1139,7 @@ class TodoView extends Backbone.View<TodoModel> {
         return true;
     }
 
-    renderTopmostTodo():TodoView {
+    renderTopmostTodo(): TodoView {
         this.$el.html(this.topmostTemplate());
         this.renderChildren();
 
@@ -1161,7 +1160,6 @@ class TodoView extends Backbone.View<TodoModel> {
         }
     }
 
-
     render(updateSidebar: boolean = true) {
         // If this is not a visible todo, then exit early, because having us
         // try to render our children may destroy otherwise visible nodes.
@@ -1180,8 +1178,8 @@ class TodoView extends Backbone.View<TodoModel> {
             isFirstMatch: false,
             isMatchInContent: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
-        } , this.model.toJSON()
-          , this.uiState.toJSON());
+        }, this.model.toJSON()
+            , this.uiState.toJSON());
 
         if (this.mainView.model.searchIsOngoing) {
             var searchMatch = this.model.searchResult.searchMatch;
@@ -1207,7 +1205,6 @@ class TodoView extends Backbone.View<TodoModel> {
 
             if (searchMatch === SearchMatch.Match ||
                 searchMatch === SearchMatch.ParentOfMatch) {
-
                 this.$el.html(this.template(renderOptions));
             } else {
                 this.$el.empty();
@@ -1239,9 +1236,9 @@ class TodoView extends Backbone.View<TodoModel> {
         window['keyboardShortcuts'].setModel(this.uiState);
         window['keyboardShortcuts'].render();
 
-	    if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
-		    TodoDetailView.instance.model = this.model;
-	    }
+        if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
+            TodoDetailView.instance.model = this.model;
+        }
 
         if (this.uiState.showUiToolbarTrigger.value) {
             this.$('.toolbar').hide().fadeIn(150);
@@ -1258,7 +1255,7 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
 
-	    return this;
+        return this;
     }
 
     /** Show the name text xor the name input. */
@@ -1302,8 +1299,8 @@ class FooterUiState extends Backbone.Model {
         var allTodos = this.baseTodoModel.flatten();
 
         var archiveable = _.filter(allTodos, m => !m.archived && m.done);
-        var deleteable  = _.filter(allTodos, m => m.archived);
-        var starred     = _.filter(allTodos, m => m.starred);
+        var deleteable = _.filter(allTodos, m => m.archived);
+        var starred = _.filter(allTodos, m => m.starred);
 
         this.hasThingsToArchive = archiveable.length > 0;
         this.numThingsToArchive = archiveable.length;
@@ -1340,11 +1337,12 @@ class FooterView extends Backbone.View<TodoModel> {
         return {
             'click .archive-all': this.archiveAllDone,
             'click .starred-item': this.gotoStarredItem,
-            'click .delete-all': this.deleteAll
+            'click .delete-all': this.deleteAll,
+            'click .save': this.save
         };
     }
 
-    initialize(attrs:any) {
+    initialize(attrs: any) {
         this.template = Util.getTemplate('footer');
         this.archivalTemplate = Util.getTemplate('archival-footer');
         this.tabModel = attrs['tabModel'];
@@ -1355,6 +1353,19 @@ class FooterView extends Backbone.View<TodoModel> {
         this.listenTo(this.model, 'global-change', this.render);
         this.listenTo(this.tabModel, 'change', this.render);
         this.render();
+    }
+
+    save() {
+        $.ajax({
+            url: baseUrl + "/save",
+            type: "POST",
+            data: JSON.stringify(this.model.getData()),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function () {
+                console.log('done')
+            }
+        });
     }
 
     deleteAll() {
@@ -1376,14 +1387,14 @@ class FooterView extends Backbone.View<TodoModel> {
     }
 
     archiveAllDone() {
-        _.each(this.model.flatten(), (m) => {
+        _.each(this.model.flatten(),(m) => {
             if (m.done) {
                 m.archived = true;
             }
         });
     }
 
-    render():FooterView {
+    render(): FooterView {
         if (this.tabModel.currentTab === TabBarState.TabSelectionTodo) {
             this.$el.html(this.template(this.uiState.toJSON()));
         } else if (this.tabModel.currentTab === TabBarState.TabSelectionArchive) {
@@ -1420,8 +1431,8 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
         TodoDetailView.instance.model = this.model;
     }
 
-    render():TodoArchiveItemView {
-		var renderOptions = _.extend({ }, this.model.toJSON(), this.model.uiState.toJSON());
+    render(): TodoArchiveItemView {
+        var renderOptions = _.extend({}, this.model.toJSON(), this.model.uiState.toJSON());
 
         this.$el.html(this.template(renderOptions));
 
@@ -1432,7 +1443,7 @@ class TodoArchiveItemView extends Backbone.View<TodoModel> {
 class TodoArchiveView extends Backbone.View<TodoModel> {
     template: ITemplate;
 
-    initialize(attrs:Backbone.ViewOptions<TodoModel>) {
+    initialize(attrs: Backbone.ViewOptions<TodoModel>) {
         this.setElement($('#archive-js'));
         this.template = Util.getTemplate('todo-archive');
 
@@ -1441,7 +1452,7 @@ class TodoArchiveView extends Backbone.View<TodoModel> {
         this.render();
     }
 
-    render():TodoArchiveView {
+    render(): TodoArchiveView {
         var self = this;
         var archivedModels = _.filter(this.model.flatten(), m => m.archived);
 
@@ -1462,10 +1473,10 @@ class TodoArchiveView extends Backbone.View<TodoModel> {
 
 // Global todo state. Could keep track of breadcrumbs etc.
 class TodoAppModel extends Backbone.Model {
-	initialize() {
-		this.isDragging = false;
+    initialize() {
+        this.isDragging = false;
         this.cachedTodoView = null;
-	}
+    }
 
     get searchText(): string { return this.get('searchText'); }
     set searchText(value: string) { this.set('searchText', value); }
@@ -1494,7 +1505,7 @@ class TodoAppModel extends Backbone.Model {
     get cachedTodoView(): TodoView { return this.get('cachedTodoView'); }
     set cachedTodoView(value: TodoView) { this.set('cachedTodoView', value); }
 
-    get baseTodoModel(): TodoModel { return this.baseTodoView.model;  }
+    get baseTodoModel(): TodoModel { return this.baseTodoView.model; }
 
     get currentTodoModel(): TodoModel {
         if (!this.currentTodoView) {
@@ -1552,7 +1563,7 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         });
     }
 
-    changeZoom(e:JQueryMouseEventObject): boolean {
+    changeZoom(e: JQueryMouseEventObject): boolean {
         var index = parseInt($(e.currentTarget).data('index'));
 
         this.model.currentTodoView = this.model.currentTodoStack[index].view;
@@ -1567,7 +1578,7 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         return false;
     }
 
-    render():TopBarView {
+    render(): TopBarView {
         this.$el.html(this.template(this.model.toJSON()));
 
         var breadcrumbView = new BreadcrumbModel({
@@ -1581,11 +1592,11 @@ class TopBarView extends Backbone.View<TodoAppModel> {
 
 class MainView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
-	savedData: SavedData;
+    savedData: SavedData;
     hasRendered: boolean = false;
 
     initialize(options: Backbone.ViewOptions<TodoAppModel>) {
-	    var self = this;
+        var self = this;
         _.bindAll(this, 'clickBody');
 
         $('body').on('click', this.clickBody);
@@ -1595,33 +1606,40 @@ class MainView extends Backbone.View<TodoAppModel> {
 
         this.model = new TodoAppModel();
 
-		this.savedData = new SavedData();
-	    this.initializeTodoTree(this.savedData.load());
+        this.savedData = new SavedData();
+        this.initializeTodoTree(this.savedData.load());
 
-	    this.listenTo(this.savedData, 'load', () => {
-		    self.initializeTodoTree(this.savedData.load());
-		    self.render();
-	    });
+        /*
+        $.getJSON(baseUrl + '/db', (d) => {
+            self.initializeTodoTree(d);
+            self.render();
+        });
+        */
+
+        this.listenTo(this.savedData, 'load',() => {
+            self.initializeTodoTree(this.savedData.load());
+            self.render();
+        });
 
         this.listenTo(this.model, 'change:currentTodoView', this.render);
         this.listenTo(this.model, 'change:searchText', this.updateSearch);
     }
 
-	private initializeTodoTree(data: ITodo) {
+    private initializeTodoTree(data: ITodo) {
         var baseTodoModel = new TodoModel().initWithData(data, null);
 
-		TodoDetailView.instance.model = baseTodoModel;
+        TodoDetailView.instance.model = baseTodoModel;
 
-	    this.savedData.watch(baseTodoModel);
+        this.savedData.watch(baseTodoModel);
 
         this.model.baseTodoView = new TodoView(<any> {
             model: baseTodoModel,
             mainView: this
         });
 
-		baseTodoModel.uiState.selected = true;
-	    this.model.currentTodoView = this.model.baseTodoView;
-	}
+        baseTodoModel.uiState.selected = true;
+        this.model.currentTodoView = this.model.baseTodoView;
+    }
 
     keydown(e: JQueryKeyEventObject): boolean {
         // Finish a search.
@@ -1633,7 +1651,6 @@ class MainView extends Backbone.View<TodoAppModel> {
         }
 
         if (e.which === 27) { // ESC
-
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
                 this.stopSearch();
@@ -1830,7 +1847,7 @@ $(() => {
 
     var tabbarView = new TabBarView();
 
-	var detailView = new TodoDetailView();
+    var detailView = new TodoDetailView();
 
     var mainView = new MainView();
     mainView.render();
@@ -1843,20 +1860,20 @@ $(() => {
         tabModel: tabbarView.model
     });
 
-	var autosaveView = new SavedDataView(<any> {
-		collection: mainView.savedData
-	});
+    var autosaveView = new SavedDataView(<any> {
+        collection: mainView.savedData
+    });
 
-    $('body').on('keydown', (e: JQueryKeyEventObject) => {
+    $('body').on('keydown',(e: JQueryKeyEventObject) => {
         // TODO: Move these 2 into mainview
 
         // Ctrl + S: Save dialog
-		if (e.which === 83 && e.ctrlKey) {
-			e.preventDefault();
-			autosaveView.render();
+        if (e.which === 83 && e.ctrlKey) {
+            e.preventDefault();
+            autosaveView.render();
 
-			return;
-		}
+            return;
+        }
 
         if (mainView.keydown(e)) {
             return;

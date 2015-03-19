@@ -30,6 +30,8 @@ var __extends = this.__extends || function (d, b) {
 // * mouseover one, highlight all
 // X pay the power bill
 // * listen to debussy
+var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
+// var baseUrl = "http://192.168.0.11:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
@@ -330,7 +332,7 @@ var TodoModel = (function (_super) {
             if (value) {
                 this.archivalDate = now;
             }
-            // Set all children to their parent's archived status. We 
+            // Set all children to their parent's archived status. We
             // bypass the setter because otherwise we'd have a crazy number
             // of recursive calls for deeply nested trees.
             _.each(this.flatten(), function (m) {
@@ -338,7 +340,7 @@ var TodoModel = (function (_super) {
                 if (value)
                     m.archivalDate = now;
             });
-            // If we're unarchiving the child (or grandchild etc.) of an unarchived item, 
+            // If we're unarchiving the child (or grandchild etc.) of an unarchived item,
             // we need to go up the tree unarchiving parents. We bypass the setter because
             // we don't want recursive unarchival in this case.
             var archivedParents = _.filter(this.pathToRoot(), function (m) { return m.archived; });
@@ -1350,7 +1352,8 @@ var FooterView = (function (_super) {
         return {
             'click .archive-all': this.archiveAllDone,
             'click .starred-item': this.gotoStarredItem,
-            'click .delete-all': this.deleteAll
+            'click .delete-all': this.deleteAll,
+            'click .save': this.save
         };
     };
     FooterView.prototype.initialize = function (attrs) {
@@ -1362,6 +1365,18 @@ var FooterView = (function (_super) {
         this.listenTo(this.model, 'global-change', this.render);
         this.listenTo(this.tabModel, 'change', this.render);
         this.render();
+    };
+    FooterView.prototype.save = function () {
+        $.ajax({
+            url: baseUrl + "/save",
+            type: "POST",
+            data: JSON.stringify(this.model.getData()),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function () {
+                console.log('done');
+            }
+        });
     };
     FooterView.prototype.deleteAll = function () {
         var archived = _.filter(this.model.flatten(), function (m) { return m.archived; });
@@ -1643,6 +1658,12 @@ var MainView = (function (_super) {
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
         this.initializeTodoTree(this.savedData.load());
+        /*
+        $.getJSON(baseUrl + '/db', (d) => {
+            self.initializeTodoTree(d);
+            self.render();
+        });
+        */
         this.listenTo(this.savedData, 'load', function () {
             self.initializeTodoTree(_this.savedData.load());
             self.render();
