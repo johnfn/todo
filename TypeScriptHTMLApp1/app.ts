@@ -29,6 +29,7 @@
 // * listen to debussy
 
 var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
+// var baseUrl = "http://192.168.0.11:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {

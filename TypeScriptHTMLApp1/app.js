@@ -31,6 +31,7 @@ var __extends = this.__extends || function (d, b) {
 // X pay the power bill
 // * listen to debussy
 var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
+// var baseUrl = "http://192.168.0.11:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
