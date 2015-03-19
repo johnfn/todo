@@ -28,6 +28,8 @@
 // X pay the power bill
 // * listen to debussy
 
+var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
+
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
         var result = _.clone(this.attributes);
@@ -1354,7 +1356,7 @@ class FooterView extends Backbone.View<TodoModel> {
 
     save() {
         $.ajax({
-            url: "http://192.168.0.11:5000/save",
+            url: baseUrl + "/save",
             type: "POST",
             data: JSON.stringify(this.model.getData()),
             contentType: "application/json; charset=utf-8",
@@ -1605,6 +1607,13 @@ class MainView extends Backbone.View<TodoAppModel> {
 
         this.savedData = new SavedData();
         this.initializeTodoTree(this.savedData.load());
+
+        /*
+        $.getJSON(baseUrl + '/db', (d) => {
+            self.initializeTodoTree(d);
+            self.render();
+        });
+        */
 
         this.listenTo(this.savedData, 'load',() => {
             self.initializeTodoTree(this.savedData.load());

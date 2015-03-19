@@ -30,6 +30,7 @@ var __extends = this.__extends || function (d, b) {
 // * mouseover one, highlight all
 // X pay the power bill
 // * listen to debussy
+var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
@@ -1366,7 +1367,7 @@ var FooterView = (function (_super) {
     };
     FooterView.prototype.save = function () {
         $.ajax({
-            url: "http://192.168.0.11:5000/save",
+            url: baseUrl + "/save",
             type: "POST",
             data: JSON.stringify(this.model.getData()),
             contentType: "application/json; charset=utf-8",
@@ -1656,6 +1657,12 @@ var MainView = (function (_super) {
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
         this.initializeTodoTree(this.savedData.load());
+        /*
+        $.getJSON(baseUrl + '/db', (d) => {
+            self.initializeTodoTree(d);
+            self.render();
+        });
+        */
         this.listenTo(this.savedData, 'load', function () {
             self.initializeTodoTree(_this.savedData.load());
             self.render();
