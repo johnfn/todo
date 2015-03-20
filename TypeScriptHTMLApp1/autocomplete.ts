@@ -5,14 +5,18 @@
         this.todo = todo;
         this.typeOfMatch = type;
 
-        if (type === "name") {
-            this.matchedString_ = this.todo.name;
-        } else if (type === "content") {
-            this.matchedString_ = this.todo.content;
-        }
-
         this.startPosition = startPosition;
         this.endPosition = endPosition;
+
+        if (type === "name") {
+            this.matchedString = this.todo.name;
+        } else if (type === "content") {
+            this.matchedString = this.todo.content;
+        }
+
+        if (this.matchedString.length > 50) {
+            this.matchedString = "..." + this.matchedString.substring(this.startPosition - 25, this.endPosition + 25) + "...";
+        }
     }
 
     get todo(): TodoModel { return this.get('todo'); }
@@ -21,22 +25,22 @@
     }
 
     get startOfMatchString(): string {
-        return this.matchedString_.substring(0, this.startPosition);
+        return this.matchedString.substring(0, this.startPosition);
     }
 
     get middleOfMatchString(): string {
-        return this.matchedString_.substring(this.startPosition, this.endPosition);
+        return this.matchedString.substring(this.startPosition, this.endPosition);
     }
 
     get endOfMatchString(): string {
-        return this.matchedString_.substring(this.endPosition);
+        return this.matchedString.substring(this.endPosition);
     }
 
     get typeOfMatch(): string { return this.get('typeOfMatch'); }
     set typeOfMatch(value: string) { this.set('typeOfMatch', value); }
 
-    get matchedString_(): string { return this.get('matchedString_'); }
-    set matchedString_(value: string) { this.set('matchedString_', value); }
+    get matchedString(): string { return this.get('matchedString_'); }
+    set matchedString(value: string) { this.set('matchedString_', value); }
 
     get startPosition(): number { return this.get('startPosition'); }
     set startPosition(value: number) { this.set('startPosition', value); }

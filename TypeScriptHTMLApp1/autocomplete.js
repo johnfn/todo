@@ -10,14 +10,17 @@ var AutocompleteItem = (function (_super) {
         _super.call(this);
         this.todo = todo;
         this.typeOfMatch = type;
-        if (type === "name") {
-            this.matchedString_ = this.todo.name;
-        }
-        else if (type === "content") {
-            this.matchedString_ = this.todo.content;
-        }
         this.startPosition = startPosition;
         this.endPosition = endPosition;
+        if (type === "name") {
+            this.matchedString = this.todo.name;
+        }
+        else if (type === "content") {
+            this.matchedString = this.todo.content;
+        }
+        if (this.matchedString.length > 50) {
+            this.matchedString = "..." + this.matchedString.substring(this.startPosition - 25, this.endPosition + 25) + "...";
+        }
     }
     Object.defineProperty(AutocompleteItem.prototype, "todo", {
         get: function () {
@@ -31,21 +34,21 @@ var AutocompleteItem = (function (_super) {
     });
     Object.defineProperty(AutocompleteItem.prototype, "startOfMatchString", {
         get: function () {
-            return this.matchedString_.substring(0, this.startPosition);
+            return this.matchedString.substring(0, this.startPosition);
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "middleOfMatchString", {
         get: function () {
-            return this.matchedString_.substring(this.startPosition, this.endPosition);
+            return this.matchedString.substring(this.startPosition, this.endPosition);
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "endOfMatchString", {
         get: function () {
-            return this.matchedString_.substring(this.endPosition);
+            return this.matchedString.substring(this.endPosition);
         },
         enumerable: true,
         configurable: true
@@ -60,7 +63,7 @@ var AutocompleteItem = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AutocompleteItem.prototype, "matchedString_", {
+    Object.defineProperty(AutocompleteItem.prototype, "matchedString", {
         get: function () {
             return this.get('matchedString_');
         },
