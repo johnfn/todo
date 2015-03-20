@@ -28,8 +28,8 @@
 // X pay the power bill
 // * listen to debussy
 
-var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
-// var baseUrl = "http://192.168.0.11:5000";
+window['SERVER'] = false;
+var baseUrl = window['SERVER'] ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
@@ -1351,6 +1351,7 @@ class FooterView extends Backbone.View<TodoModel> {
         this.setElement($('.footer'));
 
         this.listenTo(this.model, 'global-change', this.render);
+        this.listenTo(this.model, 'global-change', this.save);
         this.listenTo(this.tabModel, 'change', this.render);
         this.render();
     }
@@ -1605,19 +1606,15 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.setElement($('#main-content'));
 
         this.model = new TodoAppModel();
-
         this.savedData = new SavedData();
-        this.initializeTodoTree(this.savedData.load());
+        this.savedData.load();
 
         /*
-        $.getJSON(baseUrl + '/db', (d) => {
-            self.initializeTodoTree(d);
-            self.render();
-        });
+        this.initializeTodoTree(this.savedData.load());
         */
 
-        this.listenTo(this.savedData, 'load',() => {
-            self.initializeTodoTree(this.savedData.load());
+        $.getJSON(baseUrl + '/db',(d) => {
+            self.initializeTodoTree(d);
             self.render();
         });
 
@@ -1639,6 +1636,8 @@ class MainView extends Backbone.View<TodoAppModel> {
 
         baseTodoModel.uiState.selected = true;
         this.model.currentTodoView = this.model.baseTodoView;
+
+        this.trigger('initialization-done');
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -1850,55 +1849,55 @@ $(() => {
     var detailView = new TodoDetailView();
 
     var mainView = new MainView();
-    mainView.render();
 
-    var topBar = new TopBarView(<any> { model: mainView.model });
+    mainView.listenTo(mainView, 'initialization-done',() => {
+        var topBar = new TopBarView(<any> { model: mainView.model });
+        var archiveView = new TodoArchiveView(<any> { model: mainView.model.baseTodoModel });
+        var footerView = new FooterView(<any> {
+            model: mainView.model.baseTodoModel,
+            tabModel: tabbarView.model
+        });
 
-    var archiveView = new TodoArchiveView(<any> { model: mainView.model.baseTodoModel });
-    var footerView = new FooterView(<any> {
-        model: mainView.model.baseTodoModel,
-        tabModel: tabbarView.model
-    });
+        var autosaveView = new SavedDataView(<any> {
+            collection: mainView.savedData
+        });
 
-    var autosaveView = new SavedDataView(<any> {
-        collection: mainView.savedData
-    });
+        $('body').on('keydown',(e: JQueryKeyEventObject) => {
+            // TODO: Move these 2 into mainview
 
-    $('body').on('keydown',(e: JQueryKeyEventObject) => {
-        // TODO: Move these 2 into mainview
+            // Ctrl + S: Save dialog
+            if (e.which === 83 && e.ctrlKey) {
+                e.preventDefault();
+                autosaveView.render();
 
-        // Ctrl + S: Save dialog
-        if (e.which === 83 && e.ctrlKey) {
-            e.preventDefault();
-            autosaveView.render();
-
-            return;
-        }
-
-        if (mainView.keydown(e)) {
-            return;
-        }
-
-        // Ctrl + f: Focus on find textbox
-        if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
-            $('.search-input').focus();
-
-            return false;
-        }
-
-        for (var i = 0; i < TodoView.todoViews.length; i++) {
-            if (!TodoView.todoViews[i].keydown(e)) {
                 return;
             }
-        }
 
-        // / (for vim users! :): Focus on find textbox
-        // Comes after processing todo keydowns, because they could legitimately
-        // type /.
-        if (!$('.search-input').is(':focus') && e.which == 191) {
-            $('.search-input').focus();
+            if (mainView.keydown(e)) {
+                return;
+            }
 
-            return false;
-        }
+            // Ctrl + f: Focus on find textbox
+            if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
+                $('.search-input').focus();
+
+                return false;
+            }
+
+            for (var i = 0; i < TodoView.todoViews.length; i++) {
+                if (!TodoView.todoViews[i].keydown(e)) {
+                    return;
+                }
+            }
+
+            // / (for vim users! :): Focus on find textbox
+            // Comes after processing todo keydowns, because they could legitimately
+            // type /.
+            if (!$('.search-input').is(':focus') && e.which == 191) {
+                $('.search-input').focus();
+
+                return false;
+            }
+        });
     });
 });

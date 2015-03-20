@@ -30,8 +30,8 @@ var __extends = this.__extends || function (d, b) {
 // * mouseover one, highlight all
 // X pay the power bill
 // * listen to debussy
-var baseUrl = "https://tranquil-ocean-8657.herokuapp.com";
-// var baseUrl = "http://192.168.0.11:5000";
+window['SERVER'] = false;
+var baseUrl = window['SERVER'] ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
@@ -1363,6 +1363,7 @@ var FooterView = (function (_super) {
         this.uiState = new FooterUiState({ model: this.model });
         this.setElement($('.footer'));
         this.listenTo(this.model, 'global-change', this.render);
+        this.listenTo(this.model, 'global-change', this.save);
         this.listenTo(this.tabModel, 'change', this.render);
         this.render();
     };
@@ -1649,7 +1650,6 @@ var MainView = (function (_super) {
         this.hasRendered = false;
     }
     MainView.prototype.initialize = function (options) {
-        var _this = this;
         var self = this;
         _.bindAll(this, 'clickBody');
         $('body').on('click', this.clickBody);
@@ -1657,15 +1657,12 @@ var MainView = (function (_super) {
         this.setElement($('#main-content'));
         this.model = new TodoAppModel();
         this.savedData = new SavedData();
-        this.initializeTodoTree(this.savedData.load());
+        this.savedData.load();
         /*
-        $.getJSON(baseUrl + '/db', (d) => {
-            self.initializeTodoTree(d);
-            self.render();
-        });
+        this.initializeTodoTree(this.savedData.load());
         */
-        this.listenTo(this.savedData, 'load', function () {
-            self.initializeTodoTree(_this.savedData.load());
+        $.getJSON(baseUrl + '/db', function (d) {
+            self.initializeTodoTree(d);
             self.render();
         });
         this.listenTo(this.model, 'change:currentTodoView', this.render);
@@ -1681,6 +1678,7 @@ var MainView = (function (_super) {
         });
         baseTodoModel.uiState.selected = true;
         this.model.currentTodoView = this.model.baseTodoView;
+        this.trigger('initialization-done');
     };
     MainView.prototype.keydown = function (e) {
         // Finish a search.
@@ -1858,44 +1856,45 @@ $(function () {
     var tabbarView = new TabBarView();
     var detailView = new TodoDetailView();
     var mainView = new MainView();
-    mainView.render();
-    var topBar = new TopBarView({ model: mainView.model });
-    var archiveView = new TodoArchiveView({ model: mainView.model.baseTodoModel });
-    var footerView = new FooterView({
-        model: mainView.model.baseTodoModel,
-        tabModel: tabbarView.model
-    });
-    var autosaveView = new SavedDataView({
-        collection: mainView.savedData
-    });
-    $('body').on('keydown', function (e) {
-        // TODO: Move these 2 into mainview
-        // Ctrl + S: Save dialog
-        if (e.which === 83 && e.ctrlKey) {
-            e.preventDefault();
-            autosaveView.render();
-            return;
-        }
-        if (mainView.keydown(e)) {
-            return;
-        }
-        // Ctrl + f: Focus on find textbox
-        if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
-            $('.search-input').focus();
-            return false;
-        }
-        for (var i = 0; i < TodoView.todoViews.length; i++) {
-            if (!TodoView.todoViews[i].keydown(e)) {
+    mainView.listenTo(mainView, 'initialization-done', function () {
+        var topBar = new TopBarView({ model: mainView.model });
+        var archiveView = new TodoArchiveView({ model: mainView.model.baseTodoModel });
+        var footerView = new FooterView({
+            model: mainView.model.baseTodoModel,
+            tabModel: tabbarView.model
+        });
+        var autosaveView = new SavedDataView({
+            collection: mainView.savedData
+        });
+        $('body').on('keydown', function (e) {
+            // TODO: Move these 2 into mainview
+            // Ctrl + S: Save dialog
+            if (e.which === 83 && e.ctrlKey) {
+                e.preventDefault();
+                autosaveView.render();
                 return;
             }
-        }
-        // / (for vim users! :): Focus on find textbox
-        // Comes after processing todo keydowns, because they could legitimately
-        // type /.
-        if (!$('.search-input').is(':focus') && e.which == 191) {
-            $('.search-input').focus();
-            return false;
-        }
+            if (mainView.keydown(e)) {
+                return;
+            }
+            // Ctrl + f: Focus on find textbox
+            if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
+                $('.search-input').focus();
+                return false;
+            }
+            for (var i = 0; i < TodoView.todoViews.length; i++) {
+                if (!TodoView.todoViews[i].keydown(e)) {
+                    return;
+                }
+            }
+            // / (for vim users! :): Focus on find textbox
+            // Comes after processing todo keydowns, because they could legitimately
+            // type /.
+            if (!$('.search-input').is(':focus') && e.which == 191) {
+                $('.search-input').focus();
+                return false;
+            }
+        });
     });
 });
 //# sourceMappingURL=app.js.map
