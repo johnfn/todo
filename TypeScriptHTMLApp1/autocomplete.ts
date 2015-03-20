@@ -1,27 +1,42 @@
 ﻿class AutocompleteItem extends VaguelyMagicalModel {
+    constructor(todo: TodoModel, type: string, startPosition: number, endPosition: number) {
+        super();
+
+        this.todo = todo;
+        this.typeOfMatch = type;
+
+        if (type === "name") {
+            this.matchedString_ = this.todo.name;
+        } else if (type === "content") {
+            this.matchedString_ = this.todo.content;
+        }
+
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
+    }
+
     get todo(): TodoModel { return this.get('todo'); }
     set todo(value: TodoModel) {
         this.set('todo', value);
     }
 
-    get matchedString(): string {
-        return this.todo.get(this.typeOfMatch);
-    }
-
     get startOfMatchString(): string {
-        return this.matchedString.substring(0, this.startPosition);
+        return this.matchedString_.substring(0, this.startPosition);
     }
 
     get middleOfMatchString(): string {
-        return this.matchedString.substring(this.startPosition, this.endPosition);
+        return this.matchedString_.substring(this.startPosition, this.endPosition);
     }
 
     get endOfMatchString(): string {
-        return this.matchedString.substring(this.endPosition);
+        return this.matchedString_.substring(this.endPosition);
     }
 
     get typeOfMatch(): string { return this.get('typeOfMatch'); }
     set typeOfMatch(value: string) { this.set('typeOfMatch', value); }
+
+    get matchedString_(): string { return this.get('matchedString_'); }
+    set matchedString_(value: string) { this.set('matchedString_', value); }
 
     get startPosition(): number { return this.get('startPosition'); }
     set startPosition(value: number) { this.set('startPosition', value); }
@@ -111,12 +126,11 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
             if (matchPosition !== -1) {
                 var destinationList = currentTodo.isHeader ? "Headings" : "Todos";
 
-                sections[destinationList].push(new AutocompleteItem({
-                    todo: currentTodo,
-                    typeOfMatch: "name",
-                    startPosition: matchPosition,
-                    endPosition: matchPosition + search.length
-                }));
+                sections[destinationList].push(new AutocompleteItem(
+                    currentTodo,
+                    "name",
+                    matchPosition,
+                    matchPosition + search.length));
 
                 ++thingsAdded;
                 continue;
@@ -126,12 +140,12 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
             matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
 
             if (matchPosition !== -1) {
-                sections["Todos"].push(new AutocompleteItem({
-                    todo: currentTodo,
-                    typeOfMatch: "content",
-                    startPosition: matchPosition,
-                    endPosition: matchPosition + search.length
-                }));
+                sections["Todos"].push(new AutocompleteItem(
+                    currentTodo,
+                    "content",
+                    matchPosition,
+                    matchPosition + search.length
+                ));
 
                 ++thingsAdded;
                 continue;

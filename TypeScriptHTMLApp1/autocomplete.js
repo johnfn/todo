@@ -6,8 +6,18 @@ var __extends = this.__extends || function (d, b) {
 };
 var AutocompleteItem = (function (_super) {
     __extends(AutocompleteItem, _super);
-    function AutocompleteItem() {
-        _super.apply(this, arguments);
+    function AutocompleteItem(todo, type, startPosition, endPosition) {
+        _super.call(this);
+        this.todo = todo;
+        this.typeOfMatch = type;
+        if (type === "name") {
+            this.matchedString_ = this.todo.name;
+        }
+        else if (type === "content") {
+            this.matchedString_ = this.todo.content;
+        }
+        this.startPosition = startPosition;
+        this.endPosition = endPosition;
     }
     Object.defineProperty(AutocompleteItem.prototype, "todo", {
         get: function () {
@@ -19,30 +29,23 @@ var AutocompleteItem = (function (_super) {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AutocompleteItem.prototype, "matchedString", {
-        get: function () {
-            return this.todo.get(this.typeOfMatch);
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(AutocompleteItem.prototype, "startOfMatchString", {
         get: function () {
-            return this.matchedString.substring(0, this.startPosition);
+            return this.matchedString_.substring(0, this.startPosition);
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "middleOfMatchString", {
         get: function () {
-            return this.matchedString.substring(this.startPosition, this.endPosition);
+            return this.matchedString_.substring(this.startPosition, this.endPosition);
         },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "endOfMatchString", {
         get: function () {
-            return this.matchedString.substring(this.endPosition);
+            return this.matchedString_.substring(this.endPosition);
         },
         enumerable: true,
         configurable: true
@@ -53,6 +56,16 @@ var AutocompleteItem = (function (_super) {
         },
         set: function (value) {
             this.set('typeOfMatch', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "matchedString_", {
+        get: function () {
+            return this.get('matchedString_');
+        },
+        set: function (value) {
+            this.set('matchedString_', value);
         },
         enumerable: true,
         configurable: true
@@ -173,24 +186,14 @@ var AutocompleteResult = (function (_super) {
             matchPosition = currentTodo.name.toLowerCase().indexOf(search.toLowerCase());
             if (matchPosition !== -1) {
                 var destinationList = currentTodo.isHeader ? "Headings" : "Todos";
-                sections[destinationList].push(new AutocompleteItem({
-                    todo: currentTodo,
-                    typeOfMatch: "name",
-                    startPosition: matchPosition,
-                    endPosition: matchPosition + search.length
-                }));
+                sections[destinationList].push(new AutocompleteItem(currentTodo, "name", matchPosition, matchPosition + search.length));
                 ++thingsAdded;
                 continue;
             }
             // Check for a content match.
             matchPosition = currentTodo.content.toLowerCase().indexOf(search.toLowerCase());
             if (matchPosition !== -1) {
-                sections["Todos"].push(new AutocompleteItem({
-                    todo: currentTodo,
-                    typeOfMatch: "content",
-                    startPosition: matchPosition,
-                    endPosition: matchPosition + search.length
-                }));
+                sections["Todos"].push(new AutocompleteItem(currentTodo, "content", matchPosition, matchPosition + search.length));
                 ++thingsAdded;
                 continue;
             }
