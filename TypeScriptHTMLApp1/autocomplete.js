@@ -18,10 +18,21 @@ var AutocompleteItem = (function (_super) {
         else if (type === "content") {
             this.matchedString = this.todo.content;
         }
-        if (this.matchedString.length > 50) {
-            this.matchedString = "..." + this.matchedString.substring(this.startPosition - 25, this.endPosition + 25) + "...";
-        }
+        this.truncateMatchIfNecessary();
     }
+    AutocompleteItem.prototype.truncateMatchIfNecessary = function () {
+        var matchedLength = this.endPosition - this.startPosition;
+        if (this.matchedString.length < 50)
+            return;
+        var middle = this.startPosition + Math.floor(matchedLength / 2);
+        var start = Math.max(middle - 25, 0);
+        var end = middle + 25;
+        var startWasTruncated = start > 0;
+        var endWasTruncated = end < this.matchedString.length;
+        this.startPosition -= start - (startWasTruncated ? 3 : 0);
+        this.endPosition -= start - (startWasTruncated ? 3 : 0);
+        this.matchedString = (startWasTruncated ? "..." : "") + this.matchedString.substring(start, end) + (endWasTruncated ? "..." : "");
+    };
     Object.defineProperty(AutocompleteItem.prototype, "todo", {
         get: function () {
             return this.get('todo');
