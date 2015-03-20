@@ -28,8 +28,7 @@
 // X pay the power bill
 // * listen to debussy
 
-var remote = true;
-var baseUrl = remote ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
+var baseUrl = window['SERVER'] ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
