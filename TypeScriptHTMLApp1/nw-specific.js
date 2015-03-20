@@ -1,9 +1,5 @@
 // Load native UI library
-window['SERVER'] = false;
-
 if (typeof require !== 'undefined') {
-    window['SERVER'] = true;
-
     var gui = require('nw.gui');
 
     var win = gui.Window.get();

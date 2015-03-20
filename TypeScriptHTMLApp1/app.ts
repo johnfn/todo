@@ -1,34 +1,7 @@
-﻿// TODO (lol)
+﻿declare var require;
 
-// * TODO: rename name to content and content to desc.
-// X Make the check unicode into a checkbox
-//   X and have it be draggable
-// * Content on rightpanel
-//   * Markdown?
-// * Have the breadcrumbs in a little titlebar like thing.
-// X timeago on rightpanel
-// * Dragging items around
-//   X Can't drag item as child of itself.
-//     X Can't add item as subchild of itself.
-//   * Can't drag topmost parent.
-//   X Item should still be selected when you drop it.
-//     X I'm going to move uiState inside of TodoModel, which should solve that problem w/o any code.
-//     X This can't be done because currently TodoModels are sometimes created without views, but UiStates require views to be made.
-//       X It doesn't seem like a requirement that TodoModels have to be created without views though.
-//   X Drag items as children or same-level.
-//   X Have to be able to stop dragging somehow.
-// * Save to server
-// * Generalized search
-// * Individual view.
-//   * breadcrumb trail visible
-// * Vim like keybindings - / to go to next todo with bleh in the name, ? to go back.
-
-// * mouseover one, highlight all
-
-// X pay the power bill
-// * listen to debussy
-
-var baseUrl = window['SERVER'] ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
+var nwjs = typeof require !== 'undefined';
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
