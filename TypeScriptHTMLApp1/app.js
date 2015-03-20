@@ -30,8 +30,8 @@ var __extends = this.__extends || function (d, b) {
 // * mouseover one, highlight all
 // X pay the power bill
 // * listen to debussy
-window['SERVER'] = false;
-var baseUrl = window['SERVER'] ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
+var remote = true;
+var baseUrl = remote ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
