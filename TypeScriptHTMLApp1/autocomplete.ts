@@ -101,8 +101,9 @@ class AutocompleteSectionView extends Backbone.View<AutocompleteSection> {
 
     clickItem(e: JQueryMouseEventObject) {
         var item = this.model.items.at(parseInt($(e.currentTarget).data('index')));
-
         item.todo.view.zoomToTodo();
+
+        this.trigger('click');
     }
 
     render(): AutocompleteSectionView {
@@ -237,6 +238,8 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
                 el: $('<div>').appendTo(this.$('.autocomplete-sections')),
                 model: m
             }).render();
+
+            this.listenTo(section, 'click', this.hide);
         });
 
         return this;

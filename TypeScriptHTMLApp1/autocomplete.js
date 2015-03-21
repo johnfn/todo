@@ -161,6 +161,7 @@ var AutocompleteSectionView = (function (_super) {
     AutocompleteSectionView.prototype.clickItem = function (e) {
         var item = this.model.items.at(parseInt($(e.currentTarget).data('index')));
         item.todo.view.zoomToTodo();
+        this.trigger('click');
     };
     AutocompleteSectionView.prototype.render = function () {
         this.$el.html(this.template({
@@ -268,6 +269,7 @@ var AutocompleteView = (function (_super) {
                 el: $('<div>').appendTo(_this.$('.autocomplete-sections')),
                 model: m
             }).render();
+            _this.listenTo(section, 'click', _this.hide);
         });
         return this;
     };
