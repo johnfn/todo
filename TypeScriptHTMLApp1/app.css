@@ -149,6 +149,8 @@ a {
     /* this crazy hack makes the height of the right panel equal to the height of the left. */
     padding-bottom: 100%;
     margin-bottom: -100%;
+
+    margin-bottom: 300px;
 }
 
 .right-panel-name {
@@ -162,7 +164,6 @@ a {
 }
 
 .whole-todo-container {
-    margin-bottom: 300px;
     padding-top: 65px;
 }
 

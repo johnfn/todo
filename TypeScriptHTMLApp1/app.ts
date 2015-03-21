@@ -1,7 +1,7 @@
 ﻿declare var require;
 
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
@@ -1451,6 +1451,9 @@ class TodoAppModel extends Backbone.Model {
         this.cachedTodoView = null;
     }
 
+    get view(): MainView { return this.get('view'); }
+    set view(value: MainView) { this.set('view', value); }
+
     get searchText(): string { return this.get('searchText'); }
     set searchText(value: string) { this.set('searchText', value); }
 
@@ -1578,6 +1581,7 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.setElement($('#main-content'));
 
         this.model = new TodoAppModel();
+        this.model.view = this;
         this.savedData = new SavedData();
         this.savedData.load();
 
@@ -1591,7 +1595,7 @@ class MainView extends Backbone.View<TodoAppModel> {
         });
 
         this.listenTo(this.model, 'change:currentTodoView', this.render);
-        this.listenTo(this.model, 'change:searchText', this.updateSearch);
+        // this.listenTo(this.model, 'change:searchText', this.updateSearch);
     }
 
     private initializeTodoTree(data: ITodo) {
@@ -1705,7 +1709,7 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.render();
     }
 
-    updateSearch() {
+    renderSearch() {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
         var foundMatch = false;

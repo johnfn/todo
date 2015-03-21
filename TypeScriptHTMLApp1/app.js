@@ -5,7 +5,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.11:5000";
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
@@ -1449,6 +1449,16 @@ var TodoAppModel = (function (_super) {
         this.isDragging = false;
         this.cachedTodoView = null;
     };
+    Object.defineProperty(TodoAppModel.prototype, "view", {
+        get: function () {
+            return this.get('view');
+        },
+        set: function (value) {
+            this.set('view', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoAppModel.prototype, "searchText", {
         get: function () {
             return this.get('searchText');
@@ -1630,6 +1640,7 @@ var MainView = (function (_super) {
         this.template = Util.getTemplate('main');
         this.setElement($('#main-content'));
         this.model = new TodoAppModel();
+        this.model.view = this;
         this.savedData = new SavedData();
         this.savedData.load();
         /*
@@ -1640,7 +1651,7 @@ var MainView = (function (_super) {
             self.render();
         });
         this.listenTo(this.model, 'change:currentTodoView', this.render);
-        this.listenTo(this.model, 'change:searchText', this.updateSearch);
+        // this.listenTo(this.model, 'change:searchText', this.updateSearch);
     };
     MainView.prototype.initializeTodoTree = function (data) {
         var baseTodoModel = new TodoModel().initWithData(data, null);
@@ -1727,7 +1738,7 @@ var MainView = (function (_super) {
         this.model.cachedTodoView = null;
         this.render();
     };
-    MainView.prototype.updateSearch = function () {
+    MainView.prototype.renderSearch = function () {
         var search = this.model.searchText;
         var allTodos = this.model.baseTodoModel.flatten();
         var foundMatch = false;

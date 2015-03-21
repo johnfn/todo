@@ -190,12 +190,26 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
 class AutocompleteView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
 
+    events() {
+        return {
+            'click .see-all-js': this.clickSeeAll
+        };
+    }
+
     initialize(attrs?: any) {
         this.template = Util.getTemplate('autocomplete');
 
         this.listenTo(this.model, 'change:searchText', () => {
             this.render(this.model.searchText);
         });
+    }
+
+    clickSeeAll(e: JQueryMouseEventObject) {
+        console.log('boom');
+
+        this.model.view.renderSearch();
+
+        this.$el.toggle(false);
     }
 
     getAutocompleteResult(): AutocompleteResult {

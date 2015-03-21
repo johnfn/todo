@@ -229,12 +229,22 @@ var AutocompleteView = (function (_super) {
     function AutocompleteView() {
         _super.apply(this, arguments);
     }
+    AutocompleteView.prototype.events = function () {
+        return {
+            'click .see-all-js': this.clickSeeAll
+        };
+    };
     AutocompleteView.prototype.initialize = function (attrs) {
         var _this = this;
         this.template = Util.getTemplate('autocomplete');
         this.listenTo(this.model, 'change:searchText', function () {
             _this.render(_this.model.searchText);
         });
+    };
+    AutocompleteView.prototype.clickSeeAll = function (e) {
+        console.log('boom');
+        this.model.view.renderSearch();
+        this.$el.toggle(false);
     };
     AutocompleteView.prototype.getAutocompleteResult = function () {
         var result = new AutocompleteResult([], { appModel: this.model });
