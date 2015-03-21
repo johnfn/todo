@@ -1540,6 +1540,8 @@ class TopBarView extends Backbone.View<TodoAppModel> {
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
+        if (this.autocomplete.keydown(e)) return true;
+
         if (e.which == 27) {
             if (this.$('.search-input').is(':focus')) {
                 this.$('.search-input').val("").blur();

@@ -83,7 +83,7 @@ a {
         text-decoration: none;
     }
 
-        .toolbar a:hover {
+        .toolbar a:hover, .toolbar a.hover {
             color: #000;
             text-decoration: none;
         }

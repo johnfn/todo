@@ -139,9 +139,20 @@ var AutocompleteSection = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(AutocompleteSection.prototype, "selectionIndex", {
+        get: function () {
+            return this.get('selectionIndex');
+        },
+        set: function (value) {
+            this.set('selectionIndex', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     AutocompleteSection.prototype.initialize = function (attrs) {
         this.items = this.items || new AutocompleteSectionItems();
         this.headingName = this.headingName || "Unnamed section TODO";
+        this.selectionIndex = -1;
     };
     return AutocompleteSection;
 })(Backbone.Model);
@@ -229,6 +240,7 @@ var AutocompleteView = (function (_super) {
     __extends(AutocompleteView, _super);
     function AutocompleteView() {
         _super.apply(this, arguments);
+        this.selectionIndex = 0;
     }
     AutocompleteView.prototype.events = function () {
         return {
@@ -241,6 +253,10 @@ var AutocompleteView = (function (_super) {
         this.listenTo(this.model, 'change:searchText', function () {
             _this.render(_this.model.searchText);
         });
+    };
+    AutocompleteView.prototype.keydown = function (e) {
+        console.log(e.which);
+        return false;
     };
     AutocompleteView.prototype.clickSeeAll = function (e) {
         this.model.view.renderSearch();
@@ -264,12 +280,17 @@ var AutocompleteView = (function (_super) {
             return;
         var ar = this.getAutocompleteResult();
         this.$el.html(this.template());
+        var itemsSeen = 0;
         ar.each(function (m) {
+            if (_this.selectionIndex >= itemsSeen && _this.selectionIndex < itemsSeen + m.items.length) {
+                m.selectionIndex = _this.selectionIndex - itemsSeen;
+            }
             var section = new AutocompleteSectionView({
                 el: $('<div>').appendTo(_this.$('.autocomplete-sections')),
                 model: m
             }).render();
             _this.listenTo(section, 'click', _this.hide);
+            itemsSeen += m.items.length;
         });
         return this;
     };

@@ -80,9 +80,13 @@ class AutocompleteSection extends Backbone.Model {
     get items(): AutocompleteSectionItems { return this.get('items'); }
     set items(value: AutocompleteSectionItems) { this.set('items', value); }
 
+    get selectionIndex(): number { return this.get('selectionIndex'); }
+    set selectionIndex(value: number) { this.set('selectionIndex', value); }
+
     initialize(attrs?: any) {
         this.items = this.items || new AutocompleteSectionItems();
         this.headingName = this.headingName || "Unnamed section TODO";
+        this.selectionIndex = -1;
     }
 }
 
@@ -190,6 +194,7 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
 
 class AutocompleteView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
+    selectionIndex: number = 0;
 
     events() {
         return {
@@ -203,6 +208,12 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
         this.listenTo(this.model, 'change:searchText', () => {
             this.render(this.model.searchText);
         });
+    }
+
+    keydown(e: JQueryKeyEventObject): boolean {
+        console.log(e.which);
+
+        return false;
     }
 
     clickSeeAll(e: JQueryMouseEventObject) {
@@ -233,13 +244,21 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
         var ar = this.getAutocompleteResult();
 
         this.$el.html(this.template());
+
+        var itemsSeen = 0;
+
         ar.each(m => {
+            if (this.selectionIndex >= itemsSeen && this.selectionIndex < itemsSeen + m.items.length) {
+                m.selectionIndex = this.selectionIndex - itemsSeen;
+            }
+
             var section = new AutocompleteSectionView({
                 el: $('<div>').appendTo(this.$('.autocomplete-sections')),
                 model: m
             }).render();
 
             this.listenTo(section, 'click', this.hide);
+            itemsSeen += m.items.length;
         });
 
         return this;
