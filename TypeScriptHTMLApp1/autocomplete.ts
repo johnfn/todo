@@ -135,6 +135,14 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
         this.addTextSearchSection();
     }
 
+    totalLength(): number {
+        var result = 0;
+
+        this.each(section => { result += section.items.length });
+
+        return result;
+    }
+
     addTextSearchSection(): void {
         var search = this.appModel.searchText;
         var allTodos = _.filter(this.baseTodo.flatten(), m => m.inSearchResults);
@@ -195,6 +203,8 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
 class AutocompleteView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
     selectionIndex: number = 0;
+    currentResult: AutocompleteResult;
+    currentSearch: string;
 
     events() {
         return {
@@ -211,7 +221,27 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
-        console.log(e.which);
+        // 40 : down
+        // 38 : up
+
+        var change = false;
+        
+        if (e.which == 40) {
+            this.selectionIndex += 1;
+            change = true;
+        }
+
+        if (e.which == 38) {
+            this.selectionIndex -= 1;
+            change = true;
+        }
+
+        if (change) {
+            this.selectionIndex = this.selectionIndex % this.currentResult.totalLength();
+            this.render(this.currentSearch);
+
+            return true;
+        }
 
         return false;
     }
@@ -227,16 +257,18 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     }
 
     getAutocompleteResult(): AutocompleteResult {
-        var result = new AutocompleteResult([], { appModel: this.model });
+        this.currentResult = new AutocompleteResult([], { appModel: this.model });
 
-        result.compileSearch();
+        this.currentResult.compileSearch();
 
-        return result;
+        return this.currentResult;
     }
 
     render(text: string = ""): AutocompleteView {
         var typedAnything = text != "";
         var self = this;
+
+        this.currentSearch = text;
 
         this.$el.toggle(typedAnything);
         if (!typedAnything) return;

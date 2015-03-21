@@ -197,6 +197,13 @@ var AutocompleteResult = (function (_super) {
     AutocompleteResult.prototype.compileSearch = function () {
         this.addTextSearchSection();
     };
+    AutocompleteResult.prototype.totalLength = function () {
+        var result = 0;
+        this.each(function (section) {
+            result += section.items.length;
+        });
+        return result;
+    };
     AutocompleteResult.prototype.addTextSearchSection = function () {
         var search = this.appModel.searchText;
         var allTodos = _.filter(this.baseTodo.flatten(), function (m) { return m.inSearchResults; });
@@ -255,7 +262,22 @@ var AutocompleteView = (function (_super) {
         });
     };
     AutocompleteView.prototype.keydown = function (e) {
-        console.log(e.which);
+        // 40 : down
+        // 38 : up
+        var change = false;
+        if (e.which == 40) {
+            this.selectionIndex += 1;
+            change = true;
+        }
+        if (e.which == 38) {
+            this.selectionIndex -= 1;
+            change = true;
+        }
+        if (change) {
+            this.selectionIndex = this.selectionIndex % this.currentResult.totalLength();
+            this.render(this.currentSearch);
+            return true;
+        }
         return false;
     };
     AutocompleteView.prototype.clickSeeAll = function (e) {
@@ -266,15 +288,16 @@ var AutocompleteView = (function (_super) {
         this.$el.toggle(false);
     };
     AutocompleteView.prototype.getAutocompleteResult = function () {
-        var result = new AutocompleteResult([], { appModel: this.model });
-        result.compileSearch();
-        return result;
+        this.currentResult = new AutocompleteResult([], { appModel: this.model });
+        this.currentResult.compileSearch();
+        return this.currentResult;
     };
     AutocompleteView.prototype.render = function (text) {
         var _this = this;
         if (text === void 0) { text = ""; }
         var typedAnything = text != "";
         var self = this;
+        this.currentSearch = text;
         this.$el.toggle(typedAnything);
         if (!typedAnything)
             return;
