@@ -1539,6 +1539,19 @@ class TopBarView extends Backbone.View<TodoAppModel> {
         });
     }
 
+    keydown(e: JQueryKeyEventObject): boolean {
+        if (e.which == 27) {
+            if (this.$('.search-input').is(':focus')) {
+                this.$('.search-input').val("").blur();
+                this.autocomplete.hide();
+
+                return true;
+            }
+        }
+        
+        return false;
+    }
+
     changeZoom(e: JQueryMouseEventObject): boolean {
         var index = parseInt($(e.currentTarget).data('index'));
 
@@ -1628,6 +1641,10 @@ class MainView extends Backbone.View<TodoAppModel> {
         if (e.which === 27) { // ESC
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
+                this.stopSearch();
+
+                return true;
+            } else if ($('.search-input').is(':focus')) {
                 this.stopSearch();
 
                 return true;
@@ -1846,6 +1863,10 @@ $(() => {
                 e.preventDefault();
                 autosaveView.render();
 
+                return;
+            }
+
+            if (topBar.keydown(e)) {
                 return;
             }
 

@@ -1607,6 +1607,16 @@ var TopBarView = (function (_super) {
             el: this.$('.autocomplete-container')
         });
     };
+    TopBarView.prototype.keydown = function (e) {
+        if (e.which == 27) {
+            if (this.$('.search-input').is(':focus')) {
+                this.$('.search-input').val("").blur();
+                this.autocomplete.hide();
+                return true;
+            }
+        }
+        return false;
+    };
     TopBarView.prototype.changeZoom = function (e) {
         var index = parseInt($(e.currentTarget).data('index'));
         this.model.currentTodoView = this.model.currentTodoStack[index].view;
@@ -1674,6 +1684,10 @@ var MainView = (function (_super) {
         if (e.which === 27) {
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
+                this.stopSearch();
+                return true;
+            }
+            else if ($('.search-input').is(':focus')) {
                 this.stopSearch();
                 return true;
             }
@@ -1857,6 +1871,9 @@ $(function () {
             if (e.which === 83 && e.ctrlKey) {
                 e.preventDefault();
                 autosaveView.render();
+                return;
+            }
+            if (topBar.keydown(e)) {
                 return;
             }
             if (mainView.keydown(e)) {

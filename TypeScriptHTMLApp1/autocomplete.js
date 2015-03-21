@@ -242,8 +242,10 @@ var AutocompleteView = (function (_super) {
         });
     };
     AutocompleteView.prototype.clickSeeAll = function (e) {
-        console.log('boom');
         this.model.view.renderSearch();
+        this.$el.toggle(false);
+    };
+    AutocompleteView.prototype.hide = function () {
         this.$el.toggle(false);
     };
     AutocompleteView.prototype.getAutocompleteResult = function () {

@@ -205,10 +205,12 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     }
 
     clickSeeAll(e: JQueryMouseEventObject) {
-        console.log('boom');
-
         this.model.view.renderSearch();
 
+        this.$el.toggle(false);
+    }
+
+    hide(): void {
         this.$el.toggle(false);
     }
 
