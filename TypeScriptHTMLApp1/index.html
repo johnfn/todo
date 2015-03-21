@@ -213,8 +213,7 @@
 
         <% _.each(items, function(item, i) { %>
             <a href="#" class="autocomplete-item">
-                <% if (i == section.selectionIndex) print ("blh!") %>
-                <div class="click-autocomplete-item-js" data-index="<%= i %>">
+                <div class="click-autocomplete-item-js <% if (i == section.selectionIndex) print('hover') %>" data-index="<%= i %>">
                     <% if (item.typeOfMatch == "name") { %>
                         <%= item.startOfMatchString %><span class="autocomplete-match"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
                     <% } else { %>

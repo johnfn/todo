@@ -83,7 +83,7 @@ a {
         text-decoration: none;
     }
 
-        .toolbar a:hover, .toolbar a.hover {
+        .toolbar a:hover{
             color: #000;
             text-decoration: none;
         }
@@ -245,7 +245,7 @@ a.autocomplete-item {
     color: black;
 }
 
-    .autocomplete-item div:hover {
+    .autocomplete-item div:hover, .autocomplete-item div.hover {
         background-color: #f3f3f3;
     }
 
