@@ -103,8 +103,12 @@ class AutocompleteSectionView extends Backbone.View<AutocompleteSection> {
         this.template = Util.getTemplate('autocomplete-section');
     }
 
-    clickItem(e: JQueryMouseEventObject) {
-        var item = this.model.items.at(parseInt($(e.currentTarget).data('index')));
+    private clickItem(e: JQueryMouseEventObject) {
+        this.goToItem(parseInt($(e.currentTarget).data('index')));
+    }
+
+    goToItem(index: number) {
+        var item = this.model.items.at(index);
         item.todo.view.zoomToTodo();
 
         this.trigger('click');
@@ -205,6 +209,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     selectionIndex: number = 0;
     currentResult: AutocompleteResult;
     currentSearch: string;
+    subviews: AutocompleteSectionView[] = [];
 
     events() {
         return {
@@ -221,16 +226,40 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
-        // 40 : down
-        // 38 : up
-
         var change = false;
         
+        // enter
+        if (e.which == 13) {
+            this.hide();
+
+            $('.search-input').val('').blur();
+
+            // get item at that index.
+            var indexInSection = this.selectionIndex;
+
+            for (var i = 0; i < this.currentResult.length; i++) {
+                var m = this.currentResult.at(i);
+
+                if (indexInSection < m.items.length) {
+                    this.subviews[i].goToItem(indexInSection);
+
+                    return true;
+                }
+
+                indexInSection -= m.items.length;
+            }
+
+            // Should never get here. 
+            return true;
+        }
+
+        // 40 : down
         if (e.which == 40) {
             this.selectionIndex += 1;
             change = true;
         }
 
+        // 38 : up
         if (e.which == 38) {
             this.selectionIndex -= 1;
             change = true;
@@ -279,7 +308,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
 
         var itemsSeen = 0;
 
-        ar.each(m => {
+        this.subviews = ar.map(m => {
             if (this.selectionIndex >= itemsSeen && this.selectionIndex < itemsSeen + m.items.length) {
                 m.selectionIndex = this.selectionIndex - itemsSeen;
             }
@@ -291,6 +320,8 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
 
             this.listenTo(section, 'click', this.hide);
             itemsSeen += m.items.length;
+
+            return section;
         });
 
         return this;

@@ -5,7 +5,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://172.31.98.155:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
@@ -1678,11 +1678,6 @@ var MainView = (function (_super) {
         this.trigger('initialization-done');
     };
     MainView.prototype.keydown = function (e) {
-        // Finish a search.
-        if (e.which === 13 && $('.search-input').is(':focus')) {
-            this.zoomTo(this.model.selectedSearchModel.view);
-            return true;
-        }
         if (e.which === 27) {
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {

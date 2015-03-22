@@ -170,7 +170,10 @@ var AutocompleteSectionView = (function (_super) {
         this.template = Util.getTemplate('autocomplete-section');
     };
     AutocompleteSectionView.prototype.clickItem = function (e) {
-        var item = this.model.items.at(parseInt($(e.currentTarget).data('index')));
+        this.goToItem(parseInt($(e.currentTarget).data('index')));
+    };
+    AutocompleteSectionView.prototype.goToItem = function (index) {
+        var item = this.model.items.at(index);
         item.todo.view.zoomToTodo();
         this.trigger('click');
     };
@@ -248,6 +251,7 @@ var AutocompleteView = (function (_super) {
     function AutocompleteView() {
         _super.apply(this, arguments);
         this.selectionIndex = 0;
+        this.subviews = [];
     }
     AutocompleteView.prototype.events = function () {
         return {
@@ -262,13 +266,30 @@ var AutocompleteView = (function (_super) {
         });
     };
     AutocompleteView.prototype.keydown = function (e) {
-        // 40 : down
-        // 38 : up
         var change = false;
+        // enter
+        if (e.which == 13) {
+            this.hide();
+            $('.search-input').val('').blur();
+            // get item at that index.
+            var indexInSection = this.selectionIndex;
+            for (var i = 0; i < this.currentResult.length; i++) {
+                var m = this.currentResult.at(i);
+                if (indexInSection < m.items.length) {
+                    this.subviews[i].goToItem(indexInSection);
+                    return true;
+                }
+                indexInSection -= m.items.length;
+            }
+            // Should never get here. 
+            return true;
+        }
+        // 40 : down
         if (e.which == 40) {
             this.selectionIndex += 1;
             change = true;
         }
+        // 38 : up
         if (e.which == 38) {
             this.selectionIndex -= 1;
             change = true;
@@ -304,7 +325,7 @@ var AutocompleteView = (function (_super) {
         var ar = this.getAutocompleteResult();
         this.$el.html(this.template());
         var itemsSeen = 0;
-        ar.each(function (m) {
+        this.subviews = ar.map(function (m) {
             if (_this.selectionIndex >= itemsSeen && _this.selectionIndex < itemsSeen + m.items.length) {
                 m.selectionIndex = _this.selectionIndex - itemsSeen;
             }
@@ -314,6 +335,7 @@ var AutocompleteView = (function (_super) {
             }).render();
             _this.listenTo(section, 'click', _this.hide);
             itemsSeen += m.items.length;
+            return section;
         });
         return this;
     };

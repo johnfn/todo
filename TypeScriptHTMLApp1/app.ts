@@ -1,7 +1,7 @@
 ﻿declare var require;
 
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://172.31.98.155:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
@@ -1632,14 +1632,6 @@ class MainView extends Backbone.View<TodoAppModel> {
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
-        // Finish a search.
-
-        if (e.which === 13 && $('.search-input').is(':focus')) {
-            this.zoomTo(this.model.selectedSearchModel.view);
-
-            return true;
-        }
-
         if (e.which === 27) { // ESC
             // Cancel an ongoing search
             if (this.model.searchIsOngoing) {
