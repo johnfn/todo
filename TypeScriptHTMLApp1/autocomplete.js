@@ -265,23 +265,33 @@ var AutocompleteView = (function (_super) {
             _this.render(_this.model.searchText);
         });
     };
+    AutocompleteView.prototype.goToItem = function (index) {
+        this.hide();
+        $('.search-input').val('').blur();
+        for (var i = 0; i < this.currentResult.length; i++) {
+            var m = this.currentResult.at(i);
+            if (index < m.items.length) {
+                this.subviews[i].goToItem(index);
+                return;
+            }
+            index -= m.items.length;
+        }
+    };
     AutocompleteView.prototype.keydown = function (e) {
         var change = false;
+        var ctrl = e.ctrlKey;
+        // 1-9 and 0
+        if (ctrl && (e.which >= 49 && e.which < 59)) {
+            var numberPressed = 1 + e.which - 49;
+            if (numberPressed == 10) {
+                numberPressed = 0;
+            }
+            this.goToItem(numberPressed - 1);
+            return true;
+        }
         // enter
         if (e.which == 13) {
-            this.hide();
-            $('.search-input').val('').blur();
-            // get item at that index.
-            var indexInSection = this.selectionIndex;
-            for (var i = 0; i < this.currentResult.length; i++) {
-                var m = this.currentResult.at(i);
-                if (indexInSection < m.items.length) {
-                    this.subviews[i].goToItem(indexInSection);
-                    return true;
-                }
-                indexInSection -= m.items.length;
-            }
-            // Should never get here. 
+            this.goToItem(this.selectionIndex);
             return true;
         }
         // 40 : down
