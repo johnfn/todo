@@ -247,6 +247,10 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
         var change = false;
         var ctrl = e.ctrlKey;
 
+        if (!this.$('.search-input').is(':focus')) {
+            return false;
+        }
+
         // 1-9 and 0
         if (ctrl && (e.which >= 49 && e.which < 59)) {
             var numberPressed = 1 + e.which - 49;
