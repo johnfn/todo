@@ -247,7 +247,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
         var change = false;
         var ctrl = e.ctrlKey;
 
-        if (!this.$('.search-input').is(':focus')) {
+        if (!$('.search-input').is(':focus')) {
             return false;
         }
 
@@ -263,7 +263,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
 
             return true;
         }
-        
+
         // enter
         if (e.which == 13) {
             this.goToItem(this.selectionIndex);

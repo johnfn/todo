@@ -280,7 +280,7 @@ var AutocompleteView = (function (_super) {
     AutocompleteView.prototype.keydown = function (e) {
         var change = false;
         var ctrl = e.ctrlKey;
-        if (!this.$('.search-input').is(':focus')) {
+        if (!$('.search-input').is(':focus')) {
             return false;
         }
         // 1-9 and 0
