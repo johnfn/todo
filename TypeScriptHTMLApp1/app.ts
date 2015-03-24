@@ -853,9 +853,10 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // Add tag (press "#")
         if (e.shiftKey && e.which == 51 && this.uiState.editingName) {
+            this.model.tags.add(new TagModel("new tag", ""));
+
             this.uiState.editingName = false;
             this.uiState.editingTag = true;
-            this.uiState.whichTag = 0;
 
             this.render();
             return false;

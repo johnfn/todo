@@ -29,7 +29,12 @@
     <script src="nw-specific.js"></script>
 
     <script type="text/template" id="tag">
-        <%= name %> <span class="remove-tag">x</span>
+        <% if (isBeingEdited) { %>
+            <input class="tagname tagname-js" type="text" placeholder="title" />
+        <% } else { %>
+            <%= name %> 
+        <% } %>
+        <span class="remove-tag">x</span>
     </script>
 
     <script type="text/template" id="todo-edit">

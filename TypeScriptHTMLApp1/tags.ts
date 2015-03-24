@@ -19,17 +19,27 @@ class TagModel extends Backbone.Model {
 
 class TagView extends Backbone.View<TagModel> {
     template: ITemplate;
+    isBeingEdited: boolean;
 
-    constructor(attrs: Backbone.ViewOptions<TagModel>) {
+    constructor(model: TagModel, isBeingEdited: boolean = false) {
         this.tagName = 'a';
+        this.isBeingEdited = isBeingEdited;
 
-        super(attrs);
+        super();
 
         this.template = Util.getTemplate('tag');
+        this.model = model;
     }
 
     render(): TagView {
-        this.$el.html(this.template(this.model.toJSON()));
+        var renderOptions = this.model.toJSON();
+        renderOptions['isBeingEdited'] = this.isBeingEdited;
+        
+        this.$el.html(this.template(renderOptions));
+
+        if (this.isBeingEdited) {
+            this.$('.tagname-js').focus();
+        }
 
         return this;
     }
@@ -38,23 +48,38 @@ class TagView extends Backbone.View<TagModel> {
 class TagListView extends Backbone.View<Backbone.Model> {
     template: ITemplate;
     tags: TagList;
+    tagViews: TagView[];
+    currentlySelectedTagId: number = -1;
 
     constructor(tags: TagList) {
+        super();
+
+        this.tagViews = [];
         this.tags = tags;
 
-        super();
+        this.listenTo(this.tags, 'add', () => {
+            this.addTagView(this.tags.last(), true);
+        });
+        
+        this.tags.each((m, i) => {
+            this.addTagView(m, false);
+        });
+    }
+
+    addTagView(model: TagModel, isCurrentlyEditing) {
+        var view = new TagView(model, isCurrentlyEditing);
+
+        this.tagViews.push(view);
     }
 
     render(): TagListView {
         this.$el.empty();
 
-        this.tags.each(m => {
-            var view = new TagView({
-                model: m
-            });
+        for (var i = 0; i < this.tagViews.length; i++) {
+            var view = this.tagViews[i];
 
             view.render().$el.appendTo(this.$el);
-        });
+        }
 
         return this;
     }

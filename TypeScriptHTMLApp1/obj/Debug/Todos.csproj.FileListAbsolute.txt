@@ -14,3 +14,13 @@ C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.dll
 C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.NetFx45.dll
 C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.xml
 C:\Users\grant\Documents\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.NetFx45.xml
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Todos.dll.config
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Todos.dll
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Todos.pdb
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.dll
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.NetFx45.dll
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.xml
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\bin\Parse.NetFx45.xml
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\obj\Debug\Todos.csprojResolveAssemblyReference.cache
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\obj\Debug\Todos.dll
+\\vmware-host\Shared Folders\Desktop\GitHub\todo\TypeScriptHTMLApp1\obj\Debug\Todos.pdb

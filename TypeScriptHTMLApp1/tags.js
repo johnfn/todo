@@ -42,13 +42,21 @@ var TagModel = (function (_super) {
 })(Backbone.Model);
 var TagView = (function (_super) {
     __extends(TagView, _super);
-    function TagView(attrs) {
+    function TagView(model, isBeingEdited) {
+        if (isBeingEdited === void 0) { isBeingEdited = false; }
         this.tagName = 'a';
-        _super.call(this, attrs);
+        this.isBeingEdited = isBeingEdited;
+        _super.call(this);
         this.template = Util.getTemplate('tag');
+        this.model = model;
     }
     TagView.prototype.render = function () {
-        this.$el.html(this.template(this.model.toJSON()));
+        var renderOptions = this.model.toJSON();
+        renderOptions['isBeingEdited'] = this.isBeingEdited;
+        this.$el.html(this.template(renderOptions));
+        if (this.isBeingEdited) {
+            this.$('.tagname-js').focus();
+        }
         return this;
     };
     return TagView;
@@ -56,18 +64,28 @@ var TagView = (function (_super) {
 var TagListView = (function (_super) {
     __extends(TagListView, _super);
     function TagListView(tags) {
-        this.tags = tags;
-        _super.call(this);
-    }
-    TagListView.prototype.render = function () {
         var _this = this;
-        this.$el.empty();
-        this.tags.each(function (m) {
-            var view = new TagView({
-                model: m
-            });
-            view.render().$el.appendTo(_this.$el);
+        _super.call(this);
+        this.currentlySelectedTagId = -1;
+        this.tagViews = [];
+        this.tags = tags;
+        this.listenTo(this.tags, 'add', function () {
+            _this.addTagView(_this.tags.last(), true);
         });
+        this.tags.each(function (m, i) {
+            _this.addTagView(m, false);
+        });
+    }
+    TagListView.prototype.addTagView = function (model, isCurrentlyEditing) {
+        var view = new TagView(model, isCurrentlyEditing);
+        this.tagViews.push(view);
+    };
+    TagListView.prototype.render = function () {
+        this.$el.empty();
+        for (var i = 0; i < this.tagViews.length; i++) {
+            var view = this.tagViews[i];
+            view.render().$el.appendTo(this.$el);
+        }
         return this;
     };
     return TagListView;
