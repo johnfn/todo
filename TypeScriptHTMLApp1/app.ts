@@ -1254,7 +1254,7 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
 
-        this.tagList.setElement(this.$('.tag-container'));
+        this.tagList.setElement(this.$('.tag-container').first());
         this.tagList.render();
 
         return this;

@@ -1269,7 +1269,7 @@ var TodoView = (function (_super) {
         if (this.uiState.collapsedTrigger.value) {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
-        this.tagList.setElement(this.$('.tag-container'));
+        this.tagList.setElement(this.$('.tag-container').first());
         this.tagList.render();
         return this;
     };
