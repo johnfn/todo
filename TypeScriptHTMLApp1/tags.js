@@ -54,9 +54,6 @@ var TagView = (function (_super) {
         var renderOptions = this.model.toJSON();
         renderOptions['isBeingEdited'] = this.isBeingEdited;
         this.$el.html(this.template(renderOptions));
-        if (this.isBeingEdited) {
-            this.$('.tagname-js').focus();
-        }
         return this;
     };
     return TagView;
@@ -82,9 +79,16 @@ var TagListView = (function (_super) {
     };
     TagListView.prototype.render = function () {
         this.$el.empty();
+        var selectedIndex = -1;
         for (var i = 0; i < this.tagViews.length; i++) {
             var view = this.tagViews[i];
             view.render().$el.appendTo(this.$el);
+            if (view.isBeingEdited) {
+                selectedIndex = i;
+            }
+        }
+        if (selectedIndex !== -1) {
+            this.tagViews[selectedIndex].$el.find('.tagname-js').focus();
         }
         return this;
     };
