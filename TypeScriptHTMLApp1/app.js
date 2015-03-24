@@ -172,6 +172,7 @@ var TodoModel = (function (_super) {
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
+        this.tags = new TagList([]);
         this.searchResult = new SearchResult();
         // Pass this event up the hierarchy, so we can use it in SavedData.
         this.listenTo(this, 'global-change', function () {
@@ -189,6 +190,7 @@ var TodoModel = (function (_super) {
                 continue;
             this[prop] = data[prop];
         }
+        this.tags = new TagList(data['tags'] || []);
         this.parent = parent;
         if (!this.has('depth'))
             this.depth = 0;
@@ -205,6 +207,7 @@ var TodoModel = (function (_super) {
     TodoModel.prototype.getData = function () {
         var result = this.toJSON();
         result['children'] = _.map(this.children, function (model) { return model.getData(); });
+        result['tags'] = this.tags.toJSON();
         return result;
     };
     /** Indicate that now would be a good time to save. */
@@ -275,6 +278,16 @@ var TodoModel = (function (_super) {
         },
         set: function (value) {
             this.set('isHeader', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoModel.prototype, "tags", {
+        get: function () {
+            return this.get('tags');
+        },
+        set: function (value) {
+            this.set('tags', value);
         },
         enumerable: true,
         configurable: true
@@ -562,6 +575,26 @@ var TodoUiState = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoUiState.prototype, "editingTag", {
+        get: function () {
+            return this.get('editingTag');
+        },
+        set: function (value) {
+            this.set('editingTag', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(TodoUiState.prototype, "whichTag", {
+        get: function () {
+            return this.get('whichTag');
+        },
+        set: function (value) {
+            this.set('whichTag', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoUiState.prototype, "editingName", {
         get: function () {
             return this.get('editingName');
@@ -844,6 +877,7 @@ var TodoView = (function (_super) {
         this.childrenViews = [];
         this.uiState = new TodoUiState({ view: this });
         this.model.view = this;
+        this.tagList = new TagListView(this.model.tags);
         this.initEditView();
         for (var i = 0; i < this.model.children.length; i++) {
             this.addChildTodo(this.model.children[i]);
@@ -922,6 +956,14 @@ var TodoView = (function (_super) {
             if (!this.uiState.isEditing) {
                 return this.navigateBetweenTodos(e.which);
             }
+        }
+        // Add tag (press "#")
+        if (e.shiftKey && e.which == 51 && this.uiState.editingName) {
+            this.uiState.editingName = false;
+            this.uiState.editingTag = true;
+            this.uiState.whichTag = 0;
+            this.render();
+            return false;
         }
         // Shift + Enter to toggle between name and content editing
         if (shiftEnter && this.uiState.editingName) {
@@ -1227,6 +1269,8 @@ var TodoView = (function (_super) {
         if (this.uiState.collapsedTrigger.value) {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
+        this.tagList.setElement(this.$('.tag-container'));
+        this.tagList.render();
         return this;
     };
     /** Show the name text xor the name input. */

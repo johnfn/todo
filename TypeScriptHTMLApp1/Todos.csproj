@@ -33,6 +33,7 @@
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\underscore\underscore.d.ts" />
     <TypeScriptCompile Include="storage.ts" />
+    <TypeScriptCompile Include="tags.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

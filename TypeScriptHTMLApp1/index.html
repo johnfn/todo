@@ -22,10 +22,15 @@
 
     <script src="app.js"></script>
     <script src="autocomplete.js"></script>
+    <script src="tags.js"></script>
     <script src="keyboard-shortcuts.js"></script>
     <script src="storage.js"></script>
 
     <script src="nw-specific.js"></script>
+
+    <script type="text/template" id="tag">
+        <%= name %> <span class="remove-tag">x</span>
+    </script>
 
     <script type="text/template" id="todo-edit">
         <div class="children">
@@ -96,6 +101,10 @@
                                 <% } %>
                             </a>
                         <% } %>
+
+                        <span class="tag-container">
+
+                        </span>
                     <% } %>
 				</span>
 

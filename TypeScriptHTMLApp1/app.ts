@@ -143,6 +143,7 @@ class TodoModel extends Backbone.Model implements ITodo {
         this.archivalDate = '';
         this.archived = false;
         this.starred = false;
+        this.tags = new TagList(/* [ new TagModel("taggy", "blue") ] */[]);
         this.searchResult = new SearchResult();
 
         // Pass this event up the hierarchy, so we can use it in SavedData.
@@ -161,6 +162,8 @@ class TodoModel extends Backbone.Model implements ITodo {
 
             this[prop] = data[prop];
         }
+
+        this.tags = new TagList(data['tags'] || []);
 
         this.parent = parent;
 
@@ -183,6 +186,7 @@ class TodoModel extends Backbone.Model implements ITodo {
     getData(): ITodo {
         var result = this.toJSON();
         result['children'] = _.map(this.children, (model: TodoModel) => model.getData());
+        result['tags'] = this.tags.toJSON();
 
         return result;
     }
@@ -256,6 +260,9 @@ class TodoModel extends Backbone.Model implements ITodo {
 
     get isHeader(): boolean { return this.get('isHeader'); }
     set isHeader(value: boolean) { this.set('isHeader', value); }
+
+    get tags(): TagList { return this.get('tags'); }
+    set tags(value: TagList) { this.set('tags', value); }
 
     get starred(): boolean { return this.get('starred'); }
     set starred(value: boolean) {
@@ -438,6 +445,12 @@ class TodoUiState extends Backbone.Model {
         this.set('collapsed', value);
         this.collapsedTrigger.value = value;
     }
+
+    get editingTag(): boolean { return this.get('editingTag'); }
+    set editingTag(value: boolean) { this.set('editingTag', value); }
+
+    get whichTag(): number { return this.get('whichTag'); }
+    set whichTag(value: number) { this.set('whichTag', value); }
 
     get editingName(): boolean { return this.get('editingName'); }
     set editingName(value: boolean) {
@@ -695,6 +708,8 @@ class TodoView extends Backbone.View<TodoModel> {
     /** The view associated with the entire app. */
     mainView: MainView;
 
+    tagList: TagListView;
+
     /** List of ALL todoViews. Just used for keypress handling... */
     static todoViews: TodoView[];
 
@@ -733,6 +748,7 @@ class TodoView extends Backbone.View<TodoModel> {
         this.childrenViews = [];
         this.uiState = new TodoUiState({ view: this });
         this.model.view = this;
+        this.tagList = new TagListView(this.model.tags);
 
         this.initEditView();
 
@@ -833,6 +849,16 @@ class TodoView extends Backbone.View<TodoModel> {
             if (!this.uiState.isEditing) {
                 return this.navigateBetweenTodos(e.which);
             }
+        }
+
+        // Add tag (press "#")
+        if (e.shiftKey && e.which == 51 && this.uiState.editingName) {
+            this.uiState.editingName = false;
+            this.uiState.editingTag = true;
+            this.uiState.whichTag = 0;
+
+            this.render();
+            return false;
         }
 
         // Shift + Enter to toggle between name and content editing
@@ -1226,6 +1252,9 @@ class TodoView extends Backbone.View<TodoModel> {
         if (this.uiState.collapsedTrigger.value) {
             this.$('.children-js').removeClass('hide').fadeOut(150);
         }
+
+        this.tagList.setElement(this.$('.tag-container'));
+        this.tagList.render();
 
         return this;
     }
