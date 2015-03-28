@@ -337,6 +337,10 @@ a.autocomplete-item {
     color: black;
 }
 
+.remove-tag:hover {
+    color: red;
+}
+
 .row {
     display: table;
 }

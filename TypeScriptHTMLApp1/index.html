@@ -106,12 +106,14 @@
                                 <% } %>
                             </a>
                         <% } %>
-
-                        <span class="tag-container">
-
-                        </span>
                     <% } %>
 				</span>
+
+                <% if (!editingName) { %>
+                    <span class="tag-container">
+
+                    </span>
+                <% } %>
 
                 <% if (collapsed && !searching) { %> 
                     <a href="#" class="todo-hide-js hidden-ellipses">(<%= numActiveTotalChildren %>)</a>

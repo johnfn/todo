@@ -50,6 +50,14 @@ var TagView = (function (_super) {
         this.template = Util.getTemplate('tag');
         this.model = model;
     }
+    TagView.prototype.events = function () {
+        return {
+            'click .remove-tag': this.clickRemoveTag
+        };
+    };
+    TagView.prototype.clickRemoveTag = function (e) {
+        this.trigger('remove-tag');
+    };
     TagView.prototype.keydown = function (e) {
         // Enter
         if (e.which == 13) {
@@ -64,6 +72,7 @@ var TagView = (function (_super) {
         var renderOptions = this.model.toJSON();
         renderOptions['isBeingEdited'] = this.isBeingEdited;
         this.$el.html(this.template(renderOptions));
+        this.delegateEvents();
         return this;
     };
     return TagView;
@@ -76,8 +85,12 @@ var TagListView = (function (_super) {
         this.currentlySelectedTagId = -1;
         this.tagViews = [];
         this.tags = tags;
-        this.listenTo(this.tags, 'add', function () {
-            _this.addTagView(_this.tags.last(), true);
+        this.listenTo(this.tags, 'add', function (model) {
+            _this.addTagView(model, true);
+        });
+        this.listenTo(this.tags, 'remove', function (model) {
+            _this.tagViews = _.filter(_this.tagViews, function (view) { return view.model != model; });
+            _this.render();
         });
         this.tags.each(function (m, i) {
             _this.addTagView(m, false);
@@ -97,15 +110,18 @@ var TagListView = (function (_super) {
         return _.any(this.tagViews, function (view) { return view.isBeingEdited; });
     };
     TagListView.prototype.render = function () {
+        var _this = this;
         this.$el.empty();
         var selectedIndex = -1;
-        for (var i = 0; i < this.tagViews.length; i++) {
-            var view = this.tagViews[i];
-            view.render().$el.appendTo(this.$el);
+        _.each(this.tagViews, function (view, i) {
+            view.render().$el.appendTo(_this.$el);
             if (view.isBeingEdited) {
                 selectedIndex = i;
             }
-        }
+            view.listenTo(view, 'remove-tag', function () {
+                _this.tags.remove(view.model);
+            });
+        });
         if (selectedIndex !== -1) {
             this.tagViews[selectedIndex].$el.find('.tagname-js').focus();
         }

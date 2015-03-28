@@ -21,6 +21,12 @@ class TagView extends Backbone.View<TagModel> {
     template: ITemplate;
     isBeingEdited: boolean;
 
+    events() {
+        return {
+            'click .remove-tag': this.clickRemoveTag
+        };
+    }
+
     constructor(model: TagModel, isBeingEdited: boolean = false) {
         this.tagName = 'a';
         this.isBeingEdited = isBeingEdited;
@@ -29,6 +35,10 @@ class TagView extends Backbone.View<TagModel> {
 
         this.template = Util.getTemplate('tag');
         this.model = model;
+    }
+
+    clickRemoveTag(e: JQueryMouseEventObject) {
+        this.trigger('remove-tag');
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -49,6 +59,7 @@ class TagView extends Backbone.View<TagModel> {
         renderOptions['isBeingEdited'] = this.isBeingEdited;
         
         this.$el.html(this.template(renderOptions));
+        this.delegateEvents();
 
         return this;
     }
@@ -66,8 +77,13 @@ class TagListView extends Backbone.View<Backbone.Model> {
         this.tagViews = [];
         this.tags = tags;
 
-        this.listenTo(this.tags, 'add', () => {
-            this.addTagView(this.tags.last(), true);
+        this.listenTo(this.tags, 'add', (model) => {
+            this.addTagView(model, true);
+        });
+
+        this.listenTo(this.tags, 'remove', (model) => {
+            this.tagViews = _.filter(this.tagViews,(view) => view.model != model);
+            this.render();
         });
         
         this.tags.each((m, i) => {
@@ -98,15 +114,17 @@ class TagListView extends Backbone.View<Backbone.Model> {
 
         var selectedIndex = -1;
 
-        for (var i = 0; i < this.tagViews.length; i++) {
-            var view = this.tagViews[i];
-
+        _.each(this.tagViews,(view, i) => {
             view.render().$el.appendTo(this.$el);
 
             if (view.isBeingEdited) {
                 selectedIndex = i;
             }
-        }
+
+            view.listenTo(view, 'remove-tag',() => {
+                this.tags.remove(view.model);
+            });
+        })
 
         if (selectedIndex !== -1) {
             this.tagViews[selectedIndex].$el.find('.tagname-js').focus();
