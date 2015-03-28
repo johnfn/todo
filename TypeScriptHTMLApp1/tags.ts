@@ -31,6 +31,18 @@ class TagView extends Backbone.View<TagModel> {
         this.model = model;
     }
 
+    keydown(e: JQueryKeyEventObject): boolean {
+        // Enter
+        if (e.which == 13) {
+            this.isBeingEdited = false;
+
+            this.render();
+            return true;
+        }
+
+        return false;
+    }
+
     render(): TagView {
         var renderOptions = this.model.toJSON();
         renderOptions['isBeingEdited'] = this.isBeingEdited;
@@ -62,10 +74,22 @@ class TagListView extends Backbone.View<Backbone.Model> {
         });
     }
 
+    keydown(e: JQueryKeyEventObject): boolean {
+        if (!this.currentlyEditing()) return false;
+
+        var focusedTag = _.find(this.tagViews, view => view.isBeingEdited);
+
+        return focusedTag.keydown(e);
+    }
+
     addTagView(model: TagModel, isCurrentlyEditing) {
         var view = new TagView(model, isCurrentlyEditing);
 
         this.tagViews.push(view);
+    }
+
+    currentlyEditing(): boolean {
+        return _.any(this.tagViews, view => view.isBeingEdited);
     }
 
     render(): TagListView {

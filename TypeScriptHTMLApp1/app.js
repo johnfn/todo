@@ -949,6 +949,8 @@ var TodoView = (function (_super) {
     TodoView.prototype.keydown = function (e) {
         if (!this.uiState.selected)
             return true;
+        if (this.tagList.keydown(e))
+            return false;
         var enter = e.which === 13 && !e.shiftKey;
         var shiftEnter = e.which === 13 && e.shiftKey;
         // Navigation

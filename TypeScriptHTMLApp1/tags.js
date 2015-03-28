@@ -50,6 +50,15 @@ var TagView = (function (_super) {
         this.template = Util.getTemplate('tag');
         this.model = model;
     }
+    TagView.prototype.keydown = function (e) {
+        // Enter
+        if (e.which == 13) {
+            this.isBeingEdited = false;
+            this.render();
+            return true;
+        }
+        return false;
+    };
     TagView.prototype.render = function () {
         var renderOptions = this.model.toJSON();
         renderOptions['isBeingEdited'] = this.isBeingEdited;
@@ -73,9 +82,18 @@ var TagListView = (function (_super) {
             _this.addTagView(m, false);
         });
     }
+    TagListView.prototype.keydown = function (e) {
+        if (!this.currentlyEditing())
+            return false;
+        var focusedTag = _.find(this.tagViews, function (view) { return view.isBeingEdited; });
+        return focusedTag.keydown(e);
+    };
     TagListView.prototype.addTagView = function (model, isCurrentlyEditing) {
         var view = new TagView(model, isCurrentlyEditing);
         this.tagViews.push(view);
+    };
+    TagListView.prototype.currentlyEditing = function () {
+        return _.any(this.tagViews, function (view) { return view.isBeingEdited; });
     };
     TagListView.prototype.render = function () {
         this.$el.empty();
