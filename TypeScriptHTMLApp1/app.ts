@@ -1,7 +1,7 @@
 ﻿declare var require;
 
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://172.16.89.1:5000";
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.3:5000";
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {

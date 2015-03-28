@@ -332,6 +332,11 @@ a.autocomplete-item {
     color: white;
     text-decoration: none;
 }
+
+.tag-container > a:hover > input {
+    color: black;
+}
+
 .row {
     display: table;
 }
