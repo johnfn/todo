@@ -54,6 +54,7 @@ var TagView = (function (_super) {
         // Enter
         if (e.which == 13) {
             this.isBeingEdited = false;
+            this.model.name = this.$('input').val();
             this.render();
             return true;
         }
