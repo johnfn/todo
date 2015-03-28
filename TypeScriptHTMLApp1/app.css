@@ -319,7 +319,7 @@ a.autocomplete-item {
     background: rgba(255, 255, 255, 0.9);
 }
 
-.tag-container > a {
+.tag-container > a, .tag {
     color: black;
     border: 1px solid black;
     font-size: 12px;

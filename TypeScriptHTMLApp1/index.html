@@ -238,6 +238,14 @@
 
                     <span class="kbd-shortcut">ctrl + <%= i + 1 %></span>
 
+                    <% if (item.typeOfMatch == "tag") { %>
+                        <div class="tag-container">
+                            <% item.todo.tags.each(function(tag, i) { %>
+                                <span class="tag"><%= tag.get('name') %></span>
+                            <% }); %>
+                        </div>
+                    <% } %>
+
                     <% if (item.typeOfMatch == "content") { %>
                         <div class="autocomplete-item-content">
                             <%= item.startOfMatchString %><span class="autocomplete-match-content"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>

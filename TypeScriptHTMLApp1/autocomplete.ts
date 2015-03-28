@@ -1,9 +1,10 @@
 ﻿class AutocompleteItem extends VaguelyMagicalModel {
-    constructor(todo: TodoModel, type: string, startPosition: number, endPosition: number) {
+    constructor(todo: TodoModel, type: string, startPosition: number, endPosition: number, subType: number = -1) {
         super();
 
         this.todo = todo;
         this.typeOfMatch = type;
+        this.subtypeOfMatch = subType;
 
         this.startPosition = startPosition;
         this.endPosition = endPosition;
@@ -12,6 +13,8 @@
             this.matchedString = this.todo.name;
         } else if (type === "content") {
             this.matchedString = this.todo.content;
+        } else if (type === "tag") {
+            this.matchedString = this.todo.tags.at(subType).get('name');
         }
 
         this.truncateMatchIfNecessary();
@@ -56,6 +59,9 @@
 
     get typeOfMatch(): string { return this.get('typeOfMatch'); }
     set typeOfMatch(value: string) { this.set('typeOfMatch', value); }
+
+    get subtypeOfMatch(): number { return this.get('subtypeOfMatch'); }
+    set subtypeOfMatch(value: number) { this.set('subtypeOfMatch', value); }
 
     get matchedString(): string { return this.get('matchedString_'); }
     set matchedString(value: string) { this.set('matchedString_', value); }
@@ -201,6 +207,13 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
                 items: new AutocompleteSectionItems(sections[name])
             }));
         }
+
+        this.add(new AutocompleteSection({
+            headingName: "tags",
+            items: new AutocompleteSectionItems([
+                new AutocompleteItem(this.baseTodo.children[0].children[0], "tag", 0, 0, 0)
+            ])
+        }));
     }
 }
 

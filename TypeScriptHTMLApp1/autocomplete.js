@@ -6,10 +6,12 @@ var __extends = this.__extends || function (d, b) {
 };
 var AutocompleteItem = (function (_super) {
     __extends(AutocompleteItem, _super);
-    function AutocompleteItem(todo, type, startPosition, endPosition) {
+    function AutocompleteItem(todo, type, startPosition, endPosition, subType) {
+        if (subType === void 0) { subType = -1; }
         _super.call(this);
         this.todo = todo;
         this.typeOfMatch = type;
+        this.subtypeOfMatch = subType;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         if (type === "name") {
@@ -17,6 +19,9 @@ var AutocompleteItem = (function (_super) {
         }
         else if (type === "content") {
             this.matchedString = this.todo.content;
+        }
+        else if (type === "tag") {
+            this.matchedString = this.todo.tags.at(subType).get('name');
         }
         this.truncateMatchIfNecessary();
     }
@@ -70,6 +75,16 @@ var AutocompleteItem = (function (_super) {
         },
         set: function (value) {
             this.set('typeOfMatch', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "subtypeOfMatch", {
+        get: function () {
+            return this.get('subtypeOfMatch');
+        },
+        set: function (value) {
+            this.set('subtypeOfMatch', value);
         },
         enumerable: true,
         configurable: true
@@ -243,6 +258,12 @@ var AutocompleteResult = (function (_super) {
                 items: new AutocompleteSectionItems(sections[name])
             }));
         }
+        this.add(new AutocompleteSection({
+            headingName: "tags",
+            items: new AutocompleteSectionItems([
+                new AutocompleteItem(this.baseTodo.children[0].children[0], "tag", 0, 0, 0)
+            ])
+        }));
     };
     return AutocompleteResult;
 })(Backbone.Collection);

@@ -9,3 +9,9 @@
 *.DS_Store
 .vs/TypeScriptHTMLApp1/v14/.suo
 *.suo
+*.suo
+.vs/TypeScriptHTMLApp1/v14/.suo
+TypeScriptHTMLApp1/sass.scss
+*.cache
+TypeScriptHTMLApp1/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
+*.cache
