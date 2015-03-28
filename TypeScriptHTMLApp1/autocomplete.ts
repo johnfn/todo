@@ -1,10 +1,10 @@
 ﻿class AutocompleteItem extends VaguelyMagicalModel {
-    constructor(todo: TodoModel, type: string, startPosition: number, endPosition: number, subType: number = -1) {
+    constructor(todo: TodoModel, type: string, startPosition: number, endPosition: number, subtypeOfMatch: number = -1) {
         super();
 
         this.todo = todo;
         this.typeOfMatch = type;
-        this.subtypeOfMatch = subType;
+        this.subtypeOfMatch = subtypeOfMatch;
 
         this.startPosition = startPosition;
         this.endPosition = endPosition;
@@ -14,7 +14,7 @@
         } else if (type === "content") {
             this.matchedString = this.todo.content;
         } else if (type === "tag") {
-            this.matchedString = this.todo.tags.at(subType).get('name');
+            this.matchedString = this.todo.tags.at(subtypeOfMatch).get('name');
         }
 
         this.truncateMatchIfNecessary();

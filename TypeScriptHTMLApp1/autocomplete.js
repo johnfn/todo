@@ -6,12 +6,12 @@ var __extends = this.__extends || function (d, b) {
 };
 var AutocompleteItem = (function (_super) {
     __extends(AutocompleteItem, _super);
-    function AutocompleteItem(todo, type, startPosition, endPosition, subType) {
-        if (subType === void 0) { subType = -1; }
+    function AutocompleteItem(todo, type, startPosition, endPosition, subtypeOfMatch) {
+        if (subtypeOfMatch === void 0) { subtypeOfMatch = -1; }
         _super.call(this);
         this.todo = todo;
         this.typeOfMatch = type;
-        this.subtypeOfMatch = subType;
+        this.subtypeOfMatch = subtypeOfMatch;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         if (type === "name") {
@@ -21,7 +21,7 @@ var AutocompleteItem = (function (_super) {
             this.matchedString = this.todo.content;
         }
         else if (type === "tag") {
-            this.matchedString = this.todo.tags.at(subType).get('name');
+            this.matchedString = this.todo.tags.at(subtypeOfMatch).get('name');
         }
         this.truncateMatchIfNecessary();
     }

@@ -327,6 +327,10 @@ a.autocomplete-item {
     border-radius: 3px;
 }
 
+.tag.selected {
+    border: 2px solid black;
+}
+
 .tag-container > a:hover {
     background-color: gray;
     color: white;

@@ -241,7 +241,7 @@
                     <% if (item.typeOfMatch == "tag") { %>
                         <div class="tag-container">
                             <% item.todo.tags.each(function(tag, i) { %>
-                                <span class="tag"><%= tag.get('name') %></span>
+                                <span class="tag <% debugger; if (i == item.subtypeOfMatch) print('selected') %>"><%= tag.get('name') %></span>
                             <% }); %>
                         </div>
                     <% } %>
