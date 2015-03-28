@@ -19,17 +19,21 @@ class TagModel extends Backbone.Model {
 
 class TagView extends Backbone.View<TagModel> {
     template: ITemplate;
+
     isBeingEdited: boolean;
+    currentText: string;
 
     events() {
         return {
-            'click .remove-tag': this.clickRemoveTag
+            'click .remove-tag': this.clickRemoveTag,
+            'keyup': this.updateCurrentText
         };
     }
 
     constructor(model: TagModel, isBeingEdited: boolean = false) {
         this.tagName = 'a';
         this.isBeingEdited = isBeingEdited;
+        this.currentText = "";
 
         super();
 
@@ -41,11 +45,17 @@ class TagView extends Backbone.View<TagModel> {
         this.trigger('remove-tag');
     }
 
+    updateCurrentText() {
+        if (this.$('input').is(':focus')) {
+            this.currentText = this.$('input').val();
+        }
+    }
+
     keydown(e: JQueryKeyEventObject): boolean {
         // Enter
         if (e.which == 13) {
             this.isBeingEdited = false;
-            this.model.name = this.$('input').val();
+            this.model.name = this.currentText;
 
             this.render();
             return true;
@@ -60,6 +70,9 @@ class TagView extends Backbone.View<TagModel> {
         
         this.$el.html(this.template(renderOptions));
         this.delegateEvents();
+
+        // Hack to put the caret at the end of the input.
+        this.$("input").focus().val("").val(this.currentText);
 
         return this;
     }
@@ -124,7 +137,7 @@ class TagListView extends Backbone.View<Backbone.Model> {
             view.listenTo(view, 'remove-tag',() => {
                 this.tags.remove(view.model);
             });
-        })
+        });
 
         if (selectedIndex !== -1) {
             this.tagViews[selectedIndex].$el.find('.tagname-js').focus();

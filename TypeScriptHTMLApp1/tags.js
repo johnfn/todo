@@ -46,23 +46,30 @@ var TagView = (function (_super) {
         if (isBeingEdited === void 0) { isBeingEdited = false; }
         this.tagName = 'a';
         this.isBeingEdited = isBeingEdited;
+        this.currentText = "";
         _super.call(this);
         this.template = Util.getTemplate('tag');
         this.model = model;
     }
     TagView.prototype.events = function () {
         return {
-            'click .remove-tag': this.clickRemoveTag
+            'click .remove-tag': this.clickRemoveTag,
+            'keyup': this.updateCurrentText
         };
     };
     TagView.prototype.clickRemoveTag = function (e) {
         this.trigger('remove-tag');
     };
+    TagView.prototype.updateCurrentText = function () {
+        if (this.$('input').is(':focus')) {
+            this.currentText = this.$('input').val();
+        }
+    };
     TagView.prototype.keydown = function (e) {
         // Enter
         if (e.which == 13) {
             this.isBeingEdited = false;
-            this.model.name = this.$('input').val();
+            this.model.name = this.currentText;
             this.render();
             return true;
         }
@@ -73,6 +80,8 @@ var TagView = (function (_super) {
         renderOptions['isBeingEdited'] = this.isBeingEdited;
         this.$el.html(this.template(renderOptions));
         this.delegateEvents();
+        // Hack to put the caret at the end of the input.
+        this.$("input").focus().val("").val(this.currentText);
         return this;
     };
     return TagView;

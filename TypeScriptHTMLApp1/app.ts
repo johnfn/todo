@@ -860,8 +860,9 @@ class TodoView extends Backbone.View<TodoModel> {
             this.uiState.editingName = false;
             this.uiState.editingTag = true;
 
-            this.render();
-            return false;
+            // Don't actually show the hash in the edit textbox, though.
+            _.defer(this.render);
+            return true;
         }
 
         // Shift + Enter to toggle between name and content editing

@@ -964,8 +964,9 @@ var TodoView = (function (_super) {
             this.model.tags.add(new TagModel("new tag", ""));
             this.uiState.editingName = false;
             this.uiState.editingTag = true;
-            this.render();
-            return false;
+            // Don't actually show the hash in the edit textbox, though.
+            _.defer(this.render);
+            return true;
         }
         // Shift + Enter to toggle between name and content editing
         if (shiftEnter && this.uiState.editingName) {
