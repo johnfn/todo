@@ -109,7 +109,9 @@
                         <% } %>
 
                         <% if (!searchMatch) { %>
-                            <%= name %>
+                            <span class="actual-todo-name">
+                                <%= name %>
+                            </span>
                         <% } else { %>
                             <a href="#" class="search-link">
                                 <% if (!isMatchInContent) { %>
