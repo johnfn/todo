@@ -591,7 +591,11 @@ class NewTodoView extends Backbone.View<TodoModel> {
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
 
-        this.trigger('add-todo', this.model);
+        if (this.isChild) {
+            this.trigger('add-child-todo', this.model);
+        } else {
+            this.trigger('add-todo', this.model);
+        }
 
         return false;
     }
@@ -1090,6 +1094,11 @@ class TodoView extends Backbone.View<TodoModel> {
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo',(model: TodoModel) => {
             this.model.parent.view.addChildTodo(model, this.model.childIndex + 1);
+            self.toggleAddChildTodo();
+        });
+
+        this.listenTo(this.editView, 'add-child-todo',(model: TodoModel) => {
+            this.addChildTodo(model);
             self.toggleAddChildTodo();
         });
     }

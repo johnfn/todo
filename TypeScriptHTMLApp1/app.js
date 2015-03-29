@@ -739,7 +739,12 @@ var NewTodoView = (function (_super) {
         }
         this.model.name = this.getNameText();
         this.model.content = this.getDescText();
-        this.trigger('add-todo', this.model);
+        if (this.isChild) {
+            this.trigger('add-child-todo', this.model);
+        }
+        else {
+            this.trigger('add-todo', this.model);
+        }
         return false;
     };
     NewTodoView.prototype.cancelTodo = function (e) {
@@ -1136,6 +1141,10 @@ var TodoView = (function (_super) {
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo', function (model) {
             _this.model.parent.view.addChildTodo(model, _this.model.childIndex + 1);
+            self.toggleAddChildTodo();
+        });
+        this.listenTo(this.editView, 'add-child-todo', function (model) {
+            _this.addChildTodo(model);
             self.toggleAddChildTodo();
         });
     };
