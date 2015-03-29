@@ -42,6 +42,7 @@
 body {
     margin-bottom: 30px;
     color: #595959;
+    background-color: rgb(226, 231, 238);
 }
 
 .name {
@@ -54,7 +55,7 @@ body {
 
 .todo {
     font-family: 'Open Sans', sans-serif;
-    border-left: 1px solid #ddd;
+    border-left: 1px solid #efefef;
     padding-left: 3px;
 }
 
@@ -102,6 +103,8 @@ a {
 
 .todo-name-content {
     position: relative;
+    font-weight: 300;
+    font-size: 1.3em;
 }
 
 .todo-zoom-js {
@@ -120,7 +123,7 @@ a {
 }
 
 .selected {
-    border-left: 1px solid #777;
+    border-left: 1px solid #ddd;
     color: #222;
 }
 
@@ -336,6 +339,23 @@ a.autocomplete-item {
 .breadcrumb-container {
     padding-left: 50px;
     background: rgba(255, 255, 255, 0.9);
+    color: rgb(231, 231, 231);
+    font-family: 'Open Sans', sans-serif;
+}
+
+.breadcrumb-container a {
+    text-decoration: none;
+}
+
+/* font awesome chevron */
+.parent-todo ~ .parent-todo:before {
+    content: '\f054';
+    font-family: FontAwesome;
+    color: lightgray;
+    font-size: .8em;
+    font-weight: 400;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .tag-container > a, .tag {
