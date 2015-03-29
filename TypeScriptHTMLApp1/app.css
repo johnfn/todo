@@ -101,7 +101,8 @@ a {
     border-radius: 3px;
     box-shadow: 1px 1px 6px rgba(105, 105, 105, 0.27);
     margin-left: 10px;
-    float: right;
+    position: absolute;
+    right: 0;
 }
 
     .toolbar a {
