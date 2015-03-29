@@ -812,8 +812,6 @@ class TodoView extends Backbone.View<TodoModel> {
         var selectedModel = TodoUiState.selectedModel.model;
         var parentView = selectedModel.parent.view;
 
-        // TODO: Check if the position we're adding at is a
-        // child of the selectedModel at all and quit if so.
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
@@ -1088,7 +1086,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo',(model: TodoModel) => {
-            self.addChildTodo(model);
+            this.model.parent.view.addChildTodo(model, this.model.childIndex + 1);
             self.toggleAddChildTodo();
         });
     }

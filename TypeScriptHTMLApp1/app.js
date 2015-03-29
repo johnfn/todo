@@ -926,8 +926,6 @@ var TodoView = (function (_super) {
     TodoView.prototype.drop = function (e) {
         var selectedModel = TodoUiState.selectedModel.model;
         var parentView = selectedModel.parent.view;
-        // TODO: Check if the position we're adding at is a
-        // child of the selectedModel at all and quit if so.
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
@@ -1134,11 +1132,12 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.initEditView = function () {
+        var _this = this;
         var self = this;
         this.editView = new NewTodoView();
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo', function (model) {
-            self.addChildTodo(model);
+            _this.model.parent.view.addChildTodo(model, _this.model.childIndex + 1);
             self.toggleAddChildTodo();
         });
     };
