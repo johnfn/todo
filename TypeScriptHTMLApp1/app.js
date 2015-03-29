@@ -953,12 +953,6 @@ var TodoView = (function (_super) {
         }
         this.uiState.isDraggedOverAsChild = couldBeDraggedAsChild;
         this.uiState.isDraggedOverAsNextSibling = couldBeDraggedAsNextSibling;
-        if (this.uiState.isDraggedOver)
-            console.log("over");
-        if (this.uiState.isDraggedOverAsChild)
-            console.log("child");
-        if (this.uiState.isDraggedOverAsNextSibling)
-            console.log("sibl");
         return false;
     };
     TodoView.prototype.drop = function (e) {
