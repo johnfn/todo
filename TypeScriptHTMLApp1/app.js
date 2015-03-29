@@ -710,8 +710,10 @@ var TodoUiState = (function (_super) {
 })(Backbone.Model);
 var NewTodoView = (function (_super) {
     __extends(NewTodoView, _super);
-    function NewTodoView() {
-        _super.apply(this, arguments);
+    function NewTodoView(isChild) {
+        this.template = Util.getTemplate('todo-edit');
+        this.isChild = isChild;
+        _super.call(this);
     }
     NewTodoView.prototype.events = function () {
         return {
@@ -720,9 +722,6 @@ var NewTodoView = (function (_super) {
             'click .name-js': this.stopProp,
             'click .desc-js': this.stopProp
         };
-    };
-    NewTodoView.prototype.initialize = function (options) {
-        this.template = Util.getTemplate('todo-edit');
     };
     NewTodoView.prototype.stopProp = function () {
         return false;
@@ -748,7 +747,8 @@ var NewTodoView = (function (_super) {
         return false;
     };
     NewTodoView.prototype.render = function () {
-        this.$el.html(this.template());
+        console.log(this.isChild);
+        this.$el.html(this.template({ isChild: this.isChild }));
         this.delegateEvents();
         return this;
     };
@@ -1134,7 +1134,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.initEditView = function () {
         var _this = this;
         var self = this;
-        this.editView = new NewTodoView();
+        this.editView = new NewTodoView(false);
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo', function (model) {
             _this.model.parent.view.addChildTodo(model, _this.model.childIndex + 1);

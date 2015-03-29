@@ -38,7 +38,10 @@
     </script>
 
     <script type="text/template" id="todo-edit">
+        <% if (isChild) { %>
         <div class="children">
+        <% } %>
+
             <div>
                 <input class="name name-js" type="text" placeholder="title" />
             </div>
@@ -49,7 +52,10 @@
                 <a class="edit-add-js" href="#">Add.</a>
                 <a class="edit-cancel-js" href="#">Cancel.</a>
             </div>
+
+        <% if (isChild) { %>
         </div>
+        <% } %>
     </script>
 
     <script type="text/template" id="todo-archive-item">

@@ -551,6 +551,7 @@ class TodoUiState extends Backbone.Model {
 
 class NewTodoView extends Backbone.View<TodoModel> {
     template: ITemplate;
+    isChild: boolean;
 
     events() {
         return {
@@ -561,8 +562,11 @@ class NewTodoView extends Backbone.View<TodoModel> {
         };
     }
 
-    initialize(options: Backbone.ViewOptions<TodoModel>) {
+    constructor(isChild: boolean) {
         this.template = Util.getTemplate('todo-edit');
+        this.isChild = isChild;
+
+        super();
     }
 
     private stopProp() {
@@ -599,7 +603,9 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 
     render() {
-        this.$el.html(this.template());
+        console.log(this.isChild);
+
+        this.$el.html(this.template({ isChild: this.isChild }));
         this.delegateEvents();
 
         return this;
@@ -1082,7 +1088,7 @@ class TodoView extends Backbone.View<TodoModel> {
 
     private initEditView() {
         var self = this;
-        this.editView = new NewTodoView();
+        this.editView = new NewTodoView(false);
 
         this.listenTo(this.editView, 'cancel', this.toggleAddChildTodo);
         this.listenTo(this.editView, 'add-todo',(model: TodoModel) => {
