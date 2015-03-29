@@ -227,7 +227,8 @@ var AutocompleteResult = (function (_super) {
         var allTodos = _.filter(this.baseTodo.flatten(), function (m) { return m.inSearchResults; });
         var sections = {
             "Headings": [],
-            "Todos": []
+            "Todos": [],
+            "Tags": []
         };
         var thingsAdded = 0;
         for (var i = 0; i < allTodos.length && thingsAdded < 10; i++) {
@@ -248,6 +249,18 @@ var AutocompleteResult = (function (_super) {
                 ++thingsAdded;
                 continue;
             }
+            // Check for a tag match
+            var tagMatch = currentTodo.tags.find(function (tag, i) {
+                var match = tag.get('name').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+                if (match) {
+                    sections["Tags"].push(new AutocompleteItem(currentTodo, "tag", 0, 0, i));
+                }
+                return match;
+            });
+            if (tagMatch) {
+                ++thingsAdded;
+                continue;
+            }
         }
         for (var name in sections) {
             var items = sections[name];
@@ -258,12 +271,6 @@ var AutocompleteResult = (function (_super) {
                 items: new AutocompleteSectionItems(sections[name])
             }));
         }
-        this.add(new AutocompleteSection({
-            headingName: "tags",
-            items: new AutocompleteSectionItems([
-                new AutocompleteItem(this.baseTodo.children[0].children[0], "tag", 0, 0, 0)
-            ])
-        }));
     };
     return AutocompleteResult;
 })(Backbone.Collection);

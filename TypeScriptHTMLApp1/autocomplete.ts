@@ -158,7 +158,8 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
         var allTodos = _.filter(this.baseTodo.flatten(), m => m.inSearchResults);
         var sections: { [key: string]: AutocompleteItem[] } = {
             "Headings": [],
-            "Todos": []
+            "Todos": [],
+            "Tags": []
         };
         var thingsAdded = 0;
 
@@ -195,6 +196,26 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
                 ++thingsAdded;
                 continue;
             }
+
+            // Check for a tag match
+
+            var tagMatch = currentTodo.tags.find((tag, i) => {
+                var match = tag.get('name').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+
+                if (match) {
+                    sections["Tags"].push(new AutocompleteItem(
+                        currentTodo,
+                        "tag",
+                        0, 0, i));
+                }
+
+                return match;
+            });
+
+            if (tagMatch) {
+                ++thingsAdded;
+                continue;
+            }
         }
 
         for (var name in sections) {
@@ -207,13 +228,6 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
                 items: new AutocompleteSectionItems(sections[name])
             }));
         }
-
-        this.add(new AutocompleteSection({
-            headingName: "tags",
-            items: new AutocompleteSectionItems([
-                new AutocompleteItem(this.baseTodo.children[0].children[0], "tag", 0, 0, 0)
-            ])
-        }));
     }
 }
 
