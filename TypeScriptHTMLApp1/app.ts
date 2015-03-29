@@ -820,6 +820,7 @@ class TodoView extends Backbone.View<TodoModel> {
         var selectedModel = TodoUiState.selectedModel.model;
         var parentView = selectedModel.parent.view;
 
+        // Failure conditions: Dragged todo onto self or own children.
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
@@ -831,7 +832,7 @@ class TodoView extends Backbone.View<TodoModel> {
         parentView.removeTodo(selectedModel.childIndex);
 
         if (this.uiState.isDraggedOverAsChild) {
-            this.addChildTodo(selectedModel);
+            this.addChildTodo(selectedModel, 0);
         } else {
             this.model.parent.view.addChildTodo(selectedModel, this.model.childIndex + 1);
         }
