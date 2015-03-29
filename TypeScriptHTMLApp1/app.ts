@@ -891,6 +891,13 @@ class TodoView extends Backbone.View<TodoModel> {
             }
         }
 
+        // Zoom (press Z)
+        if (e.which == 90) {
+            this.zoomToTodo();
+
+            return true;
+        }
+
         // Add tag (press "#")
         if (e.shiftKey && e.which == 51 && this.uiState.editingName) {
             this.model.tags.add(new TagModel("new tag", ""));
@@ -1059,8 +1066,6 @@ class TodoView extends Backbone.View<TodoModel> {
 
     zoomToTodo() {
         this.mainView.zoomTo(this);
-
-        return false;
     }
 
     private clickRemoveTodo() {

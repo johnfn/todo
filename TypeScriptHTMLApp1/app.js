@@ -991,6 +991,11 @@ var TodoView = (function (_super) {
                 return this.navigateBetweenTodos(e.which);
             }
         }
+        // Zoom (press Z)
+        if (e.which == 90) {
+            this.zoomToTodo();
+            return true;
+        }
         // Add tag (press "#")
         if (e.shiftKey && e.which == 51 && this.uiState.editingName) {
             this.model.tags.add(new TagModel("new tag", ""));
@@ -1122,7 +1127,6 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.zoomToTodo = function () {
         this.mainView.zoomTo(this);
-        return false;
     };
     TodoView.prototype.clickRemoveTodo = function () {
         // Can't archive topmost todo.
