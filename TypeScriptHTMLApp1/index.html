@@ -148,17 +148,18 @@
 						<% } %>
 					</span>
 				<% } %>
-            </div>
 
-            <% if (content.length > 0) { %>
-                <div class="todo-content edit-content-js"> 
-                    <% if (searchMatch && isMatchInContent) { %>
-                        <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
-                    <% } else { %>
-                        <%= content %> 
-                    <% } %>
-                </div>
-            <% } %>
+                <% if (content.length > 0) { %>
+                    <div class="todo-content edit-content-js"> 
+                        <% if (searchMatch && isMatchInContent) { %>
+                            <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
+                        <% } else { %>
+                            <%= content %> 
+                        <% } %>
+                    </div>
+                <% } %>
+
+            </div>
             <input class='content-edit-js'/>
 
             <div class="children-js children <%= collapsed && !searching ? 'hide' : '' %>"> </div>

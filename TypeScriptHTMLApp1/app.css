@@ -74,6 +74,10 @@ body {
     margin-left: 7px;
 }
 
+.todo.selected {
+    background-color: rgb(249, 249, 249);
+}
+
 .todo.selected:before {
     border-left: 1px solid rgb(180, 180, 180);
 }
@@ -106,6 +110,7 @@ a {
     margin-left: 10px;
     position: absolute;
     right: 0;
+    top: 0;
 }
 
     .toolbar a {
@@ -191,13 +196,13 @@ a.zoom-selected {
     .dragged-over-as-child:after {
         display: block;
         content: '';
-        border-bottom: 4px solid gray;
+        border-bottom: 2px solid #ccc;
         margin-left: 20px;
     }
 
 .dragged-over {
     background: #f3f3f3;
-    border-bottom: 4px solid gray;
+    border-bottom: 2px solid #ccc;
 }
 
 .right-panel {
