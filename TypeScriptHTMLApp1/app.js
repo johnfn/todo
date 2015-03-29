@@ -939,12 +939,13 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.dragTodoOver = function (e) {
+        var height = this.$('.todo-name-content').height();
         var yOffset = (e.pageY || e.originalEvent.pageY) - $(e.currentTarget).offset().top;
-        var firstChildOffset = this.$('.todo-name').height() / 2;
-        var finalChildOffset = this.$('.todo-name').height();
+        var firstChildOffset = height / 2;
+        var finalChildOffset = height;
         var hasChildren = this.model.numActiveChildren != 0;
         var couldBeDraggedAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
-        var couldBeDraggedAsFinalChild = yOffset > finalChildOffset;
+        var couldBeDraggedAsFinalChild = yOffset > finalChildOffset && hasChildren;
         this.uiState.isDraggedOver = true;
         // If model has children, it can't be JUST dragged over.
         if (hasChildren && (!couldBeDraggedAsChild && !couldBeDraggedAsFinalChild)) {

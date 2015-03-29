@@ -823,13 +823,15 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     dragTodoOver(e: JQueryMouseEventObject): boolean {
+        var height = this.$('.todo-name-content').height();
+
         var yOffset = (e.pageY || (<any> e.originalEvent).pageY) - $(e.currentTarget).offset().top;
-        var firstChildOffset = this.$('.todo-name').height() / 2;
-        var finalChildOffset = this.$('.todo-name').height();
+        var firstChildOffset = height / 2;
+        var finalChildOffset = height;
         var hasChildren = this.model.numActiveChildren != 0;
 
         var couldBeDraggedAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
-        var couldBeDraggedAsFinalChild = yOffset > finalChildOffset;
+        var couldBeDraggedAsFinalChild = yOffset > finalChildOffset && hasChildren;
 
         this.uiState.isDraggedOver = true;
 
