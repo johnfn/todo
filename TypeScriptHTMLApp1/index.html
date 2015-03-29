@@ -80,6 +80,7 @@
 
     <script type="text/template" id="todo">
         <div class="todo 
+             <% if (isHeader) print('is-header') %>
 			 <% if (selected) print ('selected') %>
                  <% if (isDraggedOverAsNextSibling) print ('dragged-over') %>
              ">
