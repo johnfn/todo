@@ -93,7 +93,7 @@
 					  <% if (isHeader) print('todo-header') %>">
 
                     <% if (!isHeader) { %>
-                        <span class="my-checkbox todo-done-js <% if (done) print('checked') %>" draggable="true"></span>
+                        <span class="my-checkbox todo-done-js <% if (selected) print('hovered') %> <% if (done) print('checked') %>" draggable="true"></span>
                     <% } %>
 
                     <% if (editingName) { %>
