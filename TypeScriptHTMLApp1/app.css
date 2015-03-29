@@ -79,6 +79,9 @@ body {
 }
 
 .todo-content {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 300;
+    font-size: 0.9em;
     color: #B8B8B8;
     padding-bottom: 5px;
     padding-top: 5px;
@@ -117,6 +120,10 @@ a {
 
 .todo-done {
     color: #ddd;
+    text-decoration: line-through;
+}
+
+.todo-done .actual-todo-name {
     text-decoration: line-through;
 }
 
