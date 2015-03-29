@@ -1,5 +1,11 @@
 ﻿class TagList extends Backbone.Collection<TagModel> {
+    constructor(models: TagModel[]) {
+        super();
 
+        _.each(models, (m) => {
+            this.add(new TagModel(m.name, m.tagType));
+        });
+    }
 }
 
 class TagModel extends Backbone.Model {

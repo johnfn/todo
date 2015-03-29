@@ -14,7 +14,7 @@
         } else if (type === "content") {
             this.matchedString = this.todo.content;
         } else if (type === "tag") {
-            this.matchedString = this.todo.tags.at(subtypeOfMatch).get('name');
+            this.matchedString = this.todo.tags.at(subtypeOfMatch).name;
         }
 
         this.truncateMatchIfNecessary();

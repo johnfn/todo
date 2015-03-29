@@ -6,8 +6,12 @@ var __extends = this.__extends || function (d, b) {
 };
 var TagList = (function (_super) {
     __extends(TagList, _super);
-    function TagList() {
-        _super.apply(this, arguments);
+    function TagList(models) {
+        var _this = this;
+        _super.call(this);
+        _.each(models, function (m) {
+            _this.add(new TagModel(m.name, m.tagType));
+        });
     }
     return TagList;
 })(Backbone.Collection);
