@@ -135,7 +135,7 @@ a {
 .actual-todo-name {
     display: inline-block;
     vertical-align: top;
-    width: 85%;
+    max-width: calc(100% - 20px);
 }
 
 .todo-name-content .fa-star {
