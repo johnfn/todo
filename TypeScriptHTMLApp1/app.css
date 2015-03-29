@@ -104,7 +104,7 @@ a {
 .todo-name-content {
     position: relative;
     font-weight: 300;
-    font-size: 1.3em;
+    font-size: 1.1em;
 }
 
 .todo-zoom-js {
@@ -120,7 +120,7 @@ a.zoom-selected {
 }
 
 .todo-header {
-    font-size: 1.5em;
+    font-size: 1.9em;
 }
 
 .selected {
@@ -408,12 +408,12 @@ a.autocomplete-item {
 .my-checkbox.checked:before {
     content: "";
     position: absolute;
-    top: 6px;
+    top: 3px;
     left: 2px;
     display: inline-block;
     width: 11px;
     height: 11px;
-    background-color: rgb(215, 217, 232);
+    background-color: rgb(139, 143, 176);
 }
 
 .my-checkbox.hovered {
