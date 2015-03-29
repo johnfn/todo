@@ -747,7 +747,6 @@ var NewTodoView = (function (_super) {
         return false;
     };
     NewTodoView.prototype.render = function () {
-        console.log(this.isChild);
         this.$el.html(this.template({ isChild: this.isChild }));
         this.delegateEvents();
         return this;
@@ -981,6 +980,11 @@ var TodoView = (function (_super) {
         }
         // Shift + Enter to start to add child
         if (shiftEnter) {
+            this.toggleAddChildTodo(false);
+            return false;
+        }
+        // Enter to start to add sibling todo
+        if (enter && !this.uiState.isEditing) {
             this.toggleAddChildTodo();
             return false;
         }
@@ -1007,12 +1011,6 @@ var TodoView = (function (_super) {
         // Enter to finish adding child
         if (enter && this.uiState.addTodoVisible) {
             this.editView.addTodo(null);
-            this.render();
-            return false;
-        }
-        // Enter to edit name
-        if (enter && !this.uiState.editingName && !this.uiState.addTodoVisible) {
-            this.uiState.editingName = true;
             this.render();
             return false;
         }
@@ -1158,11 +1156,13 @@ var TodoView = (function (_super) {
         this.model.goodTimeToSave();
         this.render();
     };
-    TodoView.prototype.toggleAddChildTodo = function () {
+    TodoView.prototype.toggleAddChildTodo = function (sibling) {
+        if (sibling === void 0) { sibling = true; }
         var editModel = new TodoModel();
         editModel.parent = this.model;
         this.editView.model = editModel;
         this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
+        this.editView.isChild = !sibling;
         this.render();
         return false;
     };

@@ -603,8 +603,6 @@ class NewTodoView extends Backbone.View<TodoModel> {
     }
 
     render() {
-        console.log(this.isChild);
-
         this.$el.html(this.template({ isChild: this.isChild }));
         this.delegateEvents();
 
@@ -888,6 +886,13 @@ class TodoView extends Backbone.View<TodoModel> {
 
         // Shift + Enter to start to add child
         if (shiftEnter) {
+            this.toggleAddChildTodo(false);
+
+            return false;
+        }
+
+        // Enter to start to add sibling todo
+        if (enter && !this.uiState.isEditing) {
             this.toggleAddChildTodo();
 
             return false;
@@ -924,14 +929,6 @@ class TodoView extends Backbone.View<TodoModel> {
             this.editView.addTodo(null);
 
             this.render();
-            return false;
-        }
-
-        // Enter to edit name
-        if (enter && !this.uiState.editingName && !this.uiState.addTodoVisible) {
-            this.uiState.editingName = true;
-            this.render();
-
             return false;
         }
 
@@ -1120,16 +1117,17 @@ class TodoView extends Backbone.View<TodoModel> {
         this.render();
     }
 
-    toggleAddChildTodo() {
+    toggleAddChildTodo(sibling: boolean = true) {
         var editModel = new TodoModel();
 
         editModel.parent = this.model;
-
         this.editView.model = editModel;
 
         this.uiState.addTodoVisible = !this.uiState.addTodoVisible;
+        this.editView.isChild = !sibling;
 
         this.render();
+
         return false;
     }
 
