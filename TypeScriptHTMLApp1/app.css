@@ -93,6 +93,7 @@ a {
         }
 
 .todo-done {
+    color: #ddd;
     text-decoration: line-through;
 }
 
@@ -112,9 +113,10 @@ a {
     color: white;
 }
 
-.zoom-selected {
+a.zoom-selected {
     color: black;
     width: 20px;
+    text-decoration: none;
 }
 
 .todo-header {
@@ -399,6 +401,10 @@ a.autocomplete-item {
     display: inline-block;
 }
 
+.my-checkbox.checked {
+    border: 1px solid rgb(144, 144, 144);
+}
+
 .my-checkbox.checked:before {
     content: "";
     position: absolute;
@@ -407,9 +413,9 @@ a.autocomplete-item {
     display: inline-block;
     width: 11px;
     height: 11px;
-    background-color: rgb(105, 106, 115);
+    background-color: rgb(215, 217, 232);
 }
 
-.my-checkbox:hover {
-    border: 1px solid gray;
+.my-checkbox.hovered {
+    border: 1px solid #2c5a6f;
 }
