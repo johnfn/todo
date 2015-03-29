@@ -1245,6 +1245,7 @@ var TodoView = (function (_super) {
         }
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
+            topmostTodo: this.model == this.mainView.model.currentTodoModel,
             searchResultParent: false,
             searching: searchIsOngoing,
             searchMatch: false,
@@ -1630,6 +1631,8 @@ var TodoAppModel = (function (_super) {
     });
     Object.defineProperty(TodoAppModel.prototype, "baseTodoModel", {
         get: function () {
+            if (!this.baseTodoView)
+                return undefined;
             return this.baseTodoView.model;
         },
         enumerable: true,

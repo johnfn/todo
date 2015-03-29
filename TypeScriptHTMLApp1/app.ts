@@ -1217,14 +1217,15 @@ class TodoView extends Backbone.View<TodoModel> {
 
         var renderOptions = _.extend({
             numActiveChildren: this.model.numActiveChildren,
+            topmostTodo: this.model == this.mainView.model.currentTodoModel,
             searchResultParent: false,
             searching: searchIsOngoing,
             searchMatch: false,
             isFirstMatch: false,
             isMatchInContent: false,
             numActiveTotalChildren: this.model.numActiveTotalChildren
-        }, this.model.toJSON()
-            , this.uiState.toJSON());
+        } , this.model.toJSON()
+          , this.uiState.toJSON());
 
         if (this.mainView.model.searchIsOngoing) {
             var searchMatch = this.model.searchResult.searchMatch;
@@ -1558,7 +1559,11 @@ class TodoAppModel extends Backbone.Model {
     get cachedTodoView(): TodoView { return this.get('cachedTodoView'); }
     set cachedTodoView(value: TodoView) { this.set('cachedTodoView', value); }
 
-    get baseTodoModel(): TodoModel { return this.baseTodoView.model; }
+    get baseTodoModel(): TodoModel {
+        if (!this.baseTodoView) return undefined;
+
+        return this.baseTodoView.model;
+    }
 
     get currentTodoModel(): TodoModel {
         if (!this.currentTodoView) {
