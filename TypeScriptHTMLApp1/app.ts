@@ -412,7 +412,7 @@ class TodoUiState extends Backbone.Model {
         this.selected = false;
         this.isDraggedOver = false;
         this.isDraggedOverAsChild = false;
-        this.isDraggedOverAsFinalChild = false;
+        this.isDraggedOverAsNextSibling = false;
         this.collapsed = false;
 
         if (!attrs['view']) console.error('No view assigned for TodoUiState');
@@ -530,11 +530,11 @@ class TodoUiState extends Backbone.Model {
     }
 
 
-    get isDraggedOverAsFinalChild(): boolean { return this.get('isDraggedOverAsFinalChild'); }
-    set isDraggedOverAsFinalChild(value: boolean) {
-        var oldValue = this.isDraggedOverAsFinalChild;
+    get isDraggedOverAsNextSibling(): boolean { return this.get('isDraggedOverAsNextSibling'); }
+    set isDraggedOverAsNextSibling(value: boolean) {
+        var oldValue = this.isDraggedOverAsNextSibling;
 
-        this.set('isDraggedOverAsFinalChild', value);
+        this.set('isDraggedOverAsNextSibling', value);
 
         if (oldValue !== value && this.view) this.view.render();
     }
@@ -547,7 +547,7 @@ class TodoUiState extends Backbone.Model {
         if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
             TodoUiState.draggedOverModel.set('isDraggedOver', false);
             TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
-            TodoUiState.draggedOverModel.set('isDraggedOverAsFinalChild', false);
+            TodoUiState.draggedOverModel.set('isDraggedOverAsNextSibling', false);
             TodoUiState.draggedOverModel.view.render();
         }
 
@@ -557,7 +557,7 @@ class TodoUiState extends Backbone.Model {
 
         if (!value) {
             this.isDraggedOverAsChild = false;
-            this.isDraggedOverAsFinalChild = false;
+            this.isDraggedOverAsNextSibling = false;
         }
 
         if (this.view && oldValue !== value) this.view.render();
@@ -830,18 +830,22 @@ class TodoView extends Backbone.View<TodoModel> {
         var finalChildOffset = height;
         var hasChildren = this.model.numActiveChildren != 0;
 
-        var couldBeDraggedAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
-        var couldBeDraggedAsFinalChild = yOffset > finalChildOffset && hasChildren;
+        var couldBeDraggedAsChild = yOffset > firstChildOffset && (yOffset < finalChildOffset || !hasChildren);
+        var couldBeDraggedAsNextSibling = yOffset > finalChildOffset && hasChildren;
 
         this.uiState.isDraggedOver = true;
 
         // If model has children, it can't be JUST dragged over.
-        if (hasChildren && (!couldBeDraggedAsChild && !couldBeDraggedAsFinalChild)) {
+        if (hasChildren && (!couldBeDraggedAsChild && !couldBeDraggedAsNextSibling)) {
             couldBeDraggedAsChild = true;
         }
 
         this.uiState.isDraggedOverAsChild = couldBeDraggedAsChild;
-        this.uiState.isDraggedOverAsFinalChild = couldBeDraggedAsFinalChild;
+        this.uiState.isDraggedOverAsNextSibling = couldBeDraggedAsNextSibling;
+
+        if (this.uiState.isDraggedOver) console.log("over");
+        if (this.uiState.isDraggedOverAsChild) console.log("child");
+        if (this.uiState.isDraggedOverAsNextSibling) console.log("sibl");
 
         return false;
     }
@@ -854,7 +858,7 @@ class TodoView extends Backbone.View<TodoModel> {
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
-            this.uiState.isDraggedOverAsFinalChild = false;
+            this.uiState.isDraggedOverAsNextSibling = false;
             this.mainView.model.isDragging = false;
 
             return false;
