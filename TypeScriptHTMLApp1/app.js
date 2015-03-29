@@ -942,10 +942,16 @@ var TodoView = (function (_super) {
         var yOffset = (e.pageY || e.originalEvent.pageY) - $(e.currentTarget).offset().top;
         var firstChildOffset = this.$('.todo-name').height() / 2;
         var finalChildOffset = this.$('.todo-name').height();
+        var hasChildren = this.model.numActiveChildren != 0;
+        var couldBeDraggedAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
+        var couldBeDraggedAsFinalChild = yOffset > finalChildOffset;
         this.uiState.isDraggedOver = true;
-        this.uiState.isDraggedOverAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
-        this.uiState.isDraggedOverAsFinalChild = yOffset > finalChildOffset;
-        console.log(this.uiState.isDraggedOverAsFinalChild);
+        // If model has children, it can't be JUST dragged over.
+        if (hasChildren && (!couldBeDraggedAsChild && !couldBeDraggedAsFinalChild)) {
+            couldBeDraggedAsChild = true;
+        }
+        this.uiState.isDraggedOverAsChild = couldBeDraggedAsChild;
+        this.uiState.isDraggedOverAsFinalChild = couldBeDraggedAsFinalChild;
         return false;
     };
     TodoView.prototype.drop = function (e) {
@@ -1285,8 +1291,9 @@ var TodoView = (function (_super) {
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
-        window['keyboardShortcuts'].setModel(this.uiState);
-        window['keyboardShortcuts'].render();
+        // TODO ? 
+        // window['keyboardShortcuts'].setModel(this.uiState);
+        // window['keyboardShortcuts'].render();
         if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
             TodoDetailView.instance.model = this.model;
         }
