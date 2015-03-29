@@ -529,6 +529,7 @@ var TodoUiState = (function (_super) {
         this.selected = false;
         this.isDraggedOver = false;
         this.isDraggedOverAsChild = false;
+        this.isDraggedOverAsFinalChild = false;
         this.collapsed = false;
         if (!attrs['view'])
             console.error('No view assigned for TodoUiState');
@@ -683,6 +684,19 @@ var TodoUiState = (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(TodoUiState.prototype, "isDraggedOverAsFinalChild", {
+        get: function () {
+            return this.get('isDraggedOverAsFinalChild');
+        },
+        set: function (value) {
+            var oldValue = this.isDraggedOverAsFinalChild;
+            this.set('isDraggedOverAsFinalChild', value);
+            if (oldValue !== value && this.view)
+                this.view.render();
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(TodoUiState.prototype, "isDraggedOver", {
         get: function () {
             return this.get('isDraggedOver');
@@ -693,13 +707,16 @@ var TodoUiState = (function (_super) {
             if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
                 TodoUiState.draggedOverModel.set('isDraggedOver', false);
                 TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
+                TodoUiState.draggedOverModel.set('isDraggedOverAsFinalChild', false);
                 TodoUiState.draggedOverModel.view.render();
             }
             if (value)
                 TodoUiState.draggedOverModel = this;
             this.set('isDraggedOver', value);
-            if (!value)
+            if (!value) {
                 this.isDraggedOverAsChild = false;
+                this.isDraggedOverAsFinalChild = false;
+            }
             if (this.view && oldValue !== value)
                 this.view.render();
         },
@@ -923,8 +940,12 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.dragTodoOver = function (e) {
         var yOffset = (e.pageY || e.originalEvent.pageY) - $(e.currentTarget).offset().top;
+        var firstChildOffset = this.$('.todo-name').height() / 2;
+        var finalChildOffset = this.$('.todo-name').height();
         this.uiState.isDraggedOver = true;
-        this.uiState.isDraggedOverAsChild = yOffset > this.$('.todo-name').height() / 2;
+        this.uiState.isDraggedOverAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
+        this.uiState.isDraggedOverAsFinalChild = yOffset > finalChildOffset;
+        console.log(this.uiState.isDraggedOverAsFinalChild);
         return false;
     };
     TodoView.prototype.drop = function (e) {
@@ -934,6 +955,7 @@ var TodoView = (function (_super) {
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
+            this.uiState.isDraggedOverAsFinalChild = false;
             this.mainView.model.isDragging = false;
             return false;
         }

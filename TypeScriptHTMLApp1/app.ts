@@ -412,6 +412,7 @@ class TodoUiState extends Backbone.Model {
         this.selected = false;
         this.isDraggedOver = false;
         this.isDraggedOverAsChild = false;
+        this.isDraggedOverAsFinalChild = false;
         this.collapsed = false;
 
         if (!attrs['view']) console.error('No view assigned for TodoUiState');
@@ -528,6 +529,16 @@ class TodoUiState extends Backbone.Model {
         if (oldValue !== value && this.view) this.view.render();
     }
 
+
+    get isDraggedOverAsFinalChild(): boolean { return this.get('isDraggedOverAsFinalChild'); }
+    set isDraggedOverAsFinalChild(value: boolean) {
+        var oldValue = this.isDraggedOverAsFinalChild;
+
+        this.set('isDraggedOverAsFinalChild', value);
+
+        if (oldValue !== value && this.view) this.view.render();
+    }
+
     get isDraggedOver(): boolean { return this.get('isDraggedOver'); }
     set isDraggedOver(value: boolean) {
         var oldValue = this.isDraggedOver;
@@ -536,6 +547,7 @@ class TodoUiState extends Backbone.Model {
         if (TodoUiState.draggedOverModel && value && TodoUiState.draggedOverModel !== this) {
             TodoUiState.draggedOverModel.set('isDraggedOver', false);
             TodoUiState.draggedOverModel.set('isDraggedOverAsChild', false);
+            TodoUiState.draggedOverModel.set('isDraggedOverAsFinalChild', false);
             TodoUiState.draggedOverModel.view.render();
         }
 
@@ -543,7 +555,10 @@ class TodoUiState extends Backbone.Model {
 
         this.set('isDraggedOver', value);
 
-        if (!value) this.isDraggedOverAsChild = false;
+        if (!value) {
+            this.isDraggedOverAsChild = false;
+            this.isDraggedOverAsFinalChild = false;
+        }
 
         if (this.view && oldValue !== value) this.view.render();
     }
@@ -809,9 +824,14 @@ class TodoView extends Backbone.View<TodoModel> {
 
     dragTodoOver(e: JQueryMouseEventObject): boolean {
         var yOffset = (e.pageY || (<any> e.originalEvent).pageY) - $(e.currentTarget).offset().top;
+        var firstChildOffset = this.$('.todo-name').height() / 2;
+        var finalChildOffset = this.$('.todo-name').height();
 
         this.uiState.isDraggedOver = true;
-        this.uiState.isDraggedOverAsChild = yOffset > this.$('.todo-name').height() / 2;
+        this.uiState.isDraggedOverAsChild = yOffset > firstChildOffset && yOffset < finalChildOffset;
+        this.uiState.isDraggedOverAsFinalChild = yOffset > finalChildOffset;
+
+        console.log(this.uiState.isDraggedOverAsFinalChild);
 
         return false;
     }
@@ -824,6 +844,7 @@ class TodoView extends Backbone.View<TodoModel> {
         if (selectedModel === this.model || selectedModel.flatten().indexOf(this.model) !== -1) {
             this.uiState.isDraggedOver = false;
             this.uiState.isDraggedOverAsChild = false;
+            this.uiState.isDraggedOverAsFinalChild = false;
             this.mainView.model.isDragging = false;
 
             return false;

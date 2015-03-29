@@ -81,9 +81,10 @@
     <script type="text/template" id="todo">
         <div class="todo 
 			 <% if (selected) print ('selected') %>
+                 <% if (isDraggedOverAsFinalChild) print ('dragged-over-as-child') %>
              ">
             <div class="todo-name
-                 <% if (isDraggedOver && !isDraggedOverAsChild) print ('dragged-over') %>
+                 <% if (isDraggedOver && !isDraggedOverAsChild && !isDraggedOverAsFinalChild) print ('dragged-over') %>
                  <% if (isDraggedOverAsChild) print ('dragged-over-as-child') %>
                  <% if (isFirstMatch) print('search-match') %>
                  <% if (searchResultParent) print('search-result-parent') %>">
