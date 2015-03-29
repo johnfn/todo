@@ -99,6 +99,8 @@
                     <% if (editingName) { %>
                         <input class='name-edit' />
                     <% } else { %>
+                        <a href="#" class="todo-zoom-js <% if (selected) print('zoom-selected') %>">O</a>
+
                         <% if (starred) { %>
                             <i class="fa fa-star"></i>
                         <% } %>
@@ -139,7 +141,6 @@
 						<% if (numActiveChildren > 0) { %>
 							<a href="#" class="todo-hide-js"> <%= collapsed ? '[+]' : '[-]' %> </a>
 						<% } %>
-                        <a href="#" class="todo-zoom-js">O</a>
 					</span>
 				<% } %>
             </div>

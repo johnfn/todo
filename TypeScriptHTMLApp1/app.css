@@ -100,6 +100,21 @@ a {
     color: rgb(194, 75, 75);
 }
 
+.todo-name-content {
+    position: relative;
+}
+
+.todo-zoom-js {
+    position: absolute;
+    left: -20px;
+    color: white;
+}
+
+.zoom-selected {
+    color: black;
+    width: 20px;
+}
+
 .todo-header {
     font-size: 1.5em;
 }
