@@ -296,8 +296,6 @@
                     </div>
                 </div>
             </div>
-
-            <div class="title-below"></div>
         </div>
             
         <div class="breadcrumb-container">
@@ -323,29 +321,34 @@
 
     <script type="text/template" id="tab-bar">
         <div class="row">
-            <div class="col-sm-8">
+            <div class="col-sm-12">
                 <div role="tabpanel">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active todo-tab-js">
+                    <ul class="nav" role="tablist">
+                        <li role="presentation" class="active special-tab todo-tab-js">
                             <a href="#todos" aria-controls="todos" role="tab" data-tab="todos" data-toggle="tab">todos</a>
                         </li>
-                        <li role="presentation" class="archive-tab-js">
+                        <li role="presentation" class="special-tab archive-tab-js">
                             <a href="#archive" aria-controls="archive" role="tab" data-tab="archive" data-toggle="tab">archive</a>
                         </li>
                     </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="todos">
+                        <div id="main-content"></div>
+                    </div>
 
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="todos">
-                            <div id="main-content"></div>
-                        </div>
-
-                        <div role="tabpanel" class="tab-pane" id="archive">
-                            <div id="archive-js"></div>
-                        </div>
+                    <div role="tabpanel" class="tab-pane" id="archive">
+                        <div id="archive-js"></div>
                     </div>
                 </div>
             </div>
+
             <div class="col-sm-4 right-panel">
+
             </div>
         </div>
     </script>
