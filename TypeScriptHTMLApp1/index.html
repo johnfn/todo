@@ -286,8 +286,16 @@
             <div class="container">
                 <div class="row">
                     <div class="title-content col-xs-8">
-                        <i class="fa fa-cogs"></i>
-                        <span class="title-text">todo</span>
+                        <div role="tabpanel">
+                            <ul class="special-nav" role="tablist">
+                                <li role="presentation" class="active special-tab todo-tab-js">
+                                    <a href="#todos" aria-controls="todos" role="tab" data-tab="todos" data-toggle="tab">todos</a>
+                                </li>
+                                <li role="presentation" class="special-tab archive-tab-js">
+                                    <a href="#archive" aria-controls="archive" role="tab" data-tab="archive" data-toggle="tab">archive</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                     <div class="col-xs-4">
                         <input type="text" placeholder="search" class="search-input" />
@@ -320,21 +328,7 @@
     </script>
 
     <script type="text/template" id="tab-bar">
-        <div class="row">
-            <div class="col-sm-12">
-                <div role="tabpanel">
-                    <ul class="nav" role="tablist">
-                        <li role="presentation" class="active special-tab todo-tab-js">
-                            <a href="#todos" aria-controls="todos" role="tab" data-tab="todos" data-toggle="tab">todos</a>
-                        </li>
-                        <li role="presentation" class="special-tab archive-tab-js">
-                            <a href="#archive" aria-controls="archive" role="tab" data-tab="archive" data-toggle="tab">archive</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="row">
+        <div class="row todo-rows">
             <div class="col-sm-8">
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" id="todos">
@@ -346,7 +340,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-sm-4 right-panel">
 
             </div>

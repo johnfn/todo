@@ -226,8 +226,8 @@ a.zoom-selected {
     color: rgb(126, 126, 126);
 }
 
-.whole-todo-container {
-    padding-top: 65px;
+.todo-rows > div {
+    padding-top: 40px;
 }
 
 .hide {
@@ -467,4 +467,26 @@ a.autocomplete-item {
 
 .nav {
     padding-bottom: 10px;
+}
+
+.special-nav {
+
+}
+
+.special-nav li {
+    display: inline-block;
+}
+
+.special-nav li a {
+    color: #ddd;
+    text-decoration: none;
+    padding-right: 10px;
+}
+
+.special-nav li.active a {
+    color: white;
+}
+
+.special-nav {
+    margin-bottom: 0;
 }
