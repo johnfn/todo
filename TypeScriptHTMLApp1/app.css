@@ -211,7 +211,7 @@ a.zoom-selected {
     background-color: rgb(246, 246, 246);
     border-left: 1px solid rgb(215, 215, 215);
     
-    height: calc(100vh - 60px);
+    height: calc(100vh - 110px);
 }
 
 .right-panel-name {
@@ -225,7 +225,7 @@ a.zoom-selected {
 }
 
 .todo-rows > div {
-    padding-top: 60px;
+    margin-top: 60px;
 }
 
 .hide {
@@ -492,7 +492,7 @@ input[type=text] {
 
 .col-sm-8 {
     overflow-y: auto;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 110px);
     padding-left: 40px;
 }
 
