@@ -90,7 +90,6 @@
                  <% if (isFirstMatch) print('search-match') %>
                  <% if (searchResultParent) print('search-result-parent') %>">
                 <span class="edit-name-js todo-name-content
-					  <% if (done) print('todo-done') %>
 					  <% if (isHeader) print('todo-header') %>">
 
                     <% if (!isHeader) { %>
@@ -109,7 +108,9 @@
                         <% } %>
 
                         <% if (!searchMatch) { %>
-                            <span class="actual-todo-name">
+                            <span class="actual-todo-name
+                                  <% if (done) print('todo-done') %>
+                                  ">
                                 <%= name %>
 
                                 <% if (collapsed && !searching) { %> 
