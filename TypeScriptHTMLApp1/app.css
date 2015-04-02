@@ -499,3 +499,12 @@ input[type=text] {
 .todo-rows {
     width: 100vw;
 }
+
+.right-panel-title {
+     margin-top: 5px;
+     margin-bottom: 5px;
+}
+
+.right-panel-title small {
+    font-size: .5em;
+}

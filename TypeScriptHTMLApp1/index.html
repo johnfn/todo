@@ -195,8 +195,13 @@
 	<script type="text/template" id="right-panel">
         <div>
             <div> 
-                <b> <%= name %> </b> <%= doneCount %>/<%= totalCount %>
-                <small class="time"> (added <%= createdDate %>) </small>
+                <h3 class="right-panel-title">
+                    <%= name %> 
+                    <small class="time"> (added <%= createdDate %>) </small>
+                </h3> 
+            </div>
+            <div>
+                <%= doneCount %>/<%= totalCount %>
             </div>
 
             <% if (isEditingContent) { %>
