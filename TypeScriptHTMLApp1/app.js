@@ -5,7 +5,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://10.211.55.2:5000";
+var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {

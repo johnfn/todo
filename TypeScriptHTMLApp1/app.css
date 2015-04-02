@@ -43,6 +43,7 @@
 body {
     margin-bottom: 30px;
     color: #595959;
+    font-family: 'Open Sans', sans-serif;
     /*background-color: rgb(226, 231, 238); */
 }
 
@@ -207,14 +208,10 @@ a.zoom-selected {
 }
 
 .right-panel {
-    padding-top: 20px;
     background-color: rgb(246, 246, 246);
     border-left: 1px solid rgb(215, 215, 215);
-    /* this crazy hack makes the height of the right panel equal to the height of the left. */
-    padding-bottom: 100%;
-    margin-bottom: -100%;
-
-    margin-bottom: 300px;
+    
+    height: calc(100vh - 60px);
 }
 
 .right-panel-name {
@@ -426,16 +423,6 @@ a.autocomplete-item {
     color: red;
 }
 
-.row {
-    display: table;
-}
-
-[class*="col-"] {
-    float: none;
-    display: table-cell;
-    vertical-align: top;
-}
-
 .my-checkbox {
     width: 15px;
     height: 15px;
@@ -501,4 +488,14 @@ input[type=text] {
     border: 1px solid white;
     background-color: white;
     font-size: 16px;
+}
+
+.tab-content {
+    overflow-y: scroll;
+    height: calc(100vh - 120px);
+    padding-left: 40px;
+}
+
+.todo-rows {
+    width: 100vw;
 }

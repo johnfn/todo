@@ -193,27 +193,29 @@
 	</script>
 
 	<script type="text/template" id="right-panel">
-		<div> 
-			<b> <%= name %> </b> <%= doneCount %>/<%= totalCount %>
-			<small class="time"> (added <%= createdDate %>) </small>
-		</div>
-
-		<% if (isEditingContent) { %>
-			<div class="content-input-js">
-				<textarea class="content-edit-js"><%= content %></textarea>
-			</div>
-		<% } else { %>
-			<div class="content-js"> <%= content %> </div>
-		<% } %>
-
-        <% if (!archived) { %>
-            <div>
-                <input type="checkbox" class="header-checkbox-js" <% if (isHeader) print('checked') %>/> Header
-            </div>
-        <% } %>
-
         <div>
-            <input type="checkbox" class="archived-checkbox-js"  <% if (archived) print('checked') %>/> Archived
+            <div> 
+                <b> <%= name %> </b> <%= doneCount %>/<%= totalCount %>
+                <small class="time"> (added <%= createdDate %>) </small>
+            </div>
+
+            <% if (isEditingContent) { %>
+                <div class="content-input-js">
+                    <textarea class="content-edit-js"><%= content %></textarea>
+                </div>
+            <% } else { %>
+                <div class="content-js"> <%= content %> </div>
+            <% } %>
+
+            <% if (!archived) { %>
+                <div>
+                    <input type="checkbox" class="header-checkbox-js" <% if (isHeader) print('checked') %>/> Header
+                </div>
+            <% } %>
+
+            <div>
+                <input type="checkbox" class="archived-checkbox-js"  <% if (archived) print('checked') %>/> Archived
+            </div>
         </div>
 	</script>
 
@@ -352,7 +354,7 @@
     <div class="top-bar-container">
         
     </div>
-    <div class="container whole-todo-container">
+    <div class="whole-todo-container">
 
     </div>
 
