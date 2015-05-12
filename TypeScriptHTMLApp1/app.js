@@ -5,7 +5,8 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
+var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'https://fiuljlyevl.localtunnel.me';
+var userId = 1;
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
     function VaguelyMagicalModel() {
@@ -1434,8 +1435,8 @@ var FooterView = (function (_super) {
     };
     FooterView.prototype.save = function () {
         $.ajax({
-            url: baseUrl + "/save",
-            type: "POST",
+            url: baseUrl + "/todos/" + userId,
+            type: "PUT",
             data: JSON.stringify(this.model.getData()),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
@@ -1751,8 +1752,8 @@ var MainView = (function (_super) {
         /*
         this.initializeTodoTree(this.savedData.load());
         */
-        $.getJSON(baseUrl + '/db', function (d) {
-            self.initializeTodoTree(d);
+        $.getJSON(baseUrl + '/todos/' + userId, function (d) {
+            self.initializeTodoTree(d.content);
             self.render();
         });
         this.listenTo(this.model, 'change:currentTodoView', this.render);
@@ -1933,6 +1934,7 @@ var TabBarView = (function (_super) {
         // TODO: Don't store data in view.
         var tabName = $(e.currentTarget).find('a').data('tab');
         this.model.currentTab = tabName;
+        console.log(this.model.currentTab);
     };
     TabBarView.prototype.render = function () {
         this.$el.html(this.template());
@@ -1940,7 +1942,7 @@ var TabBarView = (function (_super) {
     };
     return TabBarView;
 })(Backbone.View);
-$(function () {
+function kickItOff() {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
     var tabbarView = new TabBarView();
     var detailView = new TodoDetailView();
@@ -1988,5 +1990,9 @@ $(function () {
             }
         });
     });
+}
+$(function () {
+    var registerOrSigninView = new RegisterOrSigninView();
+    registerOrSigninView.render();
 });
 //# sourceMappingURL=app.js.map

@@ -1,7 +1,8 @@
 ﻿declare var require;
 
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? "https://tranquil-ocean-8657.herokuapp.com" : "http://192.168.0.2:5000";
+var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'https://fiuljlyevl.localtunnel.me';
+var userId = 1;
 
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
@@ -1413,13 +1414,13 @@ class FooterView extends Backbone.View<TodoModel> {
 
     save() {
         $.ajax({
-            url: baseUrl + "/save",
-            type: "POST",
+            url: baseUrl + "/todos/" + userId,
+            type: "PUT",
             data: JSON.stringify(this.model.getData()),
             contentType: "application/json; charset=utf-8",
             dataType: "json",
-            success: function () {
-                console.log('done')
+            success: () => {
+                console.log('done');
             }
         });
     }
@@ -1691,8 +1692,8 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.initializeTodoTree(this.savedData.load());
         */
 
-        $.getJSON(baseUrl + '/db',(d) => {
-            self.initializeTodoTree(d);
+        $.getJSON(baseUrl + '/todos/' + userId, (d) => {
+            self.initializeTodoTree(d.content);
             self.render();
         });
 
@@ -1906,6 +1907,8 @@ class TabBarView extends Backbone.View<TabBarState> {
         // TODO: Don't store data in view.
         var tabName = $(e.currentTarget).find('a').data('tab');
         this.model.currentTab = tabName;
+
+        console.log(this.model.currentTab);
     }
 
     render(): TabBarView {
@@ -1915,13 +1918,11 @@ class TabBarView extends Backbone.View<TabBarState> {
     }
 }
 
-$(() => {
+function kickItOff() {
     window['keyboardShortcuts'] = new KeyboardShortcuts();
 
     var tabbarView = new TabBarView();
-
     var detailView = new TodoDetailView();
-
     var mainView = new MainView();
 
     mainView.listenTo(mainView, 'initialization-done',() => {
@@ -1978,4 +1979,9 @@ $(() => {
             }
         });
     });
+}
+
+$(() => {
+    var registerOrSigninView = new RegisterOrSigninView();
+    registerOrSigninView.render();
 });

@@ -15,3 +15,9 @@ TypeScriptHTMLApp1/sass.scss
 *.cache
 TypeScriptHTMLApp1/obj/Debug/DesignTimeResolveAssemblyReferencesInput.cache
 *.cache
+*.chk
+*.log
+*.ide
+TypeScriptHTMLApp1.sln.ide/edb.chk
+*.log
+TypeScriptHTMLApp1.sln.ide/edbres00001.jrs

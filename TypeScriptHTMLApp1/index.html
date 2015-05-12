@@ -21,6 +21,7 @@
     <script src="Scripts/bootstrap.js"></script>
 
     <script src="app.js"></script>
+    <script src="registration.js"></script>
     <script src="autocomplete.js"></script>
     <script src="tags.js"></script>
     <script src="keyboard-shortcuts.js"></script>
@@ -56,6 +57,68 @@
         <% if (isChild) { %>
         </div>
         <% } %>
+    </script>
+
+    <script type="text/template" id="register-or-signin">
+        <div class="generic-dialog">
+            <h2> Have we met before? </h2>
+            <div class="explanation">
+                <i>todos</i> is a todo tracking app. If you haven't signed up, you should, because it's great. Otherwise, you should sign in!
+            </div>
+            <div>
+                <button type="button" class="btn btn-default log-in-js">
+                    Log In
+                </button>
+                <button type="button" class="btn btn-primary register-js">
+                    Register
+                </button>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="signin">
+        <div class="generic-dialog">
+            <h2> Let's get this show on the road. </h2>
+            <div class="explanation">
+                Loginnnnnnrawr
+            </div>
+            <div>
+                <button type="button" class="btn btn-default done-js">
+                    Yeah.
+                </button>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="register">
+        <div class="generic-dialog">
+            <h2> Tell me a little about yourself. </h2>
+            <div>
+                <div class="error-message">
+
+                </div>
+
+                <div class="field">
+                    <label for="email-input">Email:</label>
+                    <input type="email" class="form-control" id="email-input" placeholder="Enter email">
+                </div>
+
+                <div class="field">
+                    <label for="password-input">Password:</label>
+                    <input type="password" class="form-control" id="password-input" placeholder="Enter password">
+                </div>
+
+                <div class="field">
+                    <label for="confirm-input">Password (confirm):</label>
+                    <input type="password" class="form-control" id="confirm-input" placeholder="Enter email">
+                </div>
+            </div>
+            <div>
+                <button type="button" class="btn btn-default done-js">
+                    Ok, I'm done.
+                </button>
+            </div>
+        </div>
     </script>
 
     <script type="text/template" id="todo-archive-item">
@@ -360,6 +423,11 @@
     <div class="top-bar-container">
         
     </div>
+
+    <div class="dialogs-go-here">
+        
+    </div>
+
     <div class="whole-todo-container">
 
     </div>
