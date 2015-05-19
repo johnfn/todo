@@ -64,6 +64,10 @@ class SigninView extends Backbone.View<Backbone.Model> {
 }
 
 
+// TODO
+// * Error messages should be in red
+// * Separate validation code from register code
+
 class RegisterView extends Backbone.View<Backbone.Model> {
     template: ITemplate;
 
@@ -85,14 +89,17 @@ class RegisterView extends Backbone.View<Backbone.Model> {
         this.$('.error-message').toggle(msg !== '');
     }
 
+    showHelpfulMessage(msg: string) {
+        this.$('.helpful-message').html(msg);
+        this.$('.helpful-message').toggle(msg !== '');
+    }
+
     register() {
         var email: string = this.$('#email-input').val();
         var password: string = this.$('#password-input').val();
         var confirm: string = this.$('#confirm-input').val();
 
         this.$('.error-message').hide();
-
-        debugger;
 
         if (password !== confirm) {
             this.showValidationError('Passwords do not match.');
@@ -103,6 +110,27 @@ class RegisterView extends Backbone.View<Backbone.Model> {
             this.showValidationError('Password should be at least 6 characters.');
             return;
         }
+
+        $.post(baseUrl + '/users', {
+            user: {
+                email: email,
+                password: password,
+                password_confirmation: confirm
+            }
+        }, response => {
+            // Check if the server responded with errors
+            if (typeof response == 'string') {
+                var error = response.match(/<li>(.*)<\/li>/);
+                var firstError = error[1];
+
+                if (firstError) {
+                    this.showValidationError(firstError);
+                    return;
+                }
+            }
+
+            this.showHelpfulMessage('Registration success! You may procede to log in.');
+        });
     }
 
     render(): RegisterView {

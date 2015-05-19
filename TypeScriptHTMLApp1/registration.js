@@ -60,6 +60,9 @@ var SigninView = (function (_super) {
     };
     return SigninView;
 })(Backbone.View);
+// TODO
+// * Error messages should be in red
+// * Separate validation code from register code
 var RegisterView = (function (_super) {
     __extends(RegisterView, _super);
     function RegisterView() {
@@ -79,12 +82,16 @@ var RegisterView = (function (_super) {
         this.$('.error-message').html(msg);
         this.$('.error-message').toggle(msg !== '');
     };
+    RegisterView.prototype.showHelpfulMessage = function (msg) {
+        this.$('.helpful-message').html(msg);
+        this.$('.helpful-message').toggle(msg !== '');
+    };
     RegisterView.prototype.register = function () {
+        var _this = this;
         var email = this.$('#email-input').val();
         var password = this.$('#password-input').val();
         var confirm = this.$('#confirm-input').val();
         this.$('.error-message').hide();
-        debugger;
         if (password !== confirm) {
             this.showValidationError('Passwords do not match.');
             return;
@@ -93,6 +100,24 @@ var RegisterView = (function (_super) {
             this.showValidationError('Password should be at least 6 characters.');
             return;
         }
+        $.post(baseUrl + '/users', {
+            user: {
+                email: email,
+                password: password,
+                password_confirmation: confirm
+            }
+        }, function (response) {
+            // Check if the server responded with errors
+            if (typeof response == 'string') {
+                var error = response.match(/<li>(.*)<\/li>/);
+                var firstError = error[1];
+                if (firstError) {
+                    _this.showValidationError(firstError);
+                    return;
+                }
+            }
+            _this.showHelpfulMessage('Registration success! You may procede to log in.');
+        });
     };
     RegisterView.prototype.render = function () {
         this.$el.html(this.template());

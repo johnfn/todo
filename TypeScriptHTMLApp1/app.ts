@@ -1,9 +1,14 @@
 ﻿declare var require;
 
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'https://fiuljlyevl.localtunnel.me';
+var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'https://qmxnaytoxd.localtunnel.me';
 var userId = 1;
 
+/*
+    VaguelyMagicalModel is a small extension of a Backbone Model
+    that makes properties defined as getters and setters visible
+    in the toJSON() serialization of that model. 
+*/
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
         var result = _.clone(this.attributes);
