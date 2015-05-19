@@ -1,3 +1,4 @@
+/// <reference path="./references.d.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5,7 +6,7 @@ var __extends = this.__extends || function (d, b) {
     d.prototype = new __();
 };
 var nwjs = typeof require !== 'undefined';
-var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'https://qmxnaytoxd.localtunnel.me';
+var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'http://localhost:3000';
 var userId = 1;
 /*
     VaguelyMagicalModel is a small extension of a Backbone Model
@@ -21,6 +22,7 @@ var VaguelyMagicalModel = (function (_super) {
         var _this = this;
         var result = _.clone(this.attributes);
         var getters = [];
+        // Get all getters of this object. Dark magic @_@
         for (var accessorName in this) {
             var proto = Object.getPrototypeOf(this);
             var pd = Object.getOwnPropertyDescriptor(proto, accessorName);
@@ -41,30 +43,30 @@ var SearchResult = (function (_super) {
         _super.apply(this, arguments);
     }
     SearchResult.prototype.initialize = function () {
-        this.searchMatch = 0 /* NoMatch */;
+        this.searchMatch = SearchMatch.NoMatch;
     };
     Object.defineProperty(SearchResult.prototype, "searchMatch", {
         // TODO: More DRY enum serialization
         get: function () {
             var result = this.get('searchMatch');
             if (result === 'NoMatch')
-                return 0 /* NoMatch */;
+                return SearchMatch.NoMatch;
             if (result === 'Match')
-                return 2 /* Match */;
+                return SearchMatch.Match;
             if (result === 'ParentOfMatch')
-                return 1 /* ParentOfMatch */;
+                return SearchMatch.ParentOfMatch;
             throw 'aaaaaaghjkl';
-            return 0 /* NoMatch */;
+            return SearchMatch.NoMatch;
         },
         set: function (value) {
             switch (value) {
-                case 0 /* NoMatch */:
+                case SearchMatch.NoMatch:
                     this.set('searchMatch', 'NoMatch');
                     break;
-                case 2 /* Match */:
+                case SearchMatch.Match:
                     this.set('searchMatch', 'Match');
                     break;
-                case 1 /* ParentOfMatch */:
+                case SearchMatch.ParentOfMatch:
                     this.set('searchMatch', 'ParentOfMatch');
                     break;
             }
@@ -73,43 +75,27 @@ var SearchResult = (function (_super) {
         configurable: true
     });
     Object.defineProperty(SearchResult.prototype, "isFirstMatch", {
-        get: function () {
-            return this.get('isFirstMatch');
-        },
-        set: function (value) {
-            this.set('isFirstMatch', value);
-        },
+        get: function () { return this.get('isFirstMatch'); },
+        set: function (value) { this.set('isFirstMatch', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(SearchResult.prototype, "isMatchInContent", {
         /** True if the match is in the content; false if it is in the name. */
-        get: function () {
-            return this.get('isMatchInContent');
-        },
-        set: function (value) {
-            this.set('isMatchInContent', value);
-        },
+        get: function () { return this.get('isMatchInContent'); },
+        set: function (value) { this.set('isMatchInContent', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(SearchResult.prototype, "matchStart", {
-        get: function () {
-            return this.get('matchStart');
-        },
-        set: function (value) {
-            this.set('matchStart', value);
-        },
+        get: function () { return this.get('matchStart'); },
+        set: function (value) { this.set('matchStart', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(SearchResult.prototype, "matchEnd", {
-        get: function () {
-            return this.get('matchEnd');
-        },
-        set: function (value) {
-            this.set('matchEnd', value);
-        },
+        get: function () { return this.get('matchEnd'); },
+        set: function (value) { this.set('matchEnd', value); },
         enumerable: true,
         configurable: true
     });
@@ -151,9 +137,7 @@ var Trigger = (function () {
             }
             return false;
         },
-        set: function (value) {
-            this._value = value;
-        },
+        set: function (value) { this._value = value; },
         enumerable: true,
         configurable: true
     });
@@ -272,36 +256,24 @@ var TodoModel = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "uiState", {
-        get: function () {
-            return this.view.uiState;
-        },
+        get: function () { return this.view.uiState; },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "isHeader", {
-        get: function () {
-            return this.get('isHeader');
-        },
-        set: function (value) {
-            this.set('isHeader', value);
-        },
+        get: function () { return this.get('isHeader'); },
+        set: function (value) { this.set('isHeader', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "tags", {
-        get: function () {
-            return this.get('tags');
-        },
-        set: function (value) {
-            this.set('tags', value);
-        },
+        get: function () { return this.get('tags'); },
+        set: function (value) { this.set('tags', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "starred", {
-        get: function () {
-            return this.get('starred');
-        },
+        get: function () { return this.get('starred'); },
         set: function (value) {
             this.set('starred', value);
             this.goodTimeToSave();
@@ -312,9 +284,7 @@ var TodoModel = (function (_super) {
     Object.defineProperty(TodoModel.prototype, "archived", {
         /** Archive or unarchive this todo, and apply that archival status to
             all children of this todo. */
-        get: function () {
-            return this.get('archived');
-        },
+        get: function () { return this.get('archived'); },
         set: function (value) {
             if (this.archived === value)
                 return;
@@ -353,89 +323,54 @@ var TodoModel = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "createdDate", {
-        get: function () {
-            return this.get('createdDate');
-        },
-        set: function (value) {
-            this.set('createdDate', value);
-        },
+        get: function () { return this.get('createdDate'); },
+        set: function (value) { this.set('createdDate', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "modifiedDate", {
-        get: function () {
-            return this.get('modifiedDate');
-        },
-        set: function (value) {
-            this.set('modifiedDate', value);
-        },
+        get: function () { return this.get('modifiedDate'); },
+        set: function (value) { this.set('modifiedDate', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "depth", {
-        get: function () {
-            return this.get('depth');
-        },
-        set: function (value) {
-            this.set('depth', value);
-        },
+        get: function () { return this.get('depth'); },
+        set: function (value) { this.set('depth', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "archivalDate", {
-        get: function () {
-            return this.get('archivalDate');
-        },
-        set: function (value) {
-            this.set('archivalDate', value);
-        },
+        get: function () { return this.get('archivalDate'); },
+        set: function (value) { this.set('archivalDate', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "name", {
-        get: function () {
-            return this.get('name');
-        },
-        set: function (value) {
-            this.set('name', value);
-            this.goodTimeToSave();
-        },
+        get: function () { return this.get('name'); },
+        set: function (value) { this.set('name', value); this.goodTimeToSave(); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "content", {
-        get: function () {
-            return this.get('content');
-        },
-        set: function (value) {
-            this.set('content', value);
-            this.goodTimeToSave();
-        },
+        get: function () { return this.get('content'); },
+        set: function (value) { this.set('content', value); this.goodTimeToSave(); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "done", {
-        get: function () {
-            return this.get('done');
-        },
-        set: function (value) {
-            this.set('done', value);
-            this.goodTimeToSave();
-        },
+        get: function () { return this.get('done'); },
+        set: function (value) { this.set('done', value); this.goodTimeToSave(); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "children", {
-        get: function () {
-            return this._children || [];
-        },
+        get: function () { return this._children || []; },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoModel.prototype, "numChildren", {
-        get: function () {
-            return this._children.length;
-        },
+        get: function () { return this._children.length; },
         enumerable: true,
         configurable: true
     });
@@ -542,9 +477,7 @@ var TodoUiState = (function (_super) {
         this.view = attrs['view'];
     }
     Object.defineProperty(TodoUiState.prototype, "model", {
-        get: function () {
-            return this.view.model;
-        },
+        get: function () { return this.view.model; },
         enumerable: true,
         configurable: true
     });
@@ -562,19 +495,13 @@ var TodoUiState = (function (_super) {
         this.editingContent = false;
     };
     Object.defineProperty(TodoUiState.prototype, "addTodoVisible", {
-        get: function () {
-            return this.get('addTodoVisible');
-        },
-        set: function (value) {
-            this.set('addTodoVisible', value);
-        },
+        get: function () { return this.get('addTodoVisible'); },
+        set: function (value) { this.set('addTodoVisible', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "collapsed", {
-        get: function () {
-            return this.get('collapsed');
-        },
+        get: function () { return this.get('collapsed'); },
         set: function (value) {
             this.set('collapsed', value);
             this.collapsedTrigger.value = value;
@@ -583,29 +510,19 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "editingTag", {
-        get: function () {
-            return this.get('editingTag');
-        },
-        set: function (value) {
-            this.set('editingTag', value);
-        },
+        get: function () { return this.get('editingTag'); },
+        set: function (value) { this.set('editingTag', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "whichTag", {
-        get: function () {
-            return this.get('whichTag');
-        },
-        set: function (value) {
-            this.set('whichTag', value);
-        },
+        get: function () { return this.get('whichTag'); },
+        set: function (value) { this.set('whichTag', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "editingName", {
-        get: function () {
-            return this.get('editingName');
-        },
+        get: function () { return this.get('editingName'); },
         set: function (value) {
             if (TodoUiState.isAnyoneEditingName) {
                 if (value) {
@@ -626,9 +543,7 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "editingContent", {
-        get: function () {
-            return this.get('editingContent');
-        },
+        get: function () { return this.get('editingContent'); },
         set: function (value) {
             if (TodoUiState.isAnyoneEditingContent) {
                 if (value) {
@@ -649,9 +564,7 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "selected", {
-        get: function () {
-            return this.get('selected');
-        },
+        get: function () { return this.get('selected'); },
         set: function (value) {
             if (value === this.selected)
                 return;
@@ -678,9 +591,7 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "isDraggedOverAsChild", {
-        get: function () {
-            return this.get('isDraggedOverAsChild');
-        },
+        get: function () { return this.get('isDraggedOverAsChild'); },
         set: function (value) {
             var oldValue = this.isDraggedOverAsChild;
             this.set('isDraggedOverAsChild', value);
@@ -691,9 +602,7 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "isDraggedOverAsNextSibling", {
-        get: function () {
-            return this.get('isDraggedOverAsNextSibling');
-        },
+        get: function () { return this.get('isDraggedOverAsNextSibling'); },
         set: function (value) {
             var oldValue = this.isDraggedOverAsNextSibling;
             this.set('isDraggedOverAsNextSibling', value);
@@ -704,9 +613,7 @@ var TodoUiState = (function (_super) {
         configurable: true
     });
     Object.defineProperty(TodoUiState.prototype, "isDraggedOver", {
-        get: function () {
-            return this.get('isDraggedOver');
-        },
+        get: function () { return this.get('isDraggedOver'); },
         set: function (value) {
             var oldValue = this.isDraggedOver;
             // Turn off the value on the previously-dragged-over element.
@@ -790,12 +697,8 @@ var TodoDetailUiState = (function (_super) {
         this.isEditingContent = false;
     };
     Object.defineProperty(TodoDetailUiState.prototype, "isEditingContent", {
-        get: function () {
-            return this.get('isEditingContent');
-        },
-        set: function (value) {
-            this.set('isEditingContent', value);
-        },
+        get: function () { return this.get('isEditingContent'); },
+        set: function (value) { this.set('isEditingContent', value); },
         enumerable: true,
         configurable: true
     });
@@ -830,9 +733,7 @@ var TodoDetailView = (function (_super) {
         this.render();
     };
     Object.defineProperty(TodoDetailView.prototype, "model", {
-        get: function () {
-            return this._model;
-        },
+        get: function () { return this._model; },
         set: function (value) {
             this._model = value;
             this.render();
@@ -1107,6 +1008,8 @@ var TodoView = (function (_super) {
                 newSelection = this.model.parent;
             }
             else {
+                // Now we have to deal with the case where we're ASCENDING the cliff
+                // I just mentioned.
                 while (newSelection.numChildren !== 0) {
                     newSelection = newSelection.children[newSelection.numChildren - 1];
                 }
@@ -1265,10 +1168,10 @@ var TodoView = (function (_super) {
         }, this.model.toJSON(), this.uiState.toJSON());
         if (this.mainView.model.searchIsOngoing) {
             var searchMatch = this.model.searchResult.searchMatch;
-            if (searchMatch === 1 /* ParentOfMatch */) {
+            if (searchMatch === SearchMatch.ParentOfMatch) {
                 renderOptions['searchResultParent'] = true;
             }
-            if (searchMatch === 2 /* Match */) {
+            if (searchMatch === SearchMatch.Match) {
                 var start = this.model.searchResult.matchStart;
                 var end = this.model.searchResult.matchEnd;
                 var matchedText = this.model.searchResult.isMatchInContent ? this.model.content : this.model.name;
@@ -1281,7 +1184,8 @@ var TodoView = (function (_super) {
                     searchMatch: true
                 });
             }
-            if (searchMatch === 2 /* Match */ || searchMatch === 1 /* ParentOfMatch */) {
+            if (searchMatch === SearchMatch.Match ||
+                searchMatch === SearchMatch.ParentOfMatch) {
                 this.$el.html(this.template(renderOptions));
             }
             else {
@@ -1303,7 +1207,7 @@ var TodoView = (function (_super) {
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
-        // TODO ? 
+        // TODO ?
         // window['keyboardShortcuts'].setModel(this.uiState);
         // window['keyboardShortcuts'].render();
         if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
@@ -1328,15 +1232,19 @@ var TodoView = (function (_super) {
     };
     /** Show the name text xor the name input. */
     TodoView.prototype.renderTodoName = function () {
-        var $nameInput = this.$('.name-edit').val(this.model.name);
+        var $nameInput = this.$('.name-edit')
+            .val(this.model.name);
         if (this.uiState.editingName) {
             $nameInput.select();
         }
     };
     /** Show the content text xor the content input. */
     TodoView.prototype.renderTodoContent = function () {
-        this.$('.edit-content-js').toggle(!this.uiState.editingContent);
-        var $contentInput = this.$('.content-edit-js').toggle(this.uiState.editingContent).val(this.model.content);
+        this.$('.edit-content-js')
+            .toggle(!this.uiState.editingContent);
+        var $contentInput = this.$('.content-edit-js')
+            .toggle(this.uiState.editingContent)
+            .val(this.model.content);
         if (this.uiState.editingContent) {
             $contentInput.select();
         }
@@ -1363,52 +1271,32 @@ var FooterUiState = (function (_super) {
         this.firstStarredTodo = starred[0];
     };
     Object.defineProperty(FooterUiState.prototype, "hasThingsToArchive", {
-        get: function () {
-            return this.get('hasThingsToArchive');
-        },
-        set: function (value) {
-            this.set('hasThingsToArchive', value);
-        },
+        get: function () { return this.get('hasThingsToArchive'); },
+        set: function (value) { this.set('hasThingsToArchive', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(FooterUiState.prototype, "numThingsToArchive", {
-        get: function () {
-            return this.get('numThingsToArchive');
-        },
-        set: function (value) {
-            this.set('numThingsToArchive', value);
-        },
+        get: function () { return this.get('numThingsToArchive'); },
+        set: function (value) { this.set('numThingsToArchive', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(FooterUiState.prototype, "hasThingsToDelete", {
-        get: function () {
-            return this.get('hasThingsToDelete');
-        },
-        set: function (value) {
-            this.set('hasThingsToDelete', value);
-        },
+        get: function () { return this.get('hasThingsToDelete'); },
+        set: function (value) { this.set('hasThingsToDelete', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(FooterUiState.prototype, "numThingsToDelete", {
-        get: function () {
-            return this.get('numThingsToDelete');
-        },
-        set: function (value) {
-            this.set('numThingsToDelete', value);
-        },
+        get: function () { return this.get('numThingsToDelete'); },
+        set: function (value) { this.set('numThingsToDelete', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(FooterUiState.prototype, "firstStarredTodo", {
-        get: function () {
-            return this.get('firstStarredTodo');
-        },
-        set: function (value) {
-            this.set('firstStarredTodo', value);
-        },
+        get: function () { return this.get('firstStarredTodo'); },
+        set: function (value) { this.set('firstStarredTodo', value); },
         enumerable: true,
         configurable: true
     });
@@ -1547,82 +1435,50 @@ var TodoAppModel = (function (_super) {
         this.cachedTodoView = null;
     };
     Object.defineProperty(TodoAppModel.prototype, "view", {
-        get: function () {
-            return this.get('view');
-        },
-        set: function (value) {
-            this.set('view', value);
-        },
+        get: function () { return this.get('view'); },
+        set: function (value) { this.set('view', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "searchText", {
-        get: function () {
-            return this.get('searchText');
-        },
-        set: function (value) {
-            this.set('searchText', value);
-        },
+        get: function () { return this.get('searchText'); },
+        set: function (value) { this.set('searchText', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "searchIsOngoing", {
-        get: function () {
-            return this.get('searchIsOngoing');
-        },
-        set: function (value) {
-            this.set('searchIsOngoing', value);
-        },
+        get: function () { return this.get('searchIsOngoing'); },
+        set: function (value) { this.set('searchIsOngoing', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "selectedSearchModel", {
-        get: function () {
-            return this.get('selectedSearchModel');
-        },
-        set: function (value) {
-            this.set('selectedSearchModel', value);
-        },
+        get: function () { return this.get('selectedSearchModel'); },
+        set: function (value) { this.set('selectedSearchModel', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "selectedTodo", {
-        get: function () {
-            return this.get('selectedTodo');
-        },
-        set: function (value) {
-            this.set('selectedTodo', value);
-        },
+        get: function () { return this.get('selectedTodo'); },
+        set: function (value) { this.set('selectedTodo', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "isDragging", {
-        get: function () {
-            return this.get('isDragging');
-        },
-        set: function (value) {
-            this.set('isDragging', value);
-        },
+        get: function () { return this.get('isDragging'); },
+        set: function (value) { this.set('isDragging', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "baseTodoView", {
-        get: function () {
-            return this.get('baseTodoView');
-        },
-        set: function (value) {
-            this.set('baseTodoView', value);
-        },
+        get: function () { return this.get('baseTodoView'); },
+        set: function (value) { this.set('baseTodoView', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TodoAppModel.prototype, "currentTodoView", {
-        get: function () {
-            return this.get('currentTodoView');
-        },
-        set: function (value) {
-            this.set('currentTodoView', value);
-        },
+        get: function () { return this.get('currentTodoView'); },
+        set: function (value) { this.set('currentTodoView', value); },
         enumerable: true,
         configurable: true
     });
@@ -1630,12 +1486,8 @@ var TodoAppModel = (function (_super) {
         // In case you're in the middle of an operation that changes your currentTodoView,
         // but that could become reverted.
         // Currently only used for search.
-        get: function () {
-            return this.get('cachedTodoView');
-        },
-        set: function (value) {
-            this.set('cachedTodoView', value);
-        },
+        get: function () { return this.get('cachedTodoView'); },
+        set: function (value) { this.set('cachedTodoView', value); },
         enumerable: true,
         configurable: true
     });
@@ -1803,6 +1655,7 @@ var MainView = (function (_super) {
     MainView.prototype.collapseHugeTodosIntelligently = function () {
         var todos = this.model.baseTodoModel.flattenByRow().reverse();
         var collapseThreshold = 11;
+        // Subtract 1 because we never want to collapse the root. That's just dumb.
         for (var i = 0; i < todos.length - 1; i++) {
             if (todos[i].visibleTodosUnder >= collapseThreshold) {
                 todos[i].uiState.collapsed = true;
@@ -1862,7 +1715,8 @@ var MainView = (function (_super) {
         }
         // TODO: Merge this whole thing with AutocompleteResult.
         // clear previous search results
-        _.each(allTodos, function (m) { return m.searchResult.searchMatch = 0 /* NoMatch */; });
+        _.each(allTodos, function (m) { return m.searchResult.searchMatch = SearchMatch.NoMatch; });
+        // At best this algo could be O(n) (leaves first); the way we're doing it is O(n^2).
         for (var i = 0; i < allTodos.length; i++) {
             var todo = allTodos[i];
             if (todo.archived)
@@ -1879,7 +1733,7 @@ var MainView = (function (_super) {
                 continue;
             }
             var parents = todo.pathToRoot();
-            todo.searchResult.searchMatch = 2 /* Match */;
+            todo.searchResult.searchMatch = SearchMatch.Match;
             todo.searchResult.matchStart = matchPosition;
             todo.searchResult.matchEnd = matchPosition + search.length;
             todo.searchResult.isFirstMatch = !foundMatch;
@@ -1887,8 +1741,8 @@ var MainView = (function (_super) {
                 this.model.selectedSearchModel = todo;
             }
             for (var j = 0; j < parents.length; j++) {
-                if (parents[j].searchResult.searchMatch == 0 /* NoMatch */)
-                    parents[j].searchResult.searchMatch = 1 /* ParentOfMatch */;
+                if (parents[j].searchResult.searchMatch == SearchMatch.NoMatch)
+                    parents[j].searchResult.searchMatch = SearchMatch.ParentOfMatch;
             }
             foundMatch = true;
         }
@@ -1906,12 +1760,8 @@ var TabBarState = (function (_super) {
         this.currentTab = 'todos';
     };
     Object.defineProperty(TabBarState.prototype, "currentTab", {
-        get: function () {
-            return this.get('currentTab');
-        },
-        set: function (value) {
-            this.set('currentTab', value);
-        },
+        get: function () { return this.get('currentTab'); },
+        set: function (value) { this.set('currentTab', value); },
         enumerable: true,
         configurable: true
     });
@@ -1997,7 +1847,8 @@ function kickItOff() {
     });
 }
 $(function () {
+    kickItOff();
+    return;
     var registerOrSigninView = new RegisterOrSigninView();
     registerOrSigninView.render();
 });
-//# sourceMappingURL=app.js.map

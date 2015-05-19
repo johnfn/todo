@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <title>TypeScript HTML App</title>
 
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'>
+    <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400' rel='stylesheet' type='text/css'> -->
 
     <link rel="stylesheet" href="Content/bootstrap.css" type="text/css" />
     <link rel="stylesheet" href="Content/bootstrap-theme.css" type="text/css" />
@@ -33,7 +33,7 @@
         <% if (isBeingEdited) { %>
             <input class="tagname tagname-js" type="text" placeholder="title" />
         <% } else { %>
-            <%= name %> 
+            <%= name %>
         <% } %>
         <span class="remove-tag">x</span>
     </script>
@@ -127,7 +127,7 @@
 
     <script type="text/template" id="todo-archive-item">
         <%= name %>  - <span class="time"><%= archivalDate %></span>
-        
+
         <% if (selected) { %>
             <span class="toolbar">
                 <a href="#" class="todo-remove-js"> x </a>
@@ -146,7 +146,7 @@
     </script>
 
     <script type="text/template" id="todo">
-        <div class="todo 
+        <div class="todo
              <% if (isHeader) print('is-header') %>
 			 <% if (selected) print ('selected') %>
                  <% if (isDraggedOverAsNextSibling) print ('dragged-over') %>
@@ -180,7 +180,7 @@
                                   ">
                                 <%= name %>
 
-                                <% if (collapsed && !searching) { %> 
+                                <% if (collapsed && !searching) { %>
                                     <a href="#" class="todo-hide-js hidden-ellipses"><%= numActiveTotalChildren %></a>
                                 <% } %>
                             </span>
@@ -206,7 +206,7 @@
 					<span class="toolbar">
 						<a href="#" class="todo-add-js"> + </a>
                         <% if (!isHeader) { %>
-                            <a href="#" class="todo-set-starred-js"> 
+                            <a href="#" class="todo-set-starred-js">
                                 <i class="fa fa-star<%= starred ? '' : '-o' %>"></i>
                             </a>
                         <% } %>
@@ -218,11 +218,11 @@
 				<% } %>
 
                 <% if (content.length > 0) { %>
-                    <div class="todo-content edit-content-js"> 
+                    <div class="todo-content edit-content-js">
                         <% if (searchMatch && isMatchInContent) { %>
                             <%= firstSearchText %><span class="search-match"><%= middleSearchText %></span><%= finalSearchText %>
                         <% } else { %>
-                            <%= content %> 
+                            <%= content %>
                         <% } %>
                     </div>
                 <% } %>
@@ -262,11 +262,11 @@
 
 	<script type="text/template" id="right-panel">
         <div>
-            <div> 
+            <div>
                 <h3 class="right-panel-title">
-                    <%= name %> 
+                    <%= name %>
                     <small class="time"> (added <%= createdDate %>) </small>
-                </h3> 
+                </h3>
             </div>
             <div>
                 <%= doneCount %>/<%= totalCount %>
@@ -304,7 +304,7 @@
                 </button>
 
                 <% if (typeof firstStarredTodo !== 'undefined') { %>
-                    <a class="starred-item" href="#"> 
+                    <a class="starred-item" href="#">
                         <i class="fa fa-star"></i> <%= firstStarredTodo.name %>
                     </a>
                 <% } %>
@@ -380,7 +380,7 @@
                 </div>
             </div>
         </div>
-            
+
         <div class="breadcrumb-container">
 
         </div>
@@ -425,11 +425,11 @@
 </head>
 <body>
     <div class="top-bar-container">
-        
+
     </div>
 
     <div class="dialogs-go-here">
-        
+
     </div>
 
     <div class="whole-todo-container">

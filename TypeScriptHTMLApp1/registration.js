@@ -125,4 +125,3 @@ var RegisterView = (function (_super) {
     };
     return RegisterView;
 })(Backbone.View);
-//# sourceMappingURL=registration.js.map

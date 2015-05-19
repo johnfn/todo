@@ -36,12 +36,12 @@ var AutocompleteItem = (function (_super) {
         var endWasTruncated = end < this.matchedString.length;
         this.startPosition -= start - (startWasTruncated ? 3 : 0);
         this.endPosition -= start - (startWasTruncated ? 3 : 0);
-        this.matchedString = (startWasTruncated ? "..." : "") + this.matchedString.substring(start, end) + (endWasTruncated ? "..." : "");
+        this.matchedString = (startWasTruncated ? "..." : "") +
+            this.matchedString.substring(start, end) +
+            (endWasTruncated ? "..." : "");
     };
     Object.defineProperty(AutocompleteItem.prototype, "todo", {
-        get: function () {
-            return this.get('todo');
-        },
+        get: function () { return this.get('todo'); },
         set: function (value) {
             this.set('todo', value);
         },
@@ -70,52 +70,32 @@ var AutocompleteItem = (function (_super) {
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "typeOfMatch", {
-        get: function () {
-            return this.get('typeOfMatch');
-        },
-        set: function (value) {
-            this.set('typeOfMatch', value);
-        },
+        get: function () { return this.get('typeOfMatch'); },
+        set: function (value) { this.set('typeOfMatch', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "subtypeOfMatch", {
-        get: function () {
-            return this.get('subtypeOfMatch');
-        },
-        set: function (value) {
-            this.set('subtypeOfMatch', value);
-        },
+        get: function () { return this.get('subtypeOfMatch'); },
+        set: function (value) { this.set('subtypeOfMatch', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "matchedString", {
-        get: function () {
-            return this.get('matchedString_');
-        },
-        set: function (value) {
-            this.set('matchedString_', value);
-        },
+        get: function () { return this.get('matchedString_'); },
+        set: function (value) { this.set('matchedString_', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "startPosition", {
-        get: function () {
-            return this.get('startPosition');
-        },
-        set: function (value) {
-            this.set('startPosition', value);
-        },
+        get: function () { return this.get('startPosition'); },
+        set: function (value) { this.set('startPosition', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteItem.prototype, "endPosition", {
-        get: function () {
-            return this.get('endPosition');
-        },
-        set: function (value) {
-            this.set('endPosition', value);
-        },
+        get: function () { return this.get('endPosition'); },
+        set: function (value) { this.set('endPosition', value); },
         enumerable: true,
         configurable: true
     });
@@ -135,32 +115,20 @@ var AutocompleteSection = (function (_super) {
         _super.apply(this, arguments);
     }
     Object.defineProperty(AutocompleteSection.prototype, "headingName", {
-        get: function () {
-            return this.get('headingName');
-        },
-        set: function (value) {
-            this.set('headingName', value);
-        },
+        get: function () { return this.get('headingName'); },
+        set: function (value) { this.set('headingName', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteSection.prototype, "items", {
-        get: function () {
-            return this.get('items');
-        },
-        set: function (value) {
-            this.set('items', value);
-        },
+        get: function () { return this.get('items'); },
+        set: function (value) { this.set('items', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(AutocompleteSection.prototype, "selectionIndex", {
-        get: function () {
-            return this.get('selectionIndex');
-        },
-        set: function (value) {
-            this.set('selectionIndex', value);
-        },
+        get: function () { return this.get('selectionIndex'); },
+        set: function (value) { this.set('selectionIndex', value); },
         enumerable: true,
         configurable: true
     });
@@ -217,9 +185,7 @@ var AutocompleteResult = (function (_super) {
     };
     AutocompleteResult.prototype.totalLength = function () {
         var result = 0;
-        this.each(function (section) {
-            result += section.items.length;
-        });
+        this.each(function (section) { result += section.items.length; });
         return result;
     };
     AutocompleteResult.prototype.addTextSearchSection = function () {
@@ -382,4 +348,3 @@ var AutocompleteView = (function (_super) {
     };
     return AutocompleteView;
 })(Backbone.View);
-//# sourceMappingURL=autocomplete.js.map

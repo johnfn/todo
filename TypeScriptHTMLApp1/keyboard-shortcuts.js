@@ -31,4 +31,3 @@ var KeyboardShortcuts = (function (_super) {
     };
     return KeyboardShortcuts;
 })(Backbone.View);
-//# sourceMappingURL=keyboard-shortcuts.js.map

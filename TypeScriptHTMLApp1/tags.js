@@ -23,22 +23,14 @@ var TagModel = (function (_super) {
         this.tagType = tagType;
     }
     Object.defineProperty(TagModel.prototype, "name", {
-        get: function () {
-            return this.get('name');
-        },
-        set: function (value) {
-            this.set('name', value);
-        },
+        get: function () { return this.get('name'); },
+        set: function (value) { this.set('name', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(TagModel.prototype, "tagType", {
-        get: function () {
-            return this.get('tagType');
-        },
-        set: function (value) {
-            this.set('tagType', value);
-        },
+        get: function () { return this.get('tagType'); },
+        set: function (value) { this.set('tagType', value); },
         enumerable: true,
         configurable: true
     });
@@ -142,4 +134,3 @@ var TagListView = (function (_super) {
     };
     return TagListView;
 })(Backbone.View);
-//# sourceMappingURL=tags.js.map

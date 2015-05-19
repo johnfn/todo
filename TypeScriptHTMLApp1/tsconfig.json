@@ -19,7 +19,11 @@
         "./Scripts/typings/jquery/jquery.d.ts",
         "./Scripts/typings/underscore/underscore.d.ts",
         "./app.ts",
+        "./autocomplete.ts",
         "./keyboard-shortcuts.ts",
-        "./storage.ts"
+        "./references.d.ts",
+        "./registration.ts",
+        "./storage.ts",
+        "./tags.ts"
     ]
 }

@@ -12,9 +12,7 @@ var LocalStorageBackedModel = (function (_super) {
         _super.apply(this, arguments);
         this.savedProps = ['bufferSize', 'bufferPosition'];
     }
-    LocalStorageBackedModel.prototype.namespace = function () {
-        return '';
-    };
+    LocalStorageBackedModel.prototype.namespace = function () { return ''; };
     LocalStorageBackedModel.prototype.fetch = function (options) {
         for (var i = 0; i < this.savedProps.length; i++) {
             var prop = this.savedProps[i];
@@ -64,26 +62,18 @@ var SavedSnapshot = (function (_super) {
             }
             return JSON.parse(this.get('data'));
         },
-        set: function (value) {
-            this.set('data', JSON.stringify(value));
-        },
+        set: function (value) { this.set('data', JSON.stringify(value)); },
         enumerable: true,
         configurable: true
     });
     // These methods will be called by LocalStorageBackedModel.
-    SavedSnapshot.prototype.serializedata = function (data) {
-        return JSON.stringify(data);
-    };
+    SavedSnapshot.prototype.serializedata = function (data) { return JSON.stringify(data); };
     SavedSnapshot.prototype.unserializedata = function (data) {
         return (data === 'undefined') ? undefined : JSON.parse(data);
     };
     Object.defineProperty(SavedSnapshot.prototype, "date", {
-        get: function () {
-            return this.get('date');
-        },
-        set: function (value) {
-            this.set('date', value);
-        },
+        get: function () { return this.get('date'); },
+        set: function (value) { this.set('date', value); },
         enumerable: true,
         configurable: true
     });
@@ -97,35 +87,21 @@ var SavedDataState = (function (_super) {
         this.savedProps = ['bufferSize', 'bufferPosition', 'hasEverUsedApp'];
     }
     Object.defineProperty(SavedDataState.prototype, "bufferSize", {
-        get: function () {
-            return this.get('bufferSize');
-        },
-        set: function (value) {
-            this.set('bufferSize', value);
-        },
+        get: function () { return this.get('bufferSize'); },
+        set: function (value) { this.set('bufferSize', value); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(SavedDataState.prototype, "bufferPosition", {
-        get: function () {
-            return this.get('bufferPosition');
-        },
-        set: function (value) {
-            this.set('bufferPosition', value);
-        },
+        get: function () { return this.get('bufferPosition'); },
+        set: function (value) { this.set('bufferPosition', value); },
         enumerable: true,
         configurable: true
     });
-    SavedDataState.prototype.unserializebufferPosition = function (value) {
-        return parseInt(value, 10);
-    };
+    SavedDataState.prototype.unserializebufferPosition = function (value) { return parseInt(value, 10); };
     Object.defineProperty(SavedDataState.prototype, "hasEverUsedApp", {
-        get: function () {
-            return this.get('hasEverUsedApp');
-        },
-        set: function (value) {
-            this.set('hasEverUsedApp', value);
-        },
+        get: function () { return this.get('hasEverUsedApp'); },
+        set: function (value) { this.set('hasEverUsedApp', value); },
         enumerable: true,
         configurable: true
     });
@@ -185,36 +161,36 @@ var SavedData = (function (_super) {
             modifiedDate: Util.fairlyLegibleDateTime(),
             archivalDate: '',
             content: '',
-            searchMatch: 0 /* NoMatch */,
+            searchMatch: SearchMatch.NoMatch,
             done: false,
             archived: false,
             isHeader: true,
             starred: false,
             children: [{
-                createdDate: Util.fairlyLegibleDateTime(),
-                modifiedDate: Util.fairlyLegibleDateTime(),
-                archivalDate: '',
-                name: 'Put some stuff here',
-                content: '',
-                searchMatch: 0 /* NoMatch */,
-                done: false,
-                archived: false,
-                isHeader: false,
-                starred: false,
-                children: []
-            }, {
-                createdDate: Util.fairlyLegibleDateTime(),
-                modifiedDate: Util.fairlyLegibleDateTime(),
-                archivalDate: '',
-                name: 'More stuff here.',
-                content: '',
-                searchMatch: 0 /* NoMatch */,
-                done: false,
-                archived: false,
-                isHeader: false,
-                starred: false,
-                children: []
-            }]
+                    createdDate: Util.fairlyLegibleDateTime(),
+                    modifiedDate: Util.fairlyLegibleDateTime(),
+                    archivalDate: '',
+                    name: 'Put some stuff here',
+                    content: '',
+                    searchMatch: SearchMatch.NoMatch,
+                    done: false,
+                    archived: false,
+                    isHeader: false,
+                    starred: false,
+                    children: []
+                }, {
+                    createdDate: Util.fairlyLegibleDateTime(),
+                    modifiedDate: Util.fairlyLegibleDateTime(),
+                    archivalDate: '',
+                    name: 'More stuff here.',
+                    content: '',
+                    searchMatch: SearchMatch.NoMatch,
+                    done: false,
+                    archived: false,
+                    isHeader: false,
+                    starred: false,
+                    children: []
+                }]
         };
         this.createCircularBuffer();
         var active = this.activeTodo();
@@ -298,4 +274,3 @@ var SavedDataView = (function (_super) {
     };
     return SavedDataView;
 })(Backbone.View);
-//# sourceMappingURL=storage.js.map
