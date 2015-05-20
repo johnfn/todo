@@ -11,7 +11,7 @@ var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'http://localhost:300
     VaguelyMagicalModel is a small extension of a Backbone Model
     that makes properties defined as getters and setters visible
     in the toJSON() serialization of that model. Handy if you want
-    to render() that model or send it over the wire.
+    to render() that model, or send it over the wire.
 */
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
@@ -176,10 +176,13 @@ var TodoModel = (function (_super) {
         for (var prop in data) {
             if (!data.hasOwnProperty(prop))
                 continue;
-            if (prop === 'children')
+            if (prop === 'children' || prop == 'archived')
                 continue;
             this[prop] = data[prop];
         }
+        // We bypass the setter because the setter would also set the archival date,
+        // which we don't want to do if we're just loading the todo.
+        this.set('archived', data.archived);
         this.tags = new TagList(data['tags'] || []);
         this.parent = parent;
         if (!this.has('depth'))

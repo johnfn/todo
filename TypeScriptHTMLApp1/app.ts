@@ -4,6 +4,7 @@
 // * Archival tab
 //   * Getting the proper dates is a lil tricky -_-
 //   * The 'This is currently archived' text looks bad. meh
+// * email in top right is wildly unaligned
 // * Autocomplete: highlight the text in the matching tag
 // * Hide kbd shortcuts before logged in.
 // * There is no logo lawl
@@ -14,6 +15,9 @@
 // * Clicking on tags should add their name to search.
 //   * And, actually open the search box... -_-
 // * Deleting a tag trigged done no less than 17 times
+// * Progress could just be a progress bar...
+// * Should only show 'this is currently archived' if you're on the wrong tab
+// * Should show a different message if you're looking at an unarchived item from the archive tab.
 
 declare var require;
 
@@ -24,7 +28,7 @@ var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'http://localhost:300
     VaguelyMagicalModel is a small extension of a Backbone Model
     that makes properties defined as getters and setters visible
     in the toJSON() serialization of that model. Handy if you want
-    to render() that model or send it over the wire.
+    to render() that model, or send it over the wire.
 */
 class VaguelyMagicalModel extends Backbone.Model {
     toJSON(): any {
@@ -181,10 +185,14 @@ class TodoModel extends Backbone.Model implements ITodo {
     initWithData(data: ITodo, parent: TodoModel): TodoModel {
         for (var prop in data) {
             if (!data.hasOwnProperty(prop)) continue;
-            if (prop === 'children') continue;
+            if (prop === 'children' || prop == 'archived') continue;
 
             this[prop] = data[prop];
         }
+
+        // We bypass the setter because the setter would also set the archival date,
+        // which we don't want to do if we're just loading the todo.
+        this.set('archived', data.archived)
 
         this.tags = new TagList(data['tags'] || []);
 

@@ -248,6 +248,12 @@ a.zoom-selected {
     height: calc(100vh - 110px);
 }
 
+.right-panel-info {
+    color: rgb(186, 186, 186);
+    padding-bottom: 10px;
+    padding-top: 5px;
+}
+
 .right-panel-name {
     font-size: 1.5em;
 }
