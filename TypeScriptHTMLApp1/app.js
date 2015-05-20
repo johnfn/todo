@@ -1828,9 +1828,6 @@ function kickItOff() {
             if (topBar.keydown(e)) {
                 return;
             }
-            if (mainView.keydown(e)) {
-                return;
-            }
             // Ctrl + f: Focus on find textbox
             if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
                 $('.search-input').focus();
@@ -1840,6 +1837,9 @@ function kickItOff() {
                 if (!TodoView.todoViews[i].keydown(e)) {
                     return;
                 }
+            }
+            if (mainView.keydown(e)) {
+                return;
             }
             // / (for vim users! :): Focus on find textbox
             // Comes after processing todo keydowns, because they could legitimately

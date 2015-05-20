@@ -1,5 +1,11 @@
 ﻿/// <reference path="./references.d.ts" />
 
+// TODO
+// * By default, zoom into the first guy
+// * (and dont show his name).
+// * Arrow keys don't skip archived items
+//
+
 declare var require;
 
 var nwjs = typeof require !== 'undefined';
@@ -1964,10 +1970,6 @@ function kickItOff() {
                 return;
             }
 
-            if (mainView.keydown(e)) {
-                return;
-            }
-
             // Ctrl + f: Focus on find textbox
             if (!$('.search-input').is(':focus') && (e.which == 70 && e.ctrlKey)) {
                 $('.search-input').focus();
@@ -1979,6 +1981,10 @@ function kickItOff() {
                 if (!TodoView.todoViews[i].keydown(e)) {
                     return;
                 }
+            }
+
+            if (mainView.keydown(e)) {
+                return;
             }
 
             // / (for vim users! :): Focus on find textbox
