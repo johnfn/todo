@@ -1847,8 +1847,6 @@ function kickItOff() {
     });
 }
 $(function () {
-    kickItOff();
-    return;
     var registerOrSigninView = new RegisterOrSigninView();
     registerOrSigninView.render();
 });

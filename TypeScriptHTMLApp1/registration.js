@@ -4,6 +4,11 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
+var showDialog = function (dialog) {
+    $('.dialogs-go-here').empty();
+    var newDialog = new dialog();
+    newDialog.render();
+};
 var RegisterOrSigninView = (function (_super) {
     __extends(RegisterOrSigninView, _super);
     function RegisterOrSigninView() {
@@ -21,14 +26,12 @@ var RegisterOrSigninView = (function (_super) {
         this.template = Util.getTemplate('register-or-signin');
     };
     RegisterOrSigninView.prototype.showLoginDialog = function () {
-        this.$el.empty();
-        var signinView = new SigninView();
-        signinView.render();
+        this.undelegateEvents();
+        showDialog(SigninView);
     };
     RegisterOrSigninView.prototype.showRegisterDialog = function () {
-        this.$el.empty();
-        var registerView = new RegisterView();
-        registerView.render();
+        this.undelegateEvents();
+        showDialog(RegisterView);
     };
     RegisterOrSigninView.prototype.render = function () {
         this.$el.html(this.template());
@@ -43,13 +46,18 @@ var SigninView = (function (_super) {
     }
     SigninView.prototype.events = function () {
         return {
-            'click .done-js': this.signin
+            'click .done-js': this.signin,
+            'click .cancel-js': this.cancel
         };
     };
     SigninView.prototype.initialize = function () {
         _.bindAll(this, 'render');
         this.setElement($('.dialogs-go-here'));
         this.template = Util.getTemplate('signin');
+    };
+    SigninView.prototype.cancel = function () {
+        this.undelegateEvents();
+        showDialog(RegisterOrSigninView);
     };
     SigninView.prototype.signin = function () {
         console.log('Sign in.');
@@ -70,7 +78,8 @@ var RegisterView = (function (_super) {
     }
     RegisterView.prototype.events = function () {
         return {
-            'click .done-js': this.register
+            'click .done-js': this.register,
+            'click .cancel-js': this.cancel
         };
     };
     RegisterView.prototype.initialize = function () {
@@ -118,6 +127,10 @@ var RegisterView = (function (_super) {
             }
             _this.showHelpfulMessage('Registration success! You may procede to log in.');
         });
+    };
+    RegisterView.prototype.cancel = function () {
+        this.undelegateEvents();
+        showDialog(RegisterOrSigninView);
     };
     RegisterView.prototype.render = function () {
         this.$el.html(this.template());

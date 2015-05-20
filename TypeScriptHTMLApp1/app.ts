@@ -1989,10 +1989,6 @@ function kickItOff() {
 }
 
 $(() => {
-    kickItOff()
-
-    return;
-
     var registerOrSigninView = new RegisterOrSigninView();
     registerOrSigninView.render();
 });

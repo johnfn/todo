@@ -78,13 +78,24 @@
 
     <script type="text/template" id="signin">
         <div class="generic-dialog">
-            <h2> Let's get this show on the road. </h2>
-            <div class="explanation">
-                Loginnnnnnrawr
+            <h2> Let's get this show on the road. </h2> <!-- ' -->
+            <div>
+                <div class="field">
+                    <label for="email-input">Email:</label>
+                    <input type="email" class="form-control" id="email-input" placeholder="Enter email">
+                </div>
+
+                <div class="field">
+                    <label for="password-input">Password:</label>
+                    <input type="password" class="form-control" id="password-input" placeholder="Enter password">
+                </div>
             </div>
             <div>
                 <button type="button" class="btn btn-default done-js">
                     Yeah.
+                </button>
+                <button type="button" class="btn btn-default cancel-js">
+                    Nevermind.
                 </button>
             </div>
         </div>
@@ -120,6 +131,9 @@
             <div>
                 <button type="button" class="btn btn-default done-js">
                     Ok, I'm done.
+                </button>
+                <button type="button" class="btn btn-default cancel-js">
+                    Nevermind.
                 </button>
             </div>
         </div>

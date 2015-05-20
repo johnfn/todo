@@ -1,4 +1,11 @@
-﻿class RegisterOrSigninView extends Backbone.View<Backbone.Model> {
+﻿var showDialog = function(dialog: any) {
+    $('.dialogs-go-here').empty();
+
+    var newDialog = new dialog();
+    newDialog.render();
+}
+
+class RegisterOrSigninView extends Backbone.View<Backbone.Model> {
     template: ITemplate;
 
     events() {
@@ -16,17 +23,13 @@
     }
 
     showLoginDialog() {
-        this.$el.empty();
-
-        var signinView = new SigninView();
-        signinView.render();
+        this.undelegateEvents();
+        showDialog(SigninView);
     }
 
     showRegisterDialog() {
-        this.$el.empty();
-
-        var registerView = new RegisterView();
-        registerView.render();
+        this.undelegateEvents();
+        showDialog(RegisterView);
     }
 
     render(): RegisterOrSigninView {
@@ -41,7 +44,8 @@ class SigninView extends Backbone.View<Backbone.Model> {
 
     events() {
         return {
-            'click .done-js': this.signin
+            'click .done-js': this.signin,
+            'click .cancel-js': this.cancel
         };
     }
 
@@ -50,6 +54,11 @@ class SigninView extends Backbone.View<Backbone.Model> {
 
         this.setElement($('.dialogs-go-here'));
         this.template = Util.getTemplate('signin');
+    }
+
+    cancel() {
+        this.undelegateEvents();
+        showDialog(RegisterOrSigninView);
     }
 
     signin() {
@@ -73,7 +82,8 @@ class RegisterView extends Backbone.View<Backbone.Model> {
 
     events() {
         return {
-            'click .done-js': this.register
+            'click .done-js': this.register,
+            'click .cancel-js': this.cancel
         };
     }
 
@@ -131,6 +141,11 @@ class RegisterView extends Backbone.View<Backbone.Model> {
 
             this.showHelpfulMessage('Registration success! You may procede to log in.');
         });
+    }
+
+    cancel() {
+        this.undelegateEvents();
+        showDialog(RegisterOrSigninView);
     }
 
     render(): RegisterView {
