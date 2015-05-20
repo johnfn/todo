@@ -2,6 +2,7 @@
 
 // TODO
 // * Arrow keys don't skip archived items
+// * They also need to skip items outside of current view
 // * tags look so ugly lawl
 // * Archived checkbox is broken
 // * Autocomplete: highlight the matching tag
@@ -1005,60 +1006,69 @@ class TodoView extends Backbone.View<TodoModel> {
         var newSelection: TodoModel;
         var currentSelection = this.model;
 
-        if (which === 40 || which === 39) { // down
-            if (currentSelection.numChildren !== 0 && !currentSelection.uiState.collapsed) {
-                newSelection = currentSelection.children[0];
-            } else {
-                newSelection = currentSelection.nextChild;
+        while (true) {
+            if (which === 40 || which === 39) { // down
+                if (currentSelection.numChildren !== 0 && !currentSelection.uiState.collapsed) {
+                    newSelection = currentSelection.children[0];
+                } else {
+                    newSelection = currentSelection.nextChild;
 
-                if (newSelection == null) {
-                    // We could potentially be falling off a big cliff of todos. e.g
-                    // we could be here:
-                    //
-                    // [ ] Todo blah blah
-                    //  *  [ ] Some inner todo
-                    //  *  [ ] bleh
-                    //      *  [ ] super inner todo
-                    //      *  [ ] oh no
-                    //          *  [ ] so inner! <------- HERE
-                    // [ ] Other stuff
-                    //
-                    // So we need to repeatedly ascend to the parent to see if
-                    // it has a nextChild -- all the way until there are no more
-                    // parents to check.
+                    if (newSelection == null) {
+                        // We could potentially be falling off a big cliff of todos. e.g
+                        // we could be here:
+                        //
+                        // [ ] Todo blah blah
+                        //  *  [ ] Some inner todo
+                        //  *  [ ] bleh
+                        //      *  [ ] super inner todo
+                        //      *  [ ] oh no
+                        //          *  [ ] so inner! <------- HERE
+                        // [ ] Other stuff
+                        //
+                        // So we need to repeatedly ascend to the parent to see if
+                        // it has a nextChild -- all the way until there are no more
+                        // parents to check.
 
-                    var currentParent = currentSelection.parent;
+                        var currentParent = currentSelection.parent;
 
-                    while (currentParent != null) {
-                        if (currentParent.nextChild != null) {
-                            newSelection = currentParent.nextChild;
+                        while (currentParent != null) {
+                            if (currentParent.nextChild != null) {
+                                newSelection = currentParent.nextChild;
 
-                            break;
+                                break;
+                            }
+
+                            currentParent = currentParent.parent;
                         }
-
-                        currentParent = currentParent.parent;
                     }
                 }
             }
-        }
 
-        if (which === 38) { // up
-            newSelection = currentSelection.previousChild;
+            if (which === 38) { // up
+                newSelection = currentSelection.previousChild;
 
-            if (newSelection == null) {
-                newSelection = currentSelection.parent;
-            } else {
-                // Now we have to deal with the case where we're ASCENDING the cliff
-                // I just mentioned.
-                while (newSelection.numChildren !== 0) {
-                    newSelection = newSelection.children[newSelection.numChildren - 1];
+                if (newSelection == null) {
+                    newSelection = currentSelection.parent;
+                } else {
+                    // Now we have to deal with the case where we're ASCENDING the cliff
+                    // I just mentioned.
+                    while (newSelection.numChildren !== 0) {
+                        newSelection = newSelection.children[newSelection.numChildren - 1];
+                    }
                 }
             }
-        }
 
-        if (which === 37) { // left
-            newSelection = currentSelection.parent;
-        }
+            if (which === 37) { // left
+                newSelection = currentSelection.parent;
+            }
+
+            // Skip over archived items
+            if (newSelection != null && newSelection.archived) {
+                currentSelection = newSelection;
+            } else {
+                break;
+            }
+        };
 
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {

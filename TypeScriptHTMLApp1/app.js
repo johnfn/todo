@@ -972,54 +972,64 @@ var TodoView = (function (_super) {
     TodoView.prototype.navigateBetweenTodos = function (which) {
         var newSelection;
         var currentSelection = this.model;
-        if (which === 40 || which === 39) {
-            if (currentSelection.numChildren !== 0 && !currentSelection.uiState.collapsed) {
-                newSelection = currentSelection.children[0];
-            }
-            else {
-                newSelection = currentSelection.nextChild;
-                if (newSelection == null) {
-                    // We could potentially be falling off a big cliff of todos. e.g
-                    // we could be here:
-                    //
-                    // [ ] Todo blah blah
-                    //  *  [ ] Some inner todo
-                    //  *  [ ] bleh
-                    //      *  [ ] super inner todo
-                    //      *  [ ] oh no
-                    //          *  [ ] so inner! <------- HERE
-                    // [ ] Other stuff
-                    //
-                    // So we need to repeatedly ascend to the parent to see if
-                    // it has a nextChild -- all the way until there are no more
-                    // parents to check.
-                    var currentParent = currentSelection.parent;
-                    while (currentParent != null) {
-                        if (currentParent.nextChild != null) {
-                            newSelection = currentParent.nextChild;
-                            break;
+        while (true) {
+            if (which === 40 || which === 39) {
+                if (currentSelection.numChildren !== 0 && !currentSelection.uiState.collapsed) {
+                    newSelection = currentSelection.children[0];
+                }
+                else {
+                    newSelection = currentSelection.nextChild;
+                    if (newSelection == null) {
+                        // We could potentially be falling off a big cliff of todos. e.g
+                        // we could be here:
+                        //
+                        // [ ] Todo blah blah
+                        //  *  [ ] Some inner todo
+                        //  *  [ ] bleh
+                        //      *  [ ] super inner todo
+                        //      *  [ ] oh no
+                        //          *  [ ] so inner! <------- HERE
+                        // [ ] Other stuff
+                        //
+                        // So we need to repeatedly ascend to the parent to see if
+                        // it has a nextChild -- all the way until there are no more
+                        // parents to check.
+                        var currentParent = currentSelection.parent;
+                        while (currentParent != null) {
+                            if (currentParent.nextChild != null) {
+                                newSelection = currentParent.nextChild;
+                                break;
+                            }
+                            currentParent = currentParent.parent;
                         }
-                        currentParent = currentParent.parent;
                     }
                 }
             }
-        }
-        if (which === 38) {
-            newSelection = currentSelection.previousChild;
-            if (newSelection == null) {
-                newSelection = currentSelection.parent;
-            }
-            else {
-                // Now we have to deal with the case where we're ASCENDING the cliff
-                // I just mentioned.
-                while (newSelection.numChildren !== 0) {
-                    newSelection = newSelection.children[newSelection.numChildren - 1];
+            if (which === 38) {
+                newSelection = currentSelection.previousChild;
+                if (newSelection == null) {
+                    newSelection = currentSelection.parent;
+                }
+                else {
+                    // Now we have to deal with the case where we're ASCENDING the cliff
+                    // I just mentioned.
+                    while (newSelection.numChildren !== 0) {
+                        newSelection = newSelection.children[newSelection.numChildren - 1];
+                    }
                 }
             }
+            if (which === 37) {
+                newSelection = currentSelection.parent;
+            }
+            // Skip over archived items
+            if (newSelection != null && newSelection.archived) {
+                currentSelection = newSelection;
+            }
+            else {
+                break;
+            }
         }
-        if (which === 37) {
-            newSelection = currentSelection.parent;
-        }
+        ;
         // If they did not try to navigate invalidly, then do our updates.
         if (newSelection != null) {
             newSelection.view.uiState.selected = true;
