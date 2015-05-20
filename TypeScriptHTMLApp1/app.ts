@@ -2,9 +2,7 @@
 
 // TODO
 // * I don't even think you can remove archived items any more.
-//   * Also, the dates are whack.
 //   * Getting the proper dates is a lil tricky -_-
-//   * The 'x' doesn't follow.
 //   * The 'This is currently archived' text looks bad. meh
 // * Autocomplete: highlight the matching tag
 // * There is no logo lawl
@@ -1424,8 +1422,7 @@ class FooterView extends Backbone.View<TodoModel> {
         return {
             'click .archive-all': this.archiveAllDone,
             'click .starred-item': this.gotoStarredItem,
-            'click .delete-all': this.deleteAll,
-            'click .save': this.save
+            'click .delete-all': this.deleteAll
         };
     }
 
@@ -1641,17 +1638,20 @@ class BreadcrumbModel extends Backbone.View<TodoAppModel> {
 class TopBarView extends Backbone.View<TodoAppModel> {
     template: ITemplate;
     autocomplete: AutocompleteView;
+    tabModel: TabBarState;
 
     events() {
         return {
             'click .parent-todo': this.changeZoom,
-            'keyup .search-input': this.search
+            'keyup .search-input': this.search,
+            'click li': this.switchTab
         };
     }
 
     initialize(attrs?: any) {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.top-bar-container'));
+        this.tabModel = new TabBarState();
 
         this.render();
 
@@ -1659,6 +1659,12 @@ class TopBarView extends Backbone.View<TodoAppModel> {
             model: this.model,
             el: this.$('.autocomplete-container')
         });
+    }
+
+    switchTab(e) {
+        // TODO: Don't store data in view.
+        var tabName = $(e.currentTarget).find('a').data('tab');
+        this.tabModel.currentTab = tabName;
     }
 
     keydown(e: JQueryKeyEventObject): boolean {
@@ -1923,27 +1929,11 @@ class TabBarState extends Backbone.Model {
 class TabBarView extends Backbone.View<TabBarState> {
     template: ITemplate;
 
-    events() {
-        return {
-            'click li': this.changeTab
-        };
-    }
-
     initialize(attrs?: any) {
         this.template = Util.getTemplate('tab-bar');
-        this.model = new TabBarState();
-
         this.setElement($('.whole-todo-container'));
 
         this.render();
-    }
-
-    changeTab(e: JQueryMouseEventObject) {
-        // TODO: Don't store data in view.
-        var tabName = $(e.currentTarget).find('a').data('tab');
-        this.model.currentTab = tabName;
-
-        console.log(this.model.currentTab);
     }
 
     render(): TabBarView {
@@ -1970,7 +1960,7 @@ function kickItOff() {
         var archiveView = new TodoArchiveView(<any> { model: mainView.model.baseTodoModel });
         var footerView = new FooterView(<any> {
             model: mainView.model.baseTodoModel,
-            tabModel: tabbarView.model
+            tabModel: topBar.tabModel
         });
 
         var autosaveView = new SavedDataView(<any> {

@@ -334,10 +334,6 @@
                     Archive all done <% if (hasThingsToArchive) print('(' + numThingsToArchive + ')') %>
                 </button>
 
-                <button class="btn btn-primary save">
-                    Save
-                </button>
-
                 <% if (typeof firstStarredTodo !== 'undefined') { %>
                     <a class="starred-item" href="#">
                         <i class="fa fa-star"></i> <%= firstStarredTodo.name %>

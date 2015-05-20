@@ -1322,8 +1322,7 @@ var FooterView = (function (_super) {
         return {
             'click .archive-all': this.archiveAllDone,
             'click .starred-item': this.gotoStarredItem,
-            'click .delete-all': this.deleteAll,
-            'click .save': this.save
+            'click .delete-all': this.deleteAll
         };
     };
     FooterView.prototype.initialize = function (attrs) {
@@ -1559,17 +1558,24 @@ var TopBarView = (function (_super) {
     TopBarView.prototype.events = function () {
         return {
             'click .parent-todo': this.changeZoom,
-            'keyup .search-input': this.search
+            'keyup .search-input': this.search,
+            'click li': this.switchTab
         };
     };
     TopBarView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('top-bar');
         this.setElement($('.top-bar-container'));
+        this.tabModel = new TabBarState();
         this.render();
         this.autocomplete = new AutocompleteView({
             model: this.model,
             el: this.$('.autocomplete-container')
         });
+    };
+    TopBarView.prototype.switchTab = function (e) {
+        // TODO: Don't store data in view.
+        var tabName = $(e.currentTarget).find('a').data('tab');
+        this.tabModel.currentTab = tabName;
     };
     TopBarView.prototype.keydown = function (e) {
         if (this.autocomplete.keydown(e))
@@ -1789,22 +1795,10 @@ var TabBarView = (function (_super) {
     function TabBarView() {
         _super.apply(this, arguments);
     }
-    TabBarView.prototype.events = function () {
-        return {
-            'click li': this.changeTab
-        };
-    };
     TabBarView.prototype.initialize = function (attrs) {
         this.template = Util.getTemplate('tab-bar');
-        this.model = new TabBarState();
         this.setElement($('.whole-todo-container'));
         this.render();
-    };
-    TabBarView.prototype.changeTab = function (e) {
-        // TODO: Don't store data in view.
-        var tabName = $(e.currentTarget).find('a').data('tab');
-        this.model.currentTab = tabName;
-        console.log(this.model.currentTab);
     };
     TabBarView.prototype.render = function () {
         this.$el.html(this.template());
@@ -1826,7 +1820,7 @@ function kickItOff() {
         var archiveView = new TodoArchiveView({ model: mainView.model.baseTodoModel });
         var footerView = new FooterView({
             model: mainView.model.baseTodoModel,
-            tabModel: tabbarView.model
+            tabModel: topBar.tabModel
         });
         var autosaveView = new SavedDataView({
             collection: mainView.savedData
