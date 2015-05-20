@@ -110,6 +110,7 @@ var TagListView = (function (_super) {
     TagListView.prototype.addTagView = function (model, isCurrentlyEditing) {
         var view = new TagView(model, isCurrentlyEditing);
         this.tagViews.push(view);
+        this.trigger('global-change');
     };
     TagListView.prototype.currentlyEditing = function () {
         return _.any(this.tagViews, function (view) { return view.isBeingEdited; });
@@ -125,6 +126,7 @@ var TagListView = (function (_super) {
             }
             view.listenTo(view, 'remove-tag', function () {
                 _this.tags.remove(view.model);
+                _this.trigger('global-change');
             });
         });
         if (selectedIndex !== -1) {

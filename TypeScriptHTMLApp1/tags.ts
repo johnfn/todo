@@ -122,6 +122,7 @@ class TagListView extends Backbone.View<Backbone.Model> {
         var view = new TagView(model, isCurrentlyEditing);
 
         this.tagViews.push(view);
+        this.trigger('global-change');
     }
 
     currentlyEditing(): boolean {
@@ -142,6 +143,7 @@ class TagListView extends Backbone.View<Backbone.Model> {
 
             view.listenTo(view, 'remove-tag',() => {
                 this.tags.remove(view.model);
+                this.trigger('global-change');
             });
         });
 

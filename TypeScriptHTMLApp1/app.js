@@ -793,6 +793,7 @@ var TodoView = (function (_super) {
         };
     };
     TodoView.prototype.initialize = function (options) {
+        var _this = this;
         _.bindAll(this, 'initEditView', 'addChildTodo', 'toggleAddChildTodo', 'render', 'events', 'keydown');
         if (!TodoView.todoViews)
             TodoView.todoViews = [];
@@ -810,6 +811,7 @@ var TodoView = (function (_super) {
         for (var i = 0; i < this.model.children.length; i++) {
             this.addChildTodo(this.model.children[i]);
         }
+        this.listenTo(this.tagList, 'global-change', function () { return _this.model.trigger('global-change'); });
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
         this.listenTo(this, 'remove-todo', this.removeTodo);
     };

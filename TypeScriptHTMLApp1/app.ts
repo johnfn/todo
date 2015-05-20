@@ -1,7 +1,7 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * I don't even think you can remove archived items any more.
+// * Archival tab
 //   * Getting the proper dates is a lil tricky -_-
 //   * The 'This is currently archived' text looks bad. meh
 // * Autocomplete: highlight the matching tag
@@ -10,7 +10,8 @@
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.
 // * tags look so ugly lawl
-// * You can't delete tags. -_-
+// * You can't delete tags. -_- (You can, but it doesn't save.)
+// * Clicking on tags should add their name to search.
 
 declare var require;
 
@@ -799,6 +800,7 @@ class TodoView extends Backbone.View<TodoModel> {
             this.addChildTodo(this.model.children[i]);
         }
 
+        this.listenTo(this.tagList, 'global-change', () => this.model.trigger('global-change'));
         this.listenTo(this, 'click-body', this.hideAllEditNodes);
         this.listenTo(this, 'remove-todo', this.removeTodo);
     }
