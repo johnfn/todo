@@ -1,9 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Archival tab
-//   * Getting the proper dates is a lil tricky -_-
-//   * The 'This is currently archived' text looks bad. meh
 // * email in top right is wildly unaligned
 // * Autocomplete: highlight the text in the matching tag
 // * Hide kbd shortcuts before logged in.
