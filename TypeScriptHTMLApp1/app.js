@@ -11,7 +11,8 @@ var userId = 1;
 /*
     VaguelyMagicalModel is a small extension of a Backbone Model
     that makes properties defined as getters and setters visible
-    in the toJSON() serialization of that model.
+    in the toJSON() serialization of that model. Handy if you want
+    to render() that model or send it over the wire.
 */
 var VaguelyMagicalModel = (function (_super) {
     __extends(VaguelyMagicalModel, _super);
@@ -1597,7 +1598,7 @@ var MainView = (function (_super) {
         this.hasRendered = false;
     }
     MainView.prototype.initialize = function (options) {
-        var self = this;
+        var _this = this;
         _.bindAll(this, 'clickBody');
         $('body').on('click', this.clickBody);
         this.template = Util.getTemplate('main');
@@ -1609,9 +1610,9 @@ var MainView = (function (_super) {
         /*
         this.initializeTodoTree(this.savedData.load());
         */
-        $.getJSON(baseUrl + '/todos/' + userId, function (d) {
-            self.initializeTodoTree(d.content);
-            self.render();
+        _.defer(function () {
+            _this.initializeTodoTree(User.currentUser.content);
+            _this.render();
         });
         this.listenTo(this.model, 'change:currentTodoView', this.render);
         // this.listenTo(this.model, 'change:searchText', this.updateSearch);
@@ -1798,6 +1799,10 @@ var TabBarView = (function (_super) {
     return TabBarView;
 })(Backbone.View);
 function kickItOff() {
+    if (!User.currentUser || !User.currentUser.content) {
+        console.warn("kickItOff needs User.currentUser to be initialized");
+        return;
+    }
     window['keyboardShortcuts'] = new KeyboardShortcuts();
     var tabbarView = new TabBarView();
     var detailView = new TodoDetailView();
