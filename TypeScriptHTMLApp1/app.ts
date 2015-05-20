@@ -1,10 +1,11 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Clicking on tags
-//   * Cant click on the textbox to focus it
-// * Can't make multiple tags now...
 // * Autocomplete: highlight the text in the matching tag
+// * Ctrl + 10 - what? No.
+// * email@domain.com
+// * Don't collapse the topmost todo! Ugh.
+// * Search is only up to date with the time you opened the todo list.
 // * Hide kbd shortcuts before logged in.
 // * There is no logo lawl
 // * Tooltips that indicate what stuff does
