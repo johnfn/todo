@@ -1403,7 +1403,9 @@ var TodoArchiveItemView = (function (_super) {
         TodoDetailView.instance.model = this.model;
     };
     TodoArchiveItemView.prototype.render = function () {
-        var renderOptions = _.extend({}, this.model.toJSON(), this.model.uiState.toJSON());
+        var modelOpts = this.model.toJSON();
+        modelOpts['archivalDate'] = $.timeago(modelOpts['archivalDate']);
+        var renderOptions = _.extend({}, modelOpts, this.model.uiState.toJSON());
         this.$el.html(this.template(renderOptions));
         return this;
     };
