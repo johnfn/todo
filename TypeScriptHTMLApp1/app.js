@@ -118,7 +118,7 @@ var Util = (function () {
         return a;
     };
     Util.makeDateTimeReadable = function (date) {
-        return date.slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+        return date.slice(0, -' GMT-0400 (EDT)'.length);
     };
     Util.fairlyLegibleDateTime = function () {
         return Util.makeDateTimeReadable(new Date().toString());

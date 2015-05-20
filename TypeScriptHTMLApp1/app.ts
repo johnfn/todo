@@ -1,7 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Archived checkbox is broken
 // * I don't even think you can remove archived items any more. hurf
 //   * Also, the dates are whack.
 //   * The 'x' doesn't follow.
@@ -118,7 +117,7 @@ class Util {
     }
 
     static makeDateTimeReadable(date: string): string {
-        return date.slice(0, -' GMT-0800 (Pacific Standard Time)'.length);
+        return date.slice(0, -' GMT-0400 (EDT)'.length);
     }
 
     static fairlyLegibleDateTime(): string {
