@@ -4,14 +4,15 @@
 // * Archival tab
 //   * Getting the proper dates is a lil tricky -_-
 //   * The 'This is currently archived' text looks bad. meh
-// * Autocomplete: highlight the matching tag
+// * Autocomplete: highlight the text in the matching tag
 // * There is no logo lawl
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.
 // * tags look so ugly lawl
-// * You can't delete tags. -_- (You can, but it doesn't save.)
 // * Clicking on tags should add their name to search.
+//   * And, actually open the search box... -_-
+// * Deleting a tag trigged done no less than 17 times
 
 declare var require;
 

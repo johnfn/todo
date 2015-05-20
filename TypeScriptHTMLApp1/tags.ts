@@ -32,6 +32,7 @@ class TagView extends Backbone.View<TagModel> {
     events() {
         return {
             'click .remove-tag': this.clickRemoveTag,
+            'click': this.searchForThisTag,
             'keyup': this.updateCurrentText
         };
     }
@@ -47,8 +48,14 @@ class TagView extends Backbone.View<TagModel> {
         this.model = model;
     }
 
+    searchForThisTag(e: JQueryMouseEventObject) {
+        $('.search-input').val(this.model.name).focus();
+    }
+
     clickRemoveTag(e: JQueryMouseEventObject) {
         this.trigger('remove-tag');
+
+        return false;
     }
 
     updateCurrentText() {

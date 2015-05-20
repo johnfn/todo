@@ -50,11 +50,16 @@ var TagView = (function (_super) {
     TagView.prototype.events = function () {
         return {
             'click .remove-tag': this.clickRemoveTag,
+            'click': this.searchForThisTag,
             'keyup': this.updateCurrentText
         };
     };
+    TagView.prototype.searchForThisTag = function (e) {
+        $('.search-input').val(this.model.name).focus();
+    };
     TagView.prototype.clickRemoveTag = function (e) {
         this.trigger('remove-tag');
+        return false;
     };
     TagView.prototype.updateCurrentText = function () {
         if (this.$('input').is(':focus')) {
