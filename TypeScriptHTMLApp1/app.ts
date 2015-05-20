@@ -1,20 +1,21 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Arrow keys don't skip archived items
-// * They also need to skip items outside of current view
-// * tags look so ugly lawl
 // * Archived checkbox is broken
+// * I don't even think you can remove archived items any more. hurf
+//   * Also, the dates are whack.
 // * Autocomplete: highlight the matching tag
+// * There is no logo lawl
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.
+// * tags look so ugly lawl
+// * You can't delete tags. -_-
 
 declare var require;
 
 var nwjs = typeof require !== 'undefined';
 var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'http://localhost:3000';
-var userId = 1;
 
 /*
     VaguelyMagicalModel is a small extension of a Backbone Model
@@ -1442,7 +1443,7 @@ class FooterView extends Backbone.View<TodoModel> {
 
     save() {
         $.ajax({
-            url: baseUrl + "/todos/" + userId,
+            url: baseUrl + "/todos/" + User.currentUser.id,
             type: "PUT",
             data: JSON.stringify(this.model.getData()),
             contentType: "application/json; charset=utf-8",

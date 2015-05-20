@@ -1,4 +1,5 @@
 ﻿// TODO (file)
+// * Sign in is totally shimmed right now
 // * This whole shindig could be refactored - I could make a generic dialog box abstraction
 //   Not really worth it until I make more dialogs, though.
 

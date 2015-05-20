@@ -7,7 +7,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var nwjs = typeof require !== 'undefined';
 var baseUrl = nwjs ? 'https://tdpzapqvbo.localtunnel.me' : 'http://localhost:3000';
-var userId = 1;
 /*
     VaguelyMagicalModel is a small extension of a Backbone Model
     that makes properties defined as getters and setters visible
@@ -1340,7 +1339,7 @@ var FooterView = (function (_super) {
     };
     FooterView.prototype.save = function () {
         $.ajax({
-            url: baseUrl + "/todos/" + userId,
+            url: baseUrl + "/todos/" + User.currentUser.id,
             type: "PUT",
             data: JSON.stringify(this.model.getData()),
             contentType: "application/json; charset=utf-8",
