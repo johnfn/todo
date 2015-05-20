@@ -1,20 +1,22 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * email in top right is wildly unaligned
+// * Clicking on tags should add their name to search.
+//   * And, actually open the search box... -_-
+//   * Cant see the text
+//   * Cant click on the textbox to focus it
+// * Can't make multiple tags now...
 // * Autocomplete: highlight the text in the matching tag
 // * Hide kbd shortcuts before logged in.
 // * There is no logo lawl
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.
-// * tags look so ugly lawl
-// * Clicking on tags should add their name to search.
-//   * And, actually open the search box... -_-
 // * Deleting a tag trigged done no less than 17 times
 // * Progress could just be a progress bar...
 // * Should only show 'this is currently archived' if you're on the wrong tab
 // * Should show a different message if you're looking at an unarchived item from the archive tab.
+// * You can press up from the highest thing.
 
 declare var require;
 

@@ -458,6 +458,10 @@ a.autocomplete-item {
     z-index: 10;
 }
 
+.tagname {
+    color: black;
+}
+
 .tag.selected {
     border: 2px solid black;
 }
