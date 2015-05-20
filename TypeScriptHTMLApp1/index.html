@@ -418,11 +418,15 @@
     <script type="text/template" id="breadcrumb-bar">
         <% for (var i = 0; i < parents.length; i++) { %>
             <a href="#" class="parent-todo" data-index="<%= i %>">
-                <%= parents[i].name %>
+                <% if (i == 0) { %>
+                    [Everything]
+                <% } else { %>
+                    <%= parents[i].name %>
+                <% } %>
             </a>
         <% } %>
 
-        <% if (parents.length == 0) print('[nothing]') %>
+        <% if (parents.length == 0) print('[you are not zoomed in (hint: Z)]') %>
     </script>
 
     <script type="text/template" id="archival-footer">

@@ -1,8 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * By default, zoom into the first guy
-// * (and dont show his name).
 // * Arrow keys don't skip archived items
 // * tags look so ugly lawl
 // * Archived checkbox is broken
@@ -1714,9 +1712,6 @@ class MainView extends Backbone.View<TodoAppModel> {
         _.defer(() => {
             this.initializeTodoTree(User.currentUser.content);
             this.render();
-
-            // Start out zoomed in, so that the outermost todo is not visible.
-            this.zoomTo(this.model.currentTodoView.childrenViews[0]);
         })
 
         this.listenTo(this.model, 'change:currentTodoView', this.render);

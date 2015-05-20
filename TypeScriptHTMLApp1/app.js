@@ -1615,8 +1615,6 @@ var MainView = (function (_super) {
         _.defer(function () {
             _this.initializeTodoTree(User.currentUser.content);
             _this.render();
-            // Start out zoomed in, so that the outermost todo is not visible.
-            _this.zoomTo(_this.model.currentTodoView.childrenViews[0]);
         });
         this.listenTo(this.model, 'change:currentTodoView', this.render);
         // this.listenTo(this.model, 'change:searchText', this.updateSearch);
