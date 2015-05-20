@@ -67,6 +67,7 @@ var TagView = (function (_super) {
             this.isBeingEdited = false;
             this.model.name = this.currentText;
             this.render();
+            this.trigger('finish-adding');
             return true;
         }
         return false;
@@ -108,9 +109,10 @@ var TagListView = (function (_super) {
         return focusedTag.keydown(e);
     };
     TagListView.prototype.addTagView = function (model, isCurrentlyEditing) {
+        var _this = this;
         var view = new TagView(model, isCurrentlyEditing);
         this.tagViews.push(view);
-        this.trigger('global-change');
+        this.listenTo(view, 'finish-adding', function () { return _this.trigger('global-change'); });
     };
     TagListView.prototype.currentlyEditing = function () {
         return _.any(this.tagViews, function (view) { return view.isBeingEdited; });

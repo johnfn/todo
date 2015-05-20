@@ -64,6 +64,8 @@ class TagView extends Backbone.View<TagModel> {
             this.model.name = this.currentText;
 
             this.render();
+
+            this.trigger('finish-adding');
             return true;
         }
 
@@ -122,7 +124,8 @@ class TagListView extends Backbone.View<Backbone.Model> {
         var view = new TagView(model, isCurrentlyEditing);
 
         this.tagViews.push(view);
-        this.trigger('global-change');
+
+        this.listenTo(view, 'finish-adding', () => this.trigger('global-change'));
     }
 
     currentlyEditing(): boolean {
