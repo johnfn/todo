@@ -1031,7 +1031,7 @@ var TodoView = (function (_super) {
         }
         ;
         // If they did not try to navigate invalidly, then do our updates.
-        if (newSelection != null) {
+        if (newSelection != null && newSelection.view.isVisible()) {
             newSelection.view.uiState.selected = true;
             this.render();
             return false;
