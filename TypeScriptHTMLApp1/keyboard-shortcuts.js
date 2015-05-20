@@ -3,6 +3,7 @@
 //   * tag shortcuts
 //   * collapse/show shortcut dialog
 //   * optimize so it's only called once, not O(n) times -_-
+//   * 'See all items' shortcuts (dont think there are any, but say something...)
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

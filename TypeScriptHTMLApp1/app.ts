@@ -4,6 +4,7 @@
 // * Arrow keys don't skip archived items
 // * tags look so ugly lawl
 // * Archived checkbox is broken
+// * Autocomplete: highlight the matching tag
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.
@@ -1002,12 +1003,13 @@ class TodoView extends Backbone.View<TodoModel> {
         Return true to stop key event propagation. */
     private navigateBetweenTodos(which: number): boolean {
         var newSelection: TodoModel;
+        var currentSelection = this.model;
 
         if (which === 40 || which === 39) { // down
-            if (this.model.numChildren !== 0 && !this.model.uiState.collapsed) {
-                newSelection = this.model.children[0];
+            if (currentSelection.numChildren !== 0 && !currentSelection.uiState.collapsed) {
+                newSelection = currentSelection.children[0];
             } else {
-                newSelection = this.model.nextChild;
+                newSelection = currentSelection.nextChild;
 
                 if (newSelection == null) {
                     // We could potentially be falling off a big cliff of todos. e.g
@@ -1025,7 +1027,7 @@ class TodoView extends Backbone.View<TodoModel> {
                     // it has a nextChild -- all the way until there are no more
                     // parents to check.
 
-                    var currentParent = this.model.parent;
+                    var currentParent = currentSelection.parent;
 
                     while (currentParent != null) {
                         if (currentParent.nextChild != null) {
@@ -1041,10 +1043,10 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         if (which === 38) { // up
-            newSelection = this.model.previousChild;
+            newSelection = currentSelection.previousChild;
 
             if (newSelection == null) {
-                newSelection = this.model.parent;
+                newSelection = currentSelection.parent;
             } else {
                 // Now we have to deal with the case where we're ASCENDING the cliff
                 // I just mentioned.
@@ -1055,7 +1057,7 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         if (which === 37) { // left
-            newSelection = this.model.parent;
+            newSelection = currentSelection.parent;
         }
 
         // If they did not try to navigate invalidly, then do our updates.
