@@ -4,6 +4,8 @@
 // * Archived checkbox is broken
 // * I don't even think you can remove archived items any more. hurf
 //   * Also, the dates are whack.
+//   * The 'x' doesn't follow.
+//   * The 'This is currently archived' text looks bad. meh
 // * Autocomplete: highlight the matching tag
 // * There is no logo lawl
 // * Tooltips that indicate what stuff does
@@ -692,7 +694,7 @@ class TodoDetailView extends Backbone.View<TodoModel> {
     }
 
     unarchiveTodo() {
-        this.model.archived = false;
+        this.model.archived = !this.model.archived;
 
         this.render();
     }

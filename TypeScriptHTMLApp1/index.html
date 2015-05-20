@@ -297,9 +297,15 @@
                     <small class="time"> (added <%= createdDate %>) </small>
                 </h3>
             </div>
-            <div>
-                Progress: <%= doneCount %>/<%= totalCount %>
-            </div>
+            <% if (archived) { %>
+                <div>
+                    This todo is currently archived. You can locate it (and remove it permanently) in the archive tab.
+                </div>
+            <% } else { %>
+                <div>
+                    Progress: <%= doneCount %>/<%= totalCount %>
+                </div>
+            <% } %>
 
             <% if (isEditingContent) { %>
                 <div class="content-input-js">

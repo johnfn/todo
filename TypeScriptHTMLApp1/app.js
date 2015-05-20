@@ -729,7 +729,7 @@ var TodoDetailView = (function (_super) {
         TodoDetailView.instance = this;
     };
     TodoDetailView.prototype.unarchiveTodo = function () {
-        this.model.archived = false;
+        this.model.archived = !this.model.archived;
         this.render();
     };
     Object.defineProperty(TodoDetailView.prototype, "model", {
