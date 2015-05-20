@@ -2,6 +2,36 @@
     box-sizing: border-box;
 }
 
+.my-btn-primary {
+    background-color: rgb(67, 182, 147);
+    border: 0;
+    background-image: none;
+
+    transition: all .2s ease-in;
+}
+
+.my-btn-primary:hover {
+    background-color: rgb(37, 152, 117);
+
+    transition: all .2s ease-in;
+}
+
+.my-btn-default {
+    border: 1px solid gray;
+    background-image: none;
+    background-color: rgb(255, 255, 255);
+
+    transition: all .2s ease-in;
+}
+
+.my-btn-default:hover {
+    border: 1px solid gray;
+    background-image: none;
+    background-color: rgb(246, 246, 246);
+
+    transition: all .2s ease-in;
+}
+
 .title {
     color: #fff;
     font-family: 'Open Sans', sans-serif;
