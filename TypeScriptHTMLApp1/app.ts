@@ -5,6 +5,7 @@
 //   * Getting the proper dates is a lil tricky -_-
 //   * The 'This is currently archived' text looks bad. meh
 // * Autocomplete: highlight the text in the matching tag
+// * Hide kbd shortcuts before logged in.
 // * There is no logo lawl
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs

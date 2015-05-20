@@ -2,6 +2,10 @@
     box-sizing: border-box;
 }
 
+form {
+    padding-bottom: 10px;
+}
+
 .my-btn-primary {
     background-color: rgb(67, 182, 147);
     border: 0;
@@ -554,8 +558,9 @@ input[type=text] {
     background-color: white;
 }
 
-.generic-dialog .h2 {
-    padding-bottom: 10px;
+.dialog-header {
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .explanation {
