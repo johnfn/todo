@@ -5,6 +5,10 @@
 // * (and dont show his name).
 // * Arrow keys don't skip archived items
 // * tags look so ugly lawl
+// * Archived checkbox is broken
+// * Tooltips that indicate what stuff does
+//   * The O on the side of TODOs
+//   * Everything in the toolbox menu.
 
 declare var require;
 
@@ -1702,12 +1706,17 @@ class MainView extends Backbone.View<TodoAppModel> {
         this.savedData.load();
 
         /*
-        this.initializeTodoTree(this.savedData.load());
+            This code will load our todo tree from localStorage:
+
+            this.initializeTodoTree(this.savedData.load());
         */
 
         _.defer(() => {
             this.initializeTodoTree(User.currentUser.content);
             this.render();
+
+            // Start out zoomed in, so that the outermost todo is not visible.
+            this.zoomTo(this.model.currentTodoView.childrenViews[0]);
         })
 
         this.listenTo(this.model, 'change:currentTodoView', this.render);
