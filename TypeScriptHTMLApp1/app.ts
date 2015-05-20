@@ -1,8 +1,9 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * I don't even think you can remove archived items any more. hurf
+// * I don't even think you can remove archived items any more.
 //   * Also, the dates are whack.
+//   * Getting the proper dates is a lil tricky -_-
 //   * The 'x' doesn't follow.
 //   * The 'This is currently archived' text looks bad. meh
 // * Autocomplete: highlight the matching tag

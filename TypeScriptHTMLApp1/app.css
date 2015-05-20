@@ -246,6 +246,10 @@ a.zoom-selected {
     list-style-type: none;
 }
 
+.todo-archive-list div {
+    position: relative;
+}
+
 .hidden-ellipses {
     border: 1px solid #8D8D8D;
     border-radius: 3px;
