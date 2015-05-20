@@ -447,6 +447,11 @@ a.autocomplete-item {
     padding-right: 4px;
 }
 
+.tag-container {
+    z-index: 10;
+    position: absolute;
+}
+
 .tag-container > a, .tag {
     color: white;
     background-color: rgb(59, 203, 160);
@@ -454,8 +459,6 @@ a.autocomplete-item {
     padding: 3px;
     margin-left: 4px;
     border-radius: 3px;
-    position: absolute;
-    z-index: 10;
 }
 
 .tagname {

@@ -1,9 +1,7 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Clicking on tags should add their name to search.
-//   * And, actually open the search box... -_-
-//   * Cant see the text
+// * Clicking on tags
 //   * Cant click on the textbox to focus it
 // * Can't make multiple tags now...
 // * Autocomplete: highlight the text in the matching tag
@@ -17,6 +15,7 @@
 // * Should only show 'this is currently archived' if you're on the wrong tab
 // * Should show a different message if you're looking at an unarchived item from the archive tab.
 // * You can press up from the highest thing.
+// * Clicking should take you out of the search
 
 declare var require;
 

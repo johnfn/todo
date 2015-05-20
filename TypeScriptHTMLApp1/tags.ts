@@ -49,7 +49,11 @@ class TagView extends Backbone.View<TagModel> {
     }
 
     searchForThisTag(e: JQueryMouseEventObject) {
-        $('.search-input').val(this.model.name).focus();
+        var $search = $('.search-input').val(this.model.name).focus();
+
+        _.defer(() => {
+            $search.trigger('keyup');
+        });
     }
 
     clickRemoveTag(e: JQueryMouseEventObject) {

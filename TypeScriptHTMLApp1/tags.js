@@ -55,7 +55,10 @@ var TagView = (function (_super) {
         };
     };
     TagView.prototype.searchForThisTag = function (e) {
-        $('.search-input').val(this.model.name).focus();
+        var $search = $('.search-input').val(this.model.name).focus();
+        _.defer(function () {
+            $search.trigger('keyup');
+        });
     };
     TagView.prototype.clickRemoveTag = function (e) {
         this.trigger('remove-tag');
