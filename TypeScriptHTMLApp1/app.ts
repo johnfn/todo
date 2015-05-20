@@ -4,7 +4,7 @@
 // * By default, zoom into the first guy
 // * (and dont show his name).
 // * Arrow keys don't skip archived items
-//
+// * tags look so ugly lawl
 
 declare var require;
 
@@ -1300,8 +1300,8 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         // TODO ?
-        // window['keyboardShortcuts'].setModel(this.uiState);
-        // window['keyboardShortcuts'].render();
+        window['keyboardShortcuts'].setModel(this.uiState);
+        window['keyboardShortcuts'].render();
 
         if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
             TodoDetailView.instance.model = this.model;

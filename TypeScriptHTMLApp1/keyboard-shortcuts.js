@@ -1,3 +1,8 @@
+// * show keyboard shortcuts
+//   * Search shortcuts
+//   * tag shortcuts
+//   * collapse/show shortcut dialog
+//   * optimize so it's only called once, not O(n) times -_-
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -12,6 +17,7 @@ var KeyboardShortcuts = (function (_super) {
     KeyboardShortcuts.prototype.initialize = function () {
         this.normalShortcuts = Util.getTemplate('normal-shortcuts');
         this.editingShortcuts = Util.getTemplate('editing-shortcuts');
+        this.tagShortcuts = Util.getTemplate('tag-shortcuts');
         this.setElement($('.shortcuts-js'));
     };
     KeyboardShortcuts.prototype.setModel = function (model) {
@@ -20,7 +26,10 @@ var KeyboardShortcuts = (function (_super) {
     };
     KeyboardShortcuts.prototype.render = function () {
         var keyboardShortcutTemplate;
-        if (this.model.isEditing) {
+        if (this.model.view.tagList.currentlyEditing()) {
+            keyboardShortcutTemplate = this.tagShortcuts;
+        }
+        else if (this.model.isEditing) {
             keyboardShortcutTemplate = this.editingShortcuts;
         }
         else {

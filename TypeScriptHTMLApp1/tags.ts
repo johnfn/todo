@@ -73,7 +73,7 @@ class TagView extends Backbone.View<TagModel> {
     render(): TagView {
         var renderOptions = this.model.toJSON();
         renderOptions['isBeingEdited'] = this.isBeingEdited;
-        
+
         this.$el.html(this.template(renderOptions));
         this.delegateEvents();
 
@@ -104,7 +104,7 @@ class TagListView extends Backbone.View<Backbone.Model> {
             this.tagViews = _.filter(this.tagViews,(view) => view.model != model);
             this.render();
         });
-        
+
         this.tags.each((m, i) => {
             this.addTagView(m, false);
         });
