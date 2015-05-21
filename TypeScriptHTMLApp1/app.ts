@@ -2,7 +2,6 @@
 
 // TODO
 // * There is no logo lawl
-// * CSS issue: right bar doesn't go all the way to bottom
 // * The 'invisible' O's are actually visible when you select their parent
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
