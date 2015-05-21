@@ -1,11 +1,11 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * When you click O to zoom, it auto-starts editing.
 // * email@domain.com
 // * Don't collapse the topmost todo! Ugh.
 // * Search is only up to date with the time you opened the todo list.
 // * Hide kbd shortcuts before logged in.
+// * Tags jar awkwardly in the search now.
 // * There is no logo lawl
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
@@ -1107,6 +1107,8 @@ class TodoView extends Backbone.View<TodoModel> {
 
     zoomToTodo() {
         this.mainView.zoomTo(this);
+
+        return false;
     }
 
     private clickRemoveTodo() {

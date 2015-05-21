@@ -1052,6 +1052,7 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.zoomToTodo = function () {
         this.mainView.zoomTo(this);
+        return false;
     };
     TodoView.prototype.clickRemoveTodo = function () {
         // Can't archive topmost todo.
