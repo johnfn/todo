@@ -1606,7 +1606,8 @@ var TopBarView = (function (_super) {
         return false;
     };
     TopBarView.prototype.render = function () {
-        this.$el.html(this.template(this.model.toJSON()));
+        var renderOpts = _.extend({}, this.model.toJSON(), User.currentUser.toJSON());
+        this.$el.html(this.template(renderOpts));
         var breadcrumbView = new BreadcrumbModel({
             model: this.model,
             el: this.$('.breadcrumb-container')

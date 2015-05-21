@@ -1,7 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * email@domain.com
 // * Don't collapse the topmost todo! Ugh.
 // * Search is only up to date with the time you opened the todo list.
 // * Hide kbd shortcuts before logged in.
@@ -1711,7 +1710,9 @@ class TopBarView extends Backbone.View<TodoAppModel> {
     }
 
     render(): TopBarView {
-        this.$el.html(this.template(this.model.toJSON()));
+        var renderOpts = _.extend({}, this.model.toJSON(), User.currentUser.toJSON());
+
+        this.$el.html(this.template(renderOpts));
 
         var breadcrumbView = new BreadcrumbModel({
             model: this.model,
