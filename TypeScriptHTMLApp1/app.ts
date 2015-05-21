@@ -1,7 +1,7 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Search is only up to date with the time you opened the todo list.
+// * Autocomp selection is held over from prev
 // * Ctrl + shortcuts are borked with several sections.
 // * Hide kbd shortcuts before logged in.
 // * Tags jar awkwardly in the search now.
@@ -1186,6 +1186,7 @@ class TodoView extends Backbone.View<TodoModel> {
     /** Add childModel as a child of this view. */
     addChildTodo(childModel: TodoModel, index: number = -1) {
         childModel.parent = this.model;
+        childModel.depth = this.model.depth + 1;
 
         var newView = new TodoView(<any> { model: childModel, mainView: this.mainView });
         index = index !== -1 ? index : this.childrenViews.length;

@@ -1112,6 +1112,7 @@ var TodoView = (function (_super) {
     TodoView.prototype.addChildTodo = function (childModel, index) {
         if (index === void 0) { index = -1; }
         childModel.parent = this.model;
+        childModel.depth = this.model.depth + 1;
         var newView = new TodoView({ model: childModel, mainView: this.mainView });
         index = index !== -1 ? index : this.childrenViews.length;
         this.childrenViews.splice(index, 0, newView);
