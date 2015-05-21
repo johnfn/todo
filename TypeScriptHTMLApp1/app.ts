@@ -1,7 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Hide kbd shortcuts before logged in.
 // * Tags jar awkwardly in the search now.
 // * There is no logo lawl
 // * CSS issue: right bar doesn't go all the way to bottom

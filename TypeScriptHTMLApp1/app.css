@@ -461,8 +461,12 @@ a.autocomplete-item {
     border-radius: 3px;
 }
 
-.tagname {
-    color: black;
+input[type=text].tagname {
+    color: white;
+    height: inherit;
+    background-color: rgb(98, 160, 141);
+    font-size: 12px;
+    border: none;
 }
 
 .tag.selected {
