@@ -485,6 +485,7 @@ a.autocomplete-item {
 
 .remove-tag:hover {
     color: red;
+    text-decoration: none;
 }
 
 .my-checkbox {
