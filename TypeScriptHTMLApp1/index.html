@@ -148,7 +148,7 @@
 
         <% if (selected) { %>
             <span class="toolbar">
-                <a href="#" class="todo-remove-js"> x </a>
+                <a href="#" class="todo-remove-js" data-toggle="tooltip" data-placement="bottom" title="Permanently delete"> x </a>
             </span>
         <% } %>
     </script>
@@ -185,7 +185,7 @@
                         <input class='name-edit' />
                     <% } else { %>
                         <% if (!topmostTodo) { %>
-                            <a href="#" class="todo-zoom-js <% if (selected) print('zoom-selected') %>">O</a>
+                            <a href="#" class="todo-zoom-js <% if (selected) print('zoom-selected') %>" data-toggle="tooltip" data-placement="bottom" title="Zoom">O</a>
                         <% } %>
 
                         <% if (starred) { %>
@@ -224,15 +224,15 @@
 
 				<% if (selected) { %>
 					<span class="toolbar">
-						<a href="#" class="todo-add-js"> + </a>
+						<a href="#" class="todo-add-js" data-toggle="tooltip" data-placement="bottom" title="Add"> + </a>
                         <% if (!isHeader) { %>
-                            <a href="#" class="todo-set-starred-js">
+                            <a href="#" class="todo-set-starred-js" data-toggle="tooltip" data-placement="bottom" title="<%= starred ? "Deprioritize" : "Prioritize" %> this todo."">
                                 <i class="fa fa-star<%= starred ? '' : '-o' %>"></i>
                             </a>
                         <% } %>
-						<a href="#" class="todo-remove-js"> - </a>
+						<a href="#" class="todo-remove-js" data-toggle="tooltip" data-placement="bottom" title="Archive"> x </a>
 						<% if (numActiveChildren > 0) { %>
-							<a href="#" class="todo-hide-js"> <%= collapsed ? '[+]' : '[-]' %> </a>
+							<a href="#" class="todo-hide-js" data-toggle="tooltip" data-placement="bottom" title="<%= collapsed ? "Expand" : "Collapse" %>"> <%= collapsed ? '[+]' : '[-]' %> </a>
 						<% } %>
 					</span>
 				<% } %>

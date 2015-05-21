@@ -1059,6 +1059,9 @@ var TodoView = (function (_super) {
         if (!this.model.parent) {
             return false;
         }
+        // If we delete the owner of a tooltip, the tooltip will hang around awkwardly
+        // until we manually dismiss it.
+        $('.tooltip').hide();
         this.model.archived = true;
         this.model.parent.view.render();
         // TODO: Reincorporate this code once I do full on deletion.
@@ -1066,6 +1069,9 @@ var TodoView = (function (_super) {
         return false;
     };
     TodoView.prototype.clickHideTodo = function () {
+        // If we delete the owner of a tooltip, the tooltip will hang around awkwardly
+        // until we manually dismiss it.
+        $('.tooltip').hide();
         this.uiState.collapsed = !this.uiState.collapsed;
         this.render();
         return false;
@@ -1225,10 +1231,12 @@ var TodoView = (function (_super) {
         if (this.uiState.addTodoVisible) {
             this.$('.name').focus();
         }
-        // TODO ?
         if (this.uiState.selected) {
             window['keyboardShortcuts'].setModel(this.uiState);
             window['keyboardShortcuts'].render();
+            $('[data-toggle="tooltip"]').tooltip({
+                container: "body" // Necessary because otherwise the tooltip width is constrained to the width of the parent
+            });
         }
         if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
             TodoDetailView.instance.model = this.model;

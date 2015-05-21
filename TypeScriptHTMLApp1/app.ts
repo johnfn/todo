@@ -2,10 +2,7 @@
 
 // TODO
 // * There is no logo lawl
-// * The 'invisible' O's are actually visible when you select their parent
-// * Tooltips that indicate what stuff does
-//   * The O on the side of TODOs
-//   * Everything in the toolbox menu.
+// * Clicking on prioritized TODOs doesn't work any more...
 // * show keyboard shortcuts
 //   * Search shortcuts
 //   * collapse/show shortcut dialog
@@ -1119,6 +1116,10 @@ class TodoView extends Backbone.View<TodoModel> {
             return false;
         }
 
+        // If we delete the owner of a tooltip, the tooltip will hang around awkwardly
+        // until we manually dismiss it.
+        $('.tooltip').hide();
+
         this.model.archived = true;
         this.model.parent.view.render();
 
@@ -1129,6 +1130,10 @@ class TodoView extends Backbone.View<TodoModel> {
     }
 
     private clickHideTodo() {
+        // If we delete the owner of a tooltip, the tooltip will hang around awkwardly
+        // until we manually dismiss it.
+        $('.tooltip').hide();
+
         this.uiState.collapsed = !this.uiState.collapsed;
 
         this.render();
@@ -1330,10 +1335,13 @@ class TodoView extends Backbone.View<TodoModel> {
             this.$('.name').focus();
         }
 
-        // TODO ?
         if (this.uiState.selected) {
             window['keyboardShortcuts'].setModel(this.uiState);
             window['keyboardShortcuts'].render();
+
+            $('[data-toggle="tooltip"]').tooltip({
+                container: "body" // Necessary because otherwise the tooltip width is constrained to the width of the parent
+            });
         }
 
         if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
