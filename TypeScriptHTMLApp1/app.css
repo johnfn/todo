@@ -469,6 +469,22 @@ input[type=text].tagname {
     border: none;
 }
 
+input[type=text].tagname::-webkit-input-placeholder {
+   color: rgb(239, 239, 239);
+}
+
+input[type=text].tagname:-moz-placeholder { /* Firefox 18- */
+   color: rgb(239, 239, 239);
+}
+
+input[type=text].tagname::-moz-placeholder {  /* Firefox 19+ */
+   color: rgb(239, 239, 239);
+}
+
+input[type=text].tagname:-ms-input-placeholder {
+   color: rgb(239, 239, 239);
+}
+
 .tag.selected {
     border: 2px solid black;
 }

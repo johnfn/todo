@@ -2,6 +2,7 @@
 
 // TODO
 // * Tags jar awkwardly in the search now.
+// * Typing slash in tag edit still causes you to go to search
 // * There is no logo lawl
 // * CSS issue: right bar doesn't go all the way to bottom
 // * Tooltips that indicate what stuff does
