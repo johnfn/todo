@@ -193,13 +193,14 @@ a {
 .todo-zoom-js {
     position: absolute;
     left: -20px;
-    color: white;
+    display: none;
 }
 
 a.zoom-selected {
     color: black;
     width: 20px;
     text-decoration: none;
+    display: inline;
 }
 
 .todo-header {
