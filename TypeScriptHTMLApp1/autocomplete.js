@@ -12,6 +12,7 @@ var AutocompleteItem = (function (_super) {
         this.todo = todo;
         this.typeOfMatch = type;
         this.subtypeOfMatch = subtypeOfMatch;
+        this.shortcutNumber = -1;
         this.startPosition = startPosition;
         this.endPosition = endPosition;
         if (type === "name") {
@@ -66,6 +67,12 @@ var AutocompleteItem = (function (_super) {
         get: function () {
             return this.matchedString.substring(this.endPosition);
         },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AutocompleteItem.prototype, "shortcutNumber", {
+        get: function () { return this.get('shortcutNumber'); },
+        set: function (value) { this.set('shortcutNumber', value); },
         enumerable: true,
         configurable: true
     });
@@ -228,14 +235,21 @@ var AutocompleteResult = (function (_super) {
                 continue;
             }
         }
+        var shortcut = 0;
         for (var name in sections) {
             var items = sections[name];
             if (items.length == 0)
                 continue;
+            // Only add headings that actually have items in them
             this.add(new AutocompleteSection({
                 headingName: name,
                 items: new AutocompleteSectionItems(sections[name])
             }));
+            // Also, associate shortcuts with items.
+            for (var i = 0; i < sections[name].length; i++) {
+                shortcut++;
+                sections[name][i].shortcutNumber = shortcut == 10 ? 0 : shortcut;
+            }
         }
     };
     return AutocompleteResult;

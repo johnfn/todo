@@ -357,7 +357,7 @@
                         <%= item.todo.name %>
                     <% } %>
 
-                    <span class="kbd-shortcut">ctrl + <%= i + 1 == 10 ? 0 : i + 1 %></span>
+                    <span class="kbd-shortcut">ctrl + <%= item.shortcutNumber %></span>
 
                     <% if (item.typeOfMatch == "tag") { %>
                         <div class="tag-container">

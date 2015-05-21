@@ -5,6 +5,7 @@
         this.todo = todo;
         this.typeOfMatch = type;
         this.subtypeOfMatch = subtypeOfMatch;
+        this.shortcutNumber = -1;
 
         this.startPosition = startPosition;
         this.endPosition = endPosition;
@@ -56,6 +57,9 @@
     get endOfMatchString(): string {
         return this.matchedString.substring(this.endPosition);
     }
+
+    get shortcutNumber(): number { return this.get('shortcutNumber'); }
+    set shortcutNumber(value: number) { this.set('shortcutNumber', value); }
 
     get typeOfMatch(): string { return this.get('typeOfMatch'); }
     set typeOfMatch(value: string) { this.set('typeOfMatch', value); }
@@ -218,15 +222,25 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
             }
         }
 
+        var shortcut = 0;
+
         for (var name in sections) {
             var items = sections[name];
 
             if (items.length == 0) continue;
 
+            // Only add headings that actually have items in them
             this.add(new AutocompleteSection({
                 headingName: name,
                 items: new AutocompleteSectionItems(sections[name])
             }));
+
+            // Also, associate shortcuts with items.
+            for (var i = 0; i < sections[name].length; i++) {
+                shortcut++;
+
+                sections[name][i].shortcutNumber = shortcut == 10 ? 0 : shortcut;
+            }
         }
     }
 }
