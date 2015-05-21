@@ -1,8 +1,7 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Autocomplete: highlight the text in the matching tag
-// * Ctrl + 10 - what? No.
+// * When you click O to zoom, it auto-starts editing.
 // * email@domain.com
 // * Don't collapse the topmost todo! Ugh.
 // * Search is only up to date with the time you opened the todo list.
@@ -17,6 +16,7 @@
 // * Should show a different message if you're looking at an unarchived item from the archive tab.
 // * You can press up from the highest thing.
 // * Clicking should take you out of the search
+// * Autocomplete: highlight the text in the matching tag
 
 declare var require;
 

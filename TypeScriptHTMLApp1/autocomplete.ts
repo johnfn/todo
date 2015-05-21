@@ -130,7 +130,7 @@ class AutocompleteSectionView extends Backbone.View<AutocompleteSection> {
     }
 }
 
-/** The *entire* autocomplete result - currently just composed of many 
+/** The *entire* autocomplete result - currently just composed of many
     sections. */
 class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
     appModel: TodoAppModel;
