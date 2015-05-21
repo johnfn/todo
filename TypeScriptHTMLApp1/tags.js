@@ -80,7 +80,7 @@ var TagView = (function (_super) {
             this.trigger('finish-adding');
             return true;
         }
-        return false;
+        return this.isBeingEdited;
     };
     TagView.prototype.render = function () {
         var renderOptions = this.model.toJSON();

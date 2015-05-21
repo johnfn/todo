@@ -1,20 +1,25 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Tags jar awkwardly in the search now.
-// * Typing slash in tag edit still causes you to go to search
 // * There is no logo lawl
 // * CSS issue: right bar doesn't go all the way to bottom
+// * The 'invisible' O's are actually visible when you select their parent
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.
-// * Deleting a tag trigged done no less than 17 times
+// * show keyboard shortcuts
+//   * Search shortcuts
+//   * collapse/show shortcut dialog
+//   * 'See all items' shortcuts (dont think there are any, but say something...)
+// * So does registration
 // * Progress could just be a progress bar...
 // * Should only show 'this is currently archived' if you're on the wrong tab
 // * Should show a different message if you're looking at an unarchived item from the archive tab.
 // * You can press up from the highest thing.
 // * Clicking should take you out of the search
 // * Loading...
+// * Tour?
+// * Deleting a tag trigged done no less than 17 times
 
 declare var require;
 

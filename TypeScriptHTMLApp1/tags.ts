@@ -82,7 +82,7 @@ class TagView extends Backbone.View<TagModel> {
             return true;
         }
 
-        return false;
+        return this.isBeingEdited;
     }
 
     render(): TagView {

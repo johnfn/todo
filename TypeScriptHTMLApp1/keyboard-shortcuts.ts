@@ -1,11 +1,4 @@
-﻿// * show keyboard shortcuts
-//   * Search shortcuts
-//   * tag shortcuts
-//   * collapse/show shortcut dialog
-//   * optimize so it's only called once, not O(n) times -_-
-//   * 'See all items' shortcuts (dont think there are any, but say something...)
-
-class KeyboardShortcuts extends Backbone.View<TodoUiState> {
+﻿class KeyboardShortcuts extends Backbone.View<TodoUiState> {
     normalShortcuts: ITemplate;
     editingShortcuts: ITemplate;
     tagShortcuts: ITemplate;
