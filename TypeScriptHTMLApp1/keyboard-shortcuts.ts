@@ -10,10 +10,14 @@ class KeyboardShortcuts extends Backbone.View<TodoUiState> {
     editingShortcuts: ITemplate;
     tagShortcuts: ITemplate;
 
+    shortcutTop: ITemplate;
+
     initialize() {
         this.normalShortcuts = Util.getTemplate('normal-shortcuts');
         this.editingShortcuts = Util.getTemplate('editing-shortcuts');
         this.tagShortcuts = Util.getTemplate('tag-shortcuts');
+
+        this.shortcutTop = Util.getTemplate('keyboard-shortcuts-top')
 
         this.setElement($('.shortcuts-js'));
     }
@@ -27,6 +31,8 @@ class KeyboardShortcuts extends Backbone.View<TodoUiState> {
     render() {
         var keyboardShortcutTemplate: ITemplate;
 
+        console.log('call lol');
+
         if (this.model.view.tagList.currentlyEditing()) {
             keyboardShortcutTemplate = this.tagShortcuts;
         } else if (this.model.isEditing) {
@@ -34,6 +40,8 @@ class KeyboardShortcuts extends Backbone.View<TodoUiState> {
         } else {
             keyboardShortcutTemplate = this.normalShortcuts;
         }
+
+        $('.top').html(this.shortcutTop());
 
         this.$el.html(keyboardShortcutTemplate());
 

@@ -19,6 +19,7 @@ var KeyboardShortcuts = (function (_super) {
         this.normalShortcuts = Util.getTemplate('normal-shortcuts');
         this.editingShortcuts = Util.getTemplate('editing-shortcuts');
         this.tagShortcuts = Util.getTemplate('tag-shortcuts');
+        this.shortcutTop = Util.getTemplate('keyboard-shortcuts-top');
         this.setElement($('.shortcuts-js'));
     };
     KeyboardShortcuts.prototype.setModel = function (model) {
@@ -27,6 +28,7 @@ var KeyboardShortcuts = (function (_super) {
     };
     KeyboardShortcuts.prototype.render = function () {
         var keyboardShortcutTemplate;
+        console.log('call lol');
         if (this.model.view.tagList.currentlyEditing()) {
             keyboardShortcutTemplate = this.tagShortcuts;
         }
@@ -36,6 +38,7 @@ var KeyboardShortcuts = (function (_super) {
         else {
             keyboardShortcutTemplate = this.normalShortcuts;
         }
+        $('.top').html(this.shortcutTop());
         this.$el.html(keyboardShortcutTemplate());
         return this;
     };

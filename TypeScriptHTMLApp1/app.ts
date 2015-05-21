@@ -1,7 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Ctrl + shortcuts are borked with several sections.
 // * Hide kbd shortcuts before logged in.
 // * Tags jar awkwardly in the search now.
 // * There is no logo lawl
