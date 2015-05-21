@@ -1,11 +1,12 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Don't collapse the topmost todo! Ugh.
 // * Search is only up to date with the time you opened the todo list.
+// * Ctrl + shortcuts are borked with several sections.
 // * Hide kbd shortcuts before logged in.
 // * Tags jar awkwardly in the search now.
 // * There is no logo lawl
+// * CSS issue: right bar doesn't go all the way to bottom
 // * Tooltips that indicate what stuff does
 //   * The O on the side of TODOs
 //   * Everything in the toolbox menu.

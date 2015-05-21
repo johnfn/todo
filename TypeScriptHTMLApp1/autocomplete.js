@@ -217,11 +217,11 @@ var AutocompleteResult = (function (_super) {
             }
             // Check for a tag match
             var tagMatch = currentTodo.tags.find(function (tag, i) {
-                var match = tag.get('name').toLowerCase().indexOf(search.toLowerCase()) !== -1;
-                if (match) {
-                    sections["Tags"].push(new AutocompleteItem(currentTodo, "tag", 0, 0, i));
+                var match = tag.get('name').toLowerCase().indexOf(search.toLowerCase());
+                if (match !== -1) {
+                    sections["Tags"].push(new AutocompleteItem(currentTodo, "tag", match, match + search.length, i));
                 }
-                return match;
+                return match !== -1;
             });
             if (tagMatch) {
                 ++thingsAdded;

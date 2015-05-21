@@ -200,16 +200,16 @@ class AutocompleteResult extends Backbone.Collection<AutocompleteSection> {
             // Check for a tag match
 
             var tagMatch = currentTodo.tags.find((tag, i) => {
-                var match = tag.get('name').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+                var match = tag.get('name').toLowerCase().indexOf(search.toLowerCase());
 
-                if (match) {
+                if (match !== -1) {
                     sections["Tags"].push(new AutocompleteItem(
                         currentTodo,
                         "tag",
-                        0, 0, i));
+                        match, match + search.length, i));
                 }
 
-                return match;
+                return match !== -1;
             });
 
             if (tagMatch) {
