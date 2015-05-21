@@ -31,8 +31,6 @@ class KeyboardShortcuts extends Backbone.View<TodoUiState> {
     render() {
         var keyboardShortcutTemplate: ITemplate;
 
-        console.log('call lol');
-
         if (this.model.view.tagList.currentlyEditing()) {
             keyboardShortcutTemplate = this.tagShortcuts;
         } else if (this.model.isEditing) {

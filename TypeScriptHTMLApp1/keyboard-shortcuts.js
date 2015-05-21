@@ -28,7 +28,6 @@ var KeyboardShortcuts = (function (_super) {
     };
     KeyboardShortcuts.prototype.render = function () {
         var keyboardShortcutTemplate;
-        console.log('call lol');
         if (this.model.view.tagList.currentlyEditing()) {
             keyboardShortcutTemplate = this.tagShortcuts;
         }

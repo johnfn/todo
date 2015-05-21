@@ -1226,8 +1226,10 @@ var TodoView = (function (_super) {
             this.$('.name').focus();
         }
         // TODO ?
-        window['keyboardShortcuts'].setModel(this.uiState);
-        window['keyboardShortcuts'].render();
+        if (this.uiState.selected) {
+            window['keyboardShortcuts'].setModel(this.uiState);
+            window['keyboardShortcuts'].render();
+        }
         if (updateSidebar && this.uiState.selected && this.$el.is(':visible')) {
             TodoDetailView.instance.model = this.model;
         }
