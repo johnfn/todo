@@ -199,7 +199,9 @@
                                 <%= name %>
 
                                 <% if (collapsed && !searching) { %>
-                                    <a href="#" class="todo-hide-js hidden-ellipses"><%= numActiveTotalChildren %></a>
+                                    <span class='hidden-ellipses'>
+                                        <a href="#" class="todo-hide-js"><%= numActiveTotalChildren %></a>
+                                    </span>
                                 <% } %>
                             </span>
                         <% } else { %>
@@ -362,15 +364,13 @@
                     <span class="kbd-shortcut">ctrl + <%= item.shortcutNumber %></span>
 
                     <% if (item.typeOfMatch == "tag") { %>
-                        <div class="tag-container">
-                            <% item.todo.tags.each(function(tag, i) { %>
-                                <% if (i == item.subtypeOfMatch) { %>
-                                    <span class="tag">
-                        <%= item.startOfMatchString %><span class="autocomplete-match"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
-                                    </span>
-                                <% } %>
-                            <% }); %>
-                        </div>
+                        <% item.todo.tags.each(function(tag, i) { %>
+                            <% if (i == item.subtypeOfMatch) { %>
+                                <span class="tag">
+                                    <%= item.startOfMatchString %><span class="autocomplete-match"><%= item.middleOfMatchString %></span><%= item.endOfMatchString %>
+                                </span>
+                            <% } %>
+                        <% }); %>
                     <% } %>
 
                     <% if (item.typeOfMatch == "content") { %>

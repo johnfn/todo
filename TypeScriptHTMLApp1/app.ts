@@ -14,7 +14,7 @@
 // * Should show a different message if you're looking at an unarchived item from the archive tab.
 // * You can press up from the highest thing.
 // * Clicking should take you out of the search
-// * Autocomplete: highlight the text in the matching tag
+// * Loading...
 
 declare var require;
 
