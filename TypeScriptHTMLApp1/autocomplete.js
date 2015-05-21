@@ -313,6 +313,7 @@ var AutocompleteView = (function (_super) {
         this.$el.toggle(false);
     };
     AutocompleteView.prototype.hide = function () {
+        this.selectionIndex = 0;
         this.$el.toggle(false);
     };
     AutocompleteView.prototype.getAutocompleteResult = function () {

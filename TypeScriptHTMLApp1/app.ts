@@ -1,7 +1,6 @@
 ﻿/// <reference path="./references.d.ts" />
 
 // TODO
-// * Autocomp selection is held over from prev
 // * Ctrl + shortcuts are borked with several sections.
 // * Hide kbd shortcuts before logged in.
 // * Tags jar awkwardly in the search now.

@@ -327,6 +327,7 @@ class AutocompleteView extends Backbone.View<TodoAppModel> {
     }
 
     hide(): void {
+        this.selectionIndex = 0;
         this.$el.toggle(false);
     }
 
