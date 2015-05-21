@@ -1806,7 +1806,10 @@ class MainView extends Backbone.View<TodoAppModel> {
 
         // Subtract 1 because we never want to collapse the root. That's just dumb.
         for (var i = 0; i < todos.length - 1; i++) {
-            if (todos[i].visibleTodosUnder >= collapseThreshold) {
+            var numChildren = todos[i].parent.numActiveChildren;
+
+            if (todos[i].visibleTodosUnder >= collapseThreshold &&
+                numChildren > 1) { // It's a bit silly to collapse a node with no children because you can always just collapse the parent.
                 todos[i].uiState.collapsed = true;
             }
         }

@@ -1685,7 +1685,9 @@ var MainView = (function (_super) {
         var collapseThreshold = 11;
         // Subtract 1 because we never want to collapse the root. That's just dumb.
         for (var i = 0; i < todos.length - 1; i++) {
-            if (todos[i].visibleTodosUnder >= collapseThreshold) {
+            var numChildren = todos[i].parent.numActiveChildren;
+            if (todos[i].visibleTodosUnder >= collapseThreshold &&
+                numChildren > 1) {
                 todos[i].uiState.collapsed = true;
             }
         }
