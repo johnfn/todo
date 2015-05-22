@@ -2,10 +2,9 @@
 
 // TODO
 // * There is no logo lawl
-// * Clicking on prioritized TODOs doesn't work any more...
-// * show keyboard shortcuts
-//   * Search shortcuts
+// * Keyboard shortcuts
 //   * collapse/show shortcut dialog
+//   * Search shortcuts
 //   * 'See all items' shortcuts (dont think there are any, but say something...)
 // * So does registration
 // * Progress could just be a progress bar...
@@ -821,8 +820,8 @@ class TodoView extends Backbone.View<TodoModel> {
 
     scrollToMe() {
         if (this.isVisible()) {
-            $('html, body').animate({
-                scrollTop: this.$el.offset().top
+            $('.inner-scroll').animate({
+                scrollTop: this.$el.offset().top + $('.inner-scroll').scrollTop() - 60
             }, 150);
         } else {
             this.mainView.zoomTo(this);
@@ -1210,8 +1209,6 @@ class TodoView extends Backbone.View<TodoModel> {
         }
 
         this.model.goodTimeToSave();
-
-        this.render();
     }
 
     toggleAddChildTodo(sibling: boolean = true) {
@@ -1260,6 +1257,8 @@ class TodoView extends Backbone.View<TodoModel> {
             });
         }
     }
+
+    public static count = 0;
 
     render(updateSidebar: boolean = true) {
         // If this is not a visible todo, then exit early, because having us

@@ -824,8 +824,8 @@ var TodoView = (function (_super) {
     };
     TodoView.prototype.scrollToMe = function () {
         if (this.isVisible()) {
-            $('html, body').animate({
-                scrollTop: this.$el.offset().top
+            $('.inner-scroll').animate({
+                scrollTop: this.$el.offset().top + $('.inner-scroll').scrollTop() - 60
             }, 150);
         }
         else {
@@ -1130,7 +1130,6 @@ var TodoView = (function (_super) {
             this.model.children.splice(index, 0, childModel);
         }
         this.model.goodTimeToSave();
-        this.render();
     };
     TodoView.prototype.toggleAddChildTodo = function (sibling) {
         if (sibling === void 0) { sibling = true; }
@@ -1277,6 +1276,7 @@ var TodoView = (function (_super) {
             $contentInput.select();
         }
     };
+    TodoView.count = 0;
     return TodoView;
 })(Backbone.View);
 var FooterUiState = (function (_super) {
